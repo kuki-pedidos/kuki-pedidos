@@ -1,279 +1,1447 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>KUKI | Cookies Artesanais</title>
+    <title>KUKI | Faça seu pedido</title>
 
     <meta
         name="description"
-        content="KUKI — Cookies artesanais fresquinhos. Faça seu pedido online."
+        content="Faça seu pedido de cookies artesanais KUKI."
     >
 
     <style>
+
+        /* ==============================
+           RESET
+        ============================== */
+
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #fffaf5;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+
+            background: #faf7f4;
             color: #2b1b14;
+            padding-bottom: 100px;
         }
 
-        header {
+        button {
+            font-family: inherit;
+        }
+
+
+        /* ==============================
+           HEADER
+        ============================== */
+
+        .header {
             background: #2b1b14;
             color: white;
-            padding: 22px 20px;
-            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0,0,0,.15);
         }
 
-        header h1 {
-            font-size: 32px;
-            letter-spacing: 3px;
+        .header-content {
+            max-width: 1100px;
+            margin: auto;
+
+            min-height: 72px;
+
+            padding: 0 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        header p {
-            margin-top: 6px;
+        .logo {
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: 4px;
+        }
+
+        .logo-subtitle {
+            font-size: 12px;
+            opacity: .8;
+            margin-top: 2px;
+        }
+
+        .header-cart {
+            background: #fff;
+            color: #2b1b14;
+
+            border: none;
+            border-radius: 50px;
+
+            padding: 11px 16px;
+
             font-size: 14px;
+            font-weight: 700;
+
+            cursor: pointer;
         }
+
+        .header-cart span {
+            margin-left: 5px;
+        }
+
+
+        /* ==============================
+           CONTAINER
+        ============================== */
 
         .container {
-            width: min(1100px, 92%);
-            margin: 0 auto;
+            width: min(1100px, 94%);
+            margin: auto;
         }
+
+
+        /* ==============================
+           HERO
+        ============================== */
 
         .hero {
-            padding: 45px 0 30px;
-            text-align: center;
+            padding: 38px 0 25px;
         }
 
-        .hero h2 {
-            font-size: 32px;
+        .hero h1 {
+            font-size: clamp(28px, 5vw, 42px);
+            line-height: 1.1;
             margin-bottom: 10px;
         }
 
         .hero p {
-            color: #6f625c;
+            color: #766a64;
+            font-size: 16px;
         }
+
+
+        /* ==============================
+           CATEGORIA
+        ============================== */
+
+        .section-title {
+            font-size: 22px;
+            margin: 10px 0 18px;
+        }
+
+
+        /* ==============================
+           PRODUTOS
+        ============================== */
 
         .produtos {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            padding-bottom: 100px;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 18px;
+
+            padding-bottom: 35px;
         }
 
         .produto {
             background: white;
+
             border-radius: 18px;
-            padding: 20px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+
+            overflow: hidden;
+
+            box-shadow:
+                0 3px 15px rgba(43, 27, 20, .08);
+
+            display: flex;
+            flex-direction: column;
         }
 
+
+        /* FOTO */
+
         .produto-imagem {
-            height: 180px;
-            border-radius: 14px;
-            background: #f1e4d8;
+            width: 100%;
+            height: 240px;
+
+            background: #eee2d8;
+
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 60px;
-            margin-bottom: 15px;
+
+            overflow: hidden;
         }
 
-        .produto h3 {
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-
-        .produto p {
-            color: #766a64;
-            font-size: 14px;
-            min-height: 40px;
-        }
-
-        .preco {
-            font-size: 21px;
-            font-weight: bold;
-            margin: 15px 0;
-        }
-
-        .btn {
+        .produto-imagem img {
             width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+
+            display: block;
+        }
+
+        .cookie-placeholder {
+            font-size: 80px;
+        }
+
+
+        /* INFORMAÇÕES */
+
+        .produto-info {
+            padding: 18px;
+
+            display: flex;
+            flex-direction: column;
+
+            flex: 1;
+        }
+
+        .produto-nome {
+            font-size: 21px;
+            font-weight: 800;
+
+            margin-bottom: 7px;
+        }
+
+        .produto-descricao {
+            font-size: 14px;
+            line-height: 1.45;
+
+            color: #766a64;
+
+            min-height: 42px;
+        }
+
+        .produto-bottom {
+            margin-top: auto;
+            padding-top: 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 12px;
+        }
+
+        .produto-preco {
+            font-size: 21px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+
+        /* ==============================
+           CONTROLE DE QUANTIDADE
+        ============================== */
+
+        .quantidade {
+            display: flex;
+            align-items: center;
+
+            border: 1px solid #ddd3cd;
+
+            border-radius: 10px;
+
+            overflow: hidden;
+        }
+
+        .quantidade button {
+            width: 34px;
+            height: 34px;
+
             border: none;
-            border-radius: 12px;
+
+            background: #f6f1ed;
+
+            color: #2b1b14;
+
+            font-size: 19px;
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        .quantidade span {
+            width: 32px;
+
+            text-align: center;
+
+            font-weight: 700;
+        }
+
+
+        /* ==============================
+           BOTÃO ADICIONAR
+        ============================== */
+
+        .btn-adicionar {
+            width: 100%;
+
+            margin-top: 15px;
+
+            border: none;
+            border-radius: 11px;
+
+            background: #2b1b14;
+            color: white;
+
             padding: 13px;
-            background: #2b1b14;
-            color: white;
-            font-weight: bold;
+
+            font-size: 14px;
+            font-weight: 800;
+
             cursor: pointer;
+
+            transition: .2s;
         }
 
-        .btn:hover {
-            opacity: 0.9;
+        .btn-adicionar:hover {
+            opacity: .88;
+            transform: translateY(-1px);
         }
 
-        .carrinho {
+        .btn-adicionar.adicionado {
+            background: #5d7a45;
+        }
+
+
+        /* ==============================
+           BARRA DO CARRINHO
+        ============================== */
+
+        .carrinho-barra {
             position: fixed;
-            right: 20px;
-            bottom: 20px;
+
+            bottom: 18px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            width: min(600px, 92%);
+
             background: #2b1b14;
             color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 16px 22px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+
+            border-radius: 18px;
+
+            padding: 12px 15px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            box-shadow:
+                0 7px 25px rgba(0,0,0,.25);
+
+            z-index: 200;
         }
 
-        @media (max-width: 600px) {
-            .hero h2 {
-                font-size: 26px;
+        .carrinho-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .carrinho-info small {
+            opacity: .75;
+            font-size: 11px;
+        }
+
+        .carrinho-total {
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .btn-ver-pedido {
+            border: none;
+
+            background: white;
+            color: #2b1b14;
+
+            border-radius: 11px;
+
+            padding: 12px 17px;
+
+            font-weight: 800;
+
+            cursor: pointer;
+        }
+
+
+        /* ==============================
+           MODAL DO PEDIDO
+        ============================== */
+
+        .modal {
+            position: fixed;
+
+            inset: 0;
+
+            background: rgba(0,0,0,.55);
+
+            display: none;
+
+            align-items: flex-end;
+            justify-content: center;
+
+            z-index: 500;
+        }
+
+        .modal.aberto {
+            display: flex;
+        }
+
+        .modal-conteudo {
+            background: #fff;
+
+            width: min(650px, 100%);
+
+            max-height: 90vh;
+
+            border-radius: 22px 22px 0 0;
+
+            padding: 22px;
+
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+        }
+
+        .btn-fechar {
+            width: 38px;
+            height: 38px;
+
+            border: none;
+            border-radius: 50%;
+
+            background: #f0ebe7;
+
+            font-size: 20px;
+
+            cursor: pointer;
+        }
+
+
+        /* ==============================
+           ITENS DO CARRINHO
+        ============================== */
+
+        .item-carrinho {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 14px 0;
+
+            border-bottom: 1px solid #eee;
+        }
+
+        .item-foto {
+            width: 65px;
+            height: 65px;
+
+            border-radius: 12px;
+
+            background: #eee2d8;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+
+            flex-shrink: 0;
+        }
+
+        .item-foto img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-dados {
+            flex: 1;
+        }
+
+        .item-nome {
+            font-weight: 800;
+            margin-bottom: 3px;
+        }
+
+        .item-preco {
+            color: #766a64;
+            font-size: 13px;
+        }
+
+        .item-total {
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .item-remover {
+            border: none;
+
+            background: transparent;
+
+            color: #a33;
+
+            cursor: pointer;
+
+            font-size: 13px;
+        }
+
+
+        /* ==============================
+           TOTAL
+        ============================== */
+
+        .resumo {
+            margin-top: 20px;
+            padding-top: 15px;
+
+            border-top: 2px solid #2b1b14;
+        }
+
+        .resumo-linha {
+            display: flex;
+            justify-content: space-between;
+
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .btn-finalizar {
+            width: 100%;
+
+            margin-top: 20px;
+
+            padding: 16px;
+
+            border: none;
+            border-radius: 13px;
+
+            background: #2b1b14;
+            color: white;
+
+            font-size: 16px;
+            font-weight: 800;
+
+            cursor: pointer;
+        }
+
+
+        /* ==============================
+           VAZIO
+        ============================== */
+
+        .carrinho-vazio {
+            text-align: center;
+
+            padding: 50px 20px;
+
+            color: #766a64;
+        }
+
+        .carrinho-vazio .icone {
+            font-size: 55px;
+            margin-bottom: 12px;
+        }
+
+
+        /* ==============================
+           RESPONSIVO
+        ============================== */
+
+        @media (max-width: 700px) {
+
+            .header-content {
+                min-height: 64px;
+            }
+
+            .logo {
+                font-size: 25px;
+            }
+
+            .logo-subtitle {
+                display: none;
+            }
+
+            .hero {
+                padding: 28px 0 22px;
             }
 
             .produtos {
                 grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .produto {
+                flex-direction: row;
+                align-items: stretch;
+            }
+
+            .produto-imagem {
+                width: 135px;
+                min-width: 135px;
+                height: auto;
+                min-height: 220px;
+            }
+
+            .produto-info {
+                padding: 15px;
+            }
+
+            .produto-nome {
+                font-size: 18px;
+            }
+
+            .produto-descricao {
+                font-size: 13px;
+            }
+
+            .produto-bottom {
+                display: block;
+            }
+
+            .produto-preco {
+                margin-bottom: 10px;
+            }
+
+            .quantidade {
+                width: fit-content;
+            }
+
+            .btn-adicionar {
+                margin-top: 10px;
+                padding: 11px;
+            }
+
+            .carrinho-barra {
+                bottom: 10px;
             }
         }
+
+
+        @media (max-width: 420px) {
+
+            .produto-imagem {
+                width: 115px;
+                min-width: 115px;
+            }
+
+            .produto-info {
+                padding: 13px;
+            }
+
+            .produto-descricao {
+                font-size: 12px;
+            }
+
+            .produto-preco {
+                font-size: 18px;
+            }
+        }
+
     </style>
+
 </head>
+
 
 <body>
 
-<header>
-    <h1>KUKI</h1>
-    <p>Cookies artesanais</p>
+
+<!-- ==============================
+     HEADER
+============================== -->
+
+<header class="header">
+
+    <div class="header-content">
+
+        <div>
+            <div class="logo">KUKI</div>
+            <div class="logo-subtitle">
+                Cookies artesanais
+            </div>
+        </div>
+
+        <button
+            class="header-cart"
+            onclick="abrirCarrinho()"
+        >
+            🛒 Meu pedido
+            <span id="contador-header">0</span>
+        </button>
+
+    </div>
+
 </header>
+
+
+
+<!-- ==============================
+     CONTEÚDO
+============================== -->
 
 <main class="container">
 
+
     <section class="hero">
-        <h2>Escolha seus cookies 🍪</h2>
-        <p>Feitos fresquinhos para você.</p>
-    </section>
 
-    <section class="produtos">
+        <h1>
+            Faça seu pedido 🍪
+        </h1>
 
-        <article class="produto">
-            <div class="produto-imagem">🍪</div>
-
-            <h3>TRADICIONAL</h3>
-
-            <p>
-                Chocolate ao leite e gotas de chocolate.
-            </p>
-
-            <div class="preco">
-                R$ 10,90
-            </div>
-
-            <button class="btn">
-                ADICIONAR
-            </button>
-        </article>
-
-        <article class="produto">
-            <div class="produto-imagem">🍪</div>
-
-            <h3>RED</h3>
-
-            <p>
-                Massa vermelha com muito chocolate branco.
-            </p>
-
-            <div class="preco">
-                R$ 13,90
-            </div>
-
-            <button class="btn">
-                ADICIONAR
-            </button>
-        </article>
-
-        <article class="produto">
-            <div class="produto-imagem">🍪</div>
-
-            <h3>BLACK</h3>
-
-            <p>
-                Massa 100% cacau com chocolate branco e ao leite.
-            </p>
-
-            <div class="preco">
-                R$ 13,90
-            </div>
-
-            <button class="btn">
-                ADICIONAR
-            </button>
-        </article>
-
-        <article class="produto">
-            <div class="produto-imagem">🍪</div>
-
-            <h3>NUTELLA</h3>
-
-            <p>
-                Massa tradicional com muito recheio de Nutella.
-            </p>
-
-            <div class="preco">
-                R$ 15,90
-            </div>
-
-            <button class="btn">
-                ADICIONAR
-            </button>
-        </article>
-
-        <article class="produto">
-            <div class="produto-imagem">🍪</div>
-
-            <h3>BUENO</h3>
-
-            <p>
-                Cookie com recheio cremoso e delicioso.
-            </p>
-
-            <div class="preco">
-                R$ 17,90
-            </div>
-
-            <button class="btn">
-                ADICIONAR
-            </button>
-        </article>
-
-        <article class="produto">
-            <div class="produto-imagem">🍪</div>
-
-            <h3>CREAM</h3>
-
-            <p>
-                Cookie com recheio cremoso e sabor irresistível.
-            </p>
-
-            <div class="preco">
-                R$ 15,90
-            </div>
-
-            <button class="btn">
-                ADICIONAR
-            </button>
-        </article>
+        <p>
+            Escolha seus cookies favoritos e monte seu pedido.
+        </p>
 
     </section>
+
+
+    <h2 class="section-title">
+        Nossos cookies
+    </h2>
+
+
+    <section
+        class="produtos"
+        id="lista-produtos"
+    >
+    </section>
+
 
 </main>
 
-<button class="carrinho">
-    🛒 Carrinho
-</button>
+
+
+<!-- ==============================
+     BARRA DO CARRINHO
+============================== -->
+
+<div class="carrinho-barra">
+
+    <div class="carrinho-info">
+
+        <small>
+            SEU PEDIDO
+        </small>
+
+        <div
+            class="carrinho-total"
+            id="total-barra"
+        >
+            R$ 0,00
+        </div>
+
+    </div>
+
+
+    <button
+        class="btn-ver-pedido"
+        onclick="abrirCarrinho()"
+    >
+        VER PEDIDO
+    </button>
+
+</div>
+
+
+
+<!-- ==============================
+     MODAL
+============================== -->
+
+<div
+    class="modal"
+    id="modal-carrinho"
+>
+
+    <div class="modal-conteudo">
+
+
+        <div class="modal-header">
+
+            <h2>
+                🛒 Meu pedido
+            </h2>
+
+            <button
+                class="btn-fechar"
+                onclick="fecharCarrinho()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div id="itens-carrinho">
+        </div>
+
+
+        <div
+            class="resumo"
+            id="resumo-carrinho"
+        >
+
+            <div class="resumo-linha">
+
+                <span>
+                    Total
+                </span>
+
+                <span id="total-modal">
+                    R$ 0,00
+                </span>
+
+            </div>
+
+
+            <button
+                class="btn-finalizar"
+                onclick="finalizarPedido()"
+            >
+                CONTINUAR PEDIDO
+            </button>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+
+/* ==========================================
+   PRODUTOS TEMPORÁRIOS
+
+   Depois substituiremos por dados
+   vindos do Google Sheets.
+========================================== */
+
+
+const produtos = [
+
+    {
+        id: "1",
+        nome: "TRADICIONAL",
+        descricao: "Chocolate ao leite e gotas de chocolate.",
+        preco: 10.90,
+        imagem: ""
+    },
+
+    {
+        id: "2",
+        nome: "RED",
+        descricao: "Massa vermelha com muito chocolate branco.",
+        preco: 13.90,
+        imagem: ""
+    },
+
+    {
+        id: "3",
+        nome: "BLACK",
+        descricao: "Massa 100% cacau com chocolate branco e ao leite.",
+        preco: 13.90,
+        imagem: ""
+    },
+
+    {
+        id: "4",
+        nome: "NUTELLA",
+        descricao: "Massa tradicional com muito recheio de Nutella.",
+        preco: 15.90,
+        imagem: ""
+    },
+
+    {
+        id: "5",
+        nome: "BUENO",
+        descricao: "Cookie com recheio cremoso e delicioso.",
+        preco: 17.90,
+        imagem: ""
+    },
+
+    {
+        id: "6",
+        nome: "CREAM",
+        descricao: "Cookie com recheio cremoso e sabor irresistível.",
+        preco: 15.90,
+        imagem: ""
+    }
+
+];
+
+
+
+/* ==========================================
+   CARRINHO
+========================================== */
+
+let carrinho = [];
+
+
+
+/* ==========================================
+   FORMATAÇÃO DE DINHEIRO
+========================================== */
+
+function formatarPreco(valor) {
+
+    return valor.toLocaleString(
+        "pt-BR",
+        {
+            style: "currency",
+            currency: "BRL"
+        }
+    );
+
+}
+
+
+
+/* ==========================================
+   RENDERIZAR PRODUTOS
+========================================== */
+
+function renderizarProdutos() {
+
+    const container =
+        document.getElementById(
+            "lista-produtos"
+        );
+
+    container.innerHTML = "";
+
+
+    produtos.forEach(produto => {
+
+        const itemCarrinho =
+            carrinho.find(
+                item => item.id === produto.id
+            );
+
+
+        const quantidade =
+            itemCarrinho
+                ? itemCarrinho.quantidade
+                : 0;
+
+
+        const imagem = produto.imagem
+            ? `
+                <img
+                    src="${produto.imagem}"
+                    alt="${produto.nome}"
+                >
+              `
+            : `
+                <div class="cookie-placeholder">
+                    🍪
+                </div>
+              `;
+
+
+        container.innerHTML += `
+
+            <article class="produto">
+
+
+                <div class="produto-imagem">
+
+                    ${imagem}
+
+                </div>
+
+
+                <div class="produto-info">
+
+
+                    <h3 class="produto-nome">
+                        ${produto.nome}
+                    </h3>
+
+
+                    <p class="produto-descricao">
+                        ${produto.descricao}
+                    </p>
+
+
+                    <div class="produto-bottom">
+
+
+                        <div class="produto-preco">
+                            ${formatarPreco(produto.preco)}
+                        </div>
+
+
+                        <div class="quantidade">
+
+                            <button
+                                onclick="alterarQuantidade('${produto.id}', -1)"
+                            >
+                                −
+                            </button>
+
+                            <span id="qtd-${produto.id}">
+                                ${quantidade}
+                            </span>
+
+                            <button
+                                onclick="alterarQuantidade('${produto.id}', 1)"
+                            >
+                                +
+                            </button>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <button
+                        class="btn-adicionar ${quantidade > 0 ? "adicionado" : ""}"
+                        onclick="adicionarProduto('${produto.id}')"
+                    >
+
+                        ${
+                            quantidade > 0
+                                ? "✓ ADICIONADO"
+                                : "ADICIONAR AO PEDIDO"
+                        }
+
+                    </button>
+
+
+                </div>
+
+
+            </article>
+
+        `;
+
+    });
+
+}
+
+
+
+/* ==========================================
+   ADICIONAR PRODUTO
+========================================== */
+
+function adicionarProduto(id) {
+
+    const produto =
+        produtos.find(
+            item => item.id === id
+        );
+
+
+    if (!produto) {
+        return;
+    }
+
+
+    const existente =
+        carrinho.find(
+            item => item.id === id
+        );
+
+
+    if (existente) {
+
+        existente.quantidade++;
+
+    } else {
+
+        carrinho.push({
+
+            id: produto.id,
+
+            nome: produto.nome,
+
+            preco: produto.preco,
+
+            imagem: produto.imagem,
+
+            quantidade: 1
+
+        });
+
+    }
+
+
+    atualizarCarrinho();
+
+}
+
+
+
+/* ==========================================
+   ALTERAR QUANTIDADE
+========================================== */
+
+function alterarQuantidade(id, valor) {
+
+    const existente =
+        carrinho.find(
+            item => item.id === id
+        );
+
+
+    if (!existente && valor > 0) {
+
+        adicionarProduto(id);
+
+        return;
+
+    }
+
+
+    if (!existente) {
+        return;
+    }
+
+
+    existente.quantidade += valor;
+
+
+    if (existente.quantidade <= 0) {
+
+        carrinho =
+            carrinho.filter(
+                item => item.id !== id
+            );
+
+    }
+
+
+    atualizarCarrinho();
+
+}
+
+
+
+/* ==========================================
+   REMOVER
+========================================== */
+
+function removerProduto(id) {
+
+    carrinho =
+        carrinho.filter(
+            item => item.id !== id
+        );
+
+
+    atualizarCarrinho();
+
+}
+
+
+
+/* ==========================================
+   CALCULAR TOTAL
+========================================== */
+
+function calcularTotal() {
+
+    return carrinho.reduce(
+
+        (total, item) => {
+
+            return total +
+                (item.preco * item.quantidade);
+
+        },
+
+        0
+
+    );
+
+}
+
+
+
+/* ==========================================
+   QUANTIDADE TOTAL
+========================================== */
+
+function calcularQuantidade() {
+
+    return carrinho.reduce(
+
+        (total, item) => {
+
+            return total + item.quantidade;
+
+        },
+
+        0
+
+    );
+
+}
+
+
+
+/* ==========================================
+   ATUALIZAR CARRINHO
+========================================== */
+
+function atualizarCarrinho() {
+
+    renderizarProdutos();
+
+
+    const quantidade =
+        calcularQuantidade();
+
+
+    const total =
+        calcularTotal();
+
+
+    document.getElementById(
+        "contador-header"
+    ).textContent = quantidade;
+
+
+    document.getElementById(
+        "total-barra"
+    ).textContent =
+        formatarPreco(total);
+
+
+    document.getElementById(
+        "total-modal"
+    ).textContent =
+        formatarPreco(total);
+
+
+    renderizarItensCarrinho();
+
+}
+
+
+
+/* ==========================================
+   RENDERIZAR ITENS DO CARRINHO
+========================================== */
+
+function renderizarItensCarrinho() {
+
+    const container =
+        document.getElementById(
+            "itens-carrinho"
+        );
+
+
+    if (carrinho.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="carrinho-vazio">
+
+                <div class="icone">
+                    🍪
+                </div>
+
+                <p>
+                    Seu pedido está vazio.
+                </p>
+
+                <p>
+                    Escolha seus cookies favoritos!
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    carrinho.forEach(item => {
+
+
+        const subtotal =
+            item.preco * item.quantidade;
+
+
+        const imagem = item.imagem
+
+            ? `
+                <img
+                    src="${item.imagem}"
+                    alt="${item.nome}"
+                >
+              `
+
+            : `
+                🍪
+              `;
+
+
+        container.innerHTML += `
+
+            <div class="item-carrinho">
+
+
+                <div class="item-foto">
+                    ${imagem}
+                </div>
+
+
+                <div class="item-dados">
+
+                    <div class="item-nome">
+                        ${item.nome}
+                    </div>
+
+                    <div class="item-preco">
+
+                        ${item.quantidade}
+                        ×
+                        ${formatarPreco(item.preco)}
+
+                    </div>
+
+
+                    <button
+                        class="item-remover"
+                        onclick="removerProduto('${item.id}')"
+                    >
+                        Remover
+                    </button>
+
+                </div>
+
+
+                <div class="item-total">
+
+                    ${formatarPreco(subtotal)}
+
+                </div>
+
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+
+/* ==========================================
+   ABRIR CARRINHO
+========================================== */
+
+function abrirCarrinho() {
+
+    document
+        .getElementById("modal-carrinho")
+        .classList
+        .add("aberto");
+
+
+    renderizarItensCarrinho();
+
+}
+
+
+
+/* ==========================================
+   FECHAR CARRINHO
+========================================== */
+
+function fecharCarrinho() {
+
+    document
+        .getElementById("modal-carrinho")
+        .classList
+        .remove("aberto");
+
+}
+
+
+
+/* ==========================================
+   FINALIZAR
+========================================== */
+
+function finalizarPedido() {
+
+    if (carrinho.length === 0) {
+
+        alert(
+            "Adicione pelo menos um cookie ao pedido."
+        );
+
+        return;
+
+    }
+
+
+    alert(
+        "Perfeito! Agora vamos preencher seus dados para finalizar o pedido."
+    );
+
+}
+
+
+
+/* ==========================================
+   INICIALIZAÇÃO
+========================================== */
+
+renderizarProdutos();
+
+atualizarCarrinho();
+
+
+</script>
+
 
 </body>
+
 </html>
