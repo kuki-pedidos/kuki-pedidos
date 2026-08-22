@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KUKI | Cookies Artesanais</title>
+
+    <meta
+        name="description"
+        content="KUKI — Cookies artesanais fresquinhos. Faça seu pedido online."
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #fffaf5;
+            color: #2b1b14;
+        }
+
+        header {
+            background: #2b1b14;
+            color: white;
+            padding: 22px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 32px;
+            letter-spacing: 3px;
+        }
+
+        header p {
+            margin-top: 6px;
+            font-size: 14px;
+        }
+
+        .container {
+            width: min(1100px, 92%);
+            margin: 0 auto;
+        }
+
+        .hero {
+            padding: 45px 0 30px;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: #6f625c;
+        }
+
+        .produtos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            padding-bottom: 100px;
+        }
+
+        .produto {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .produto-imagem {
+            height: 180px;
+            border-radius: 14px;
+            background: #f1e4d8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .produto h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .produto p {
+            color: #766a64;
+            font-size: 14px;
+            min-height: 40px;
+        }
+
+        .preco {
+            font-size: 21px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .btn {
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            padding: 13px;
+            background: #2b1b14;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .carrinho {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background: #2b1b14;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 16px 22px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            .hero h2 {
+                font-size: 26px;
+            }
+
+            .produtos {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>KUKI</h1>
+    <p>Cookies artesanais</p>
+</header>
+
+<main class="container">
+
+    <section class="hero">
+        <h2>Escolha seus cookies 🍪</h2>
+        <p>Feitos fresquinhos para você.</p>
+    </section>
+
+    <section class="produtos">
+
+        <article class="produto">
+            <div class="produto-imagem">🍪</div>
+
+            <h3>TRADICIONAL</h3>
+
+            <p>
+                Chocolate ao leite e gotas de chocolate.
+            </p>
+
+            <div class="preco">
+                R$ 10,90
+            </div>
+
+            <button class="btn">
+                ADICIONAR
+            </button>
+        </article>
+
+        <article class="produto">
+            <div class="produto-imagem">🍪</div>
+
+            <h3>RED</h3>
+
+            <p>
+                Massa vermelha com muito chocolate branco.
+            </p>
+
+            <div class="preco">
+                R$ 13,90
+            </div>
+
+            <button class="btn">
+                ADICIONAR
+            </button>
+        </article>
+
+        <article class="produto">
+            <div class="produto-imagem">🍪</div>
+
+            <h3>BLACK</h3>
+
+            <p>
+                Massa 100% cacau com chocolate branco e ao leite.
+            </p>
+
+            <div class="preco">
+                R$ 13,90
+            </div>
+
+            <button class="btn">
+                ADICIONAR
+            </button>
+        </article>
+
+        <article class="produto">
+            <div class="produto-imagem">🍪</div>
+
+            <h3>NUTELLA</h3>
+
+            <p>
+                Massa tradicional com muito recheio de Nutella.
+            </p>
+
+            <div class="preco">
+                R$ 15,90
+            </div>
+
+            <button class="btn">
+                ADICIONAR
+            </button>
+        </article>
+
+        <article class="produto">
+            <div class="produto-imagem">🍪</div>
+
+            <h3>BUENO</h3>
+
+            <p>
+                Cookie com recheio cremoso e delicioso.
+            </p>
+
+            <div class="preco">
+                R$ 17,90
+            </div>
+
+            <button class="btn">
+                ADICIONAR
+            </button>
+        </article>
+
+        <article class="produto">
+            <div class="produto-imagem">🍪</div>
+
+            <h3>CREAM</h3>
+
+            <p>
+                Cookie com recheio cremoso e sabor irresistível.
+            </p>
+
+            <div class="preco">
+                R$ 15,90
+            </div>
+
+            <button class="btn">
+                ADICIONAR
+            </button>
+        </article>
+
+    </section>
+
+</main>
+
+<button class="carrinho">
+    🛒 Carrinho
+</button>
+
+</body>
+</html>
