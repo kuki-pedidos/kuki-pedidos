@@ -1,702 +1,567 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>KUKI | Faça seu pedido</title>
-
-    <meta
-        name="description"
-        content="Faça seu pedido de cookies artesanais KUKI."
-    >
-
-    <style>
-
-        /* ==============================
-           RESET
-        ============================== */
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Roboto,
-                Arial,
-                sans-serif;
-
-            background: #faf7f4;
-            color: #2b1b14;
-            padding-bottom: 100px;
-        }
-
-        button {
-            font-family: inherit;
-        }
-
-
-        /* ==============================
-           HEADER
-        ============================== */
-
-        .header {
-            background: #2b1b14;
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 12px rgba(0,0,0,.15);
-        }
-
-        .header-content {
-            max-width: 1100px;
-            margin: auto;
-
-            min-height: 72px;
-
-            padding: 0 20px;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            font-size: 30px;
-            font-weight: 900;
-            letter-spacing: 4px;
-        }
-
-        .logo-subtitle {
-            font-size: 12px;
-            opacity: .8;
-            margin-top: 2px;
-        }
-
-        .header-cart {
-            background: #fff;
-            color: #2b1b14;
-
-            border: none;
-            border-radius: 50px;
-
-            padding: 11px 16px;
-
-            font-size: 14px;
-            font-weight: 700;
-
-            cursor: pointer;
-        }
-
-        .header-cart span {
-            margin-left: 5px;
-        }
-
-
-        /* ==============================
-           CONTAINER
-        ============================== */
-
-        .container {
-            width: min(1100px, 94%);
-            margin: auto;
-        }
-
-
-        /* ==============================
-           HERO
-        ============================== */
-
-        .hero {
-            padding: 38px 0 25px;
-        }
-
-        .hero h1 {
-            font-size: clamp(28px, 5vw, 42px);
-            line-height: 1.1;
-            margin-bottom: 10px;
-        }
-
-        .hero p {
-            color: #766a64;
-            font-size: 16px;
-        }
-
-
-        /* ==============================
-           CATEGORIA
-        ============================== */
-
-        .section-title {
-            font-size: 22px;
-            margin: 10px 0 18px;
-        }
-
-
-        /* ==============================
-           PRODUTOS
-        ============================== */
-
-        .produtos {
-            display: grid;
-
-            grid-template-columns:
-                repeat(2, minmax(0, 1fr));
-
-            gap: 18px;
-
-            padding-bottom: 35px;
-        }
-
-        .produto {
-            background: white;
-
-            border-radius: 18px;
-
-            overflow: hidden;
-
-            box-shadow:
-                0 3px 15px rgba(43, 27, 20, .08);
-
-            display: flex;
-            flex-direction: column;
-        }
-
-
-        /* FOTO */
-
-        .produto-imagem {
-            width: 100%;
-            height: 240px;
-
-            background: #eee2d8;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            overflow: hidden;
-        }
-
-        .produto-imagem img {
-            width: 100%;
-            height: 100%;
-
-            object-fit: cover;
-
-            display: block;
-        }
-
-        .cookie-placeholder {
-            font-size: 80px;
-        }
-
-
-        /* INFORMAÇÕES */
-
-        .produto-info {
-            padding: 18px;
-
-            display: flex;
-            flex-direction: column;
-
-            flex: 1;
-        }
-
-        .produto-nome {
-            font-size: 21px;
-            font-weight: 800;
-
-            margin-bottom: 7px;
-        }
-
-        .produto-descricao {
-            font-size: 14px;
-            line-height: 1.45;
-
-            color: #766a64;
-
-            min-height: 42px;
-        }
-
-        .produto-bottom {
-            margin-top: auto;
-            padding-top: 18px;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            gap: 12px;
-        }
-
-        .produto-preco {
-            font-size: 21px;
-            font-weight: 800;
-            white-space: nowrap;
-        }
-
-
-        /* ==============================
-           CONTROLE DE QUANTIDADE
-        ============================== */
-
-        .quantidade {
-            display: flex;
-            align-items: center;
-
-            border: 1px solid #ddd3cd;
-
-            border-radius: 10px;
-
-            overflow: hidden;
-        }
-
-        .quantidade button {
-            width: 34px;
-            height: 34px;
-
-            border: none;
-
-            background: #f6f1ed;
-
-            color: #2b1b14;
-
-            font-size: 19px;
-            font-weight: 700;
-
-            cursor: pointer;
-        }
-
-        .quantidade span {
-            width: 32px;
-
-            text-align: center;
-
-            font-weight: 700;
-        }
-
-
-        /* ==============================
-           BOTÃO ADICIONAR
-        ============================== */
-
-        .btn-adicionar {
-            width: 100%;
-
-            margin-top: 15px;
-
-            border: none;
-            border-radius: 11px;
-
-            background: #2b1b14;
-            color: white;
-
-            padding: 13px;
-
-            font-size: 14px;
-            font-weight: 800;
-
-            cursor: pointer;
-
-            transition: .2s;
-        }
-
-        .btn-adicionar:hover {
-            opacity: .88;
-            transform: translateY(-1px);
-        }
-
-        .btn-adicionar.adicionado {
-            background: #5d7a45;
-        }
-
-
-        /* ==============================
-           BARRA DO CARRINHO
-        ============================== */
-
-        .carrinho-barra {
-            position: fixed;
-
-            bottom: 18px;
-            left: 50%;
-
-            transform: translateX(-50%);
-
-            width: min(600px, 92%);
-
-            background: #2b1b14;
-            color: white;
-
-            border-radius: 18px;
-
-            padding: 12px 15px;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            box-shadow:
-                0 7px 25px rgba(0,0,0,.25);
-
-            z-index: 200;
-        }
-
-        .carrinho-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .carrinho-info small {
-            opacity: .75;
-            font-size: 11px;
-        }
-
-        .carrinho-total {
-            font-size: 17px;
-            font-weight: 800;
-        }
-
-        .btn-ver-pedido {
-            border: none;
-
-            background: white;
-            color: #2b1b14;
-
-            border-radius: 11px;
-
-            padding: 12px 17px;
-
-            font-weight: 800;
-
-            cursor: pointer;
-        }
-
-
-        /* ==============================
-           MODAL DO PEDIDO
-        ============================== */
-
-        .modal {
-            position: fixed;
-
-            inset: 0;
-
-            background: rgba(0,0,0,.55);
-
-            display: none;
-
-            align-items: flex-end;
-            justify-content: center;
-
-            z-index: 500;
-        }
-
-        .modal.aberto {
-            display: flex;
-        }
-
-        .modal-conteudo {
-            background: #fff;
-
-            width: min(650px, 100%);
-
-            max-height: 90vh;
-
-            border-radius: 22px 22px 0 0;
-
-            padding: 22px;
-
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            margin-bottom: 20px;
-        }
-
-        .modal-header h2 {
-            font-size: 24px;
-        }
-
-        .btn-fechar {
-            width: 38px;
-            height: 38px;
-
-            border: none;
-            border-radius: 50%;
-
-            background: #f0ebe7;
-
-            font-size: 20px;
-
-            cursor: pointer;
-        }
-
-
-        /* ==============================
-           ITENS DO CARRINHO
-        ============================== */
-
-        .item-carrinho {
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-            padding: 14px 0;
-
-            border-bottom: 1px solid #eee;
-        }
-
-        .item-foto {
-            width: 65px;
-            height: 65px;
-
-            border-radius: 12px;
-
-            background: #eee2d8;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            overflow: hidden;
-
-            flex-shrink: 0;
-        }
-
-        .item-foto img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .item-dados {
-            flex: 1;
-        }
-
-        .item-nome {
-            font-weight: 800;
-            margin-bottom: 3px;
-        }
-
-        .item-preco {
-            color: #766a64;
-            font-size: 13px;
-        }
-
-        .item-total {
-            font-weight: 800;
-            white-space: nowrap;
-        }
-
-        .item-remover {
-            border: none;
-
-            background: transparent;
-
-            color: #a33;
-
-            cursor: pointer;
-
-            font-size: 13px;
-        }
-
-
-        /* ==============================
-           TOTAL
-        ============================== */
-
-        .resumo {
-            margin-top: 20px;
-            padding-top: 15px;
-
-            border-top: 2px solid #2b1b14;
-        }
-
-        .resumo-linha {
-            display: flex;
-            justify-content: space-between;
-
-            font-size: 18px;
-            font-weight: 800;
-        }
-
-        .btn-finalizar {
-            width: 100%;
-
-            margin-top: 20px;
-
-            padding: 16px;
-
-            border: none;
-            border-radius: 13px;
-
-            background: #2b1b14;
-            color: white;
-
-            font-size: 16px;
-            font-weight: 800;
-
-            cursor: pointer;
-        }
-
-
-        /* ==============================
-           VAZIO
-        ============================== */
-
-        .carrinho-vazio {
-            text-align: center;
-
-            padding: 50px 20px;
-
-            color: #766a64;
-        }
-
-        .carrinho-vazio .icone {
-            font-size: 55px;
-            margin-bottom: 12px;
-        }
-
-
-        /* ==============================
-           RESPONSIVO
-        ============================== */
-
-        @media (max-width: 700px) {
-
-            .header-content {
-                min-height: 64px;
-            }
-
-            .logo {
-                font-size: 25px;
-            }
-
-            .logo-subtitle {
-                display: none;
-            }
-
-            .hero {
-                padding: 28px 0 22px;
-            }
-
-            .produtos {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .produto {
-                flex-direction: row;
-                align-items: stretch;
-            }
-
-            .produto-imagem {
-                width: 135px;
-                min-width: 135px;
-                height: auto;
-                min-height: 220px;
-            }
-
-            .produto-info {
-                padding: 15px;
-            }
-
-            .produto-nome {
-                font-size: 18px;
-            }
-
-            .produto-descricao {
-                font-size: 13px;
-            }
-
-            .produto-bottom {
-                display: block;
-            }
-
-            .produto-preco {
-                margin-bottom: 10px;
-            }
-
-            .quantidade {
-                width: fit-content;
-            }
-
-            .btn-adicionar {
-                margin-top: 10px;
-                padding: 11px;
-            }
-
-            .carrinho-barra {
-                bottom: 10px;
-            }
-        }
-
-
-        @media (max-width: 420px) {
-
-            .produto-imagem {
-                width: 115px;
-                min-width: 115px;
-            }
-
-            .produto-info {
-                padding: 13px;
-            }
-
-            .produto-descricao {
-                font-size: 12px;
-            }
-
-            .produto-preco {
-                font-size: 18px;
-            }
-        }
-
-    </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>KUKI | Faça seu pedido</title>
+
+<meta name="description"
+      content="Faça seu pedido de cookies artesanais KUKI.">
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --marrom: #321c14;
+    --marrom-claro: #5a3528;
+    --bege: #f8f1e9;
+    --bege-2: #f0e1d1;
+    --branco: #ffffff;
+    --texto: #241713;
+    --cinza: #756a65;
+    --borda: #eadbd0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bege);
+    color: var(--texto);
+}
+
+/* =========================
+   CABEÇALHO
+========================= */
+
+header {
+    background: var(--branco);
+    border-bottom: 1px solid var(--borda);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-inner {
+    max-width: 1200px;
+    margin: auto;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-cookie {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #d69b69;
+    border: 4px solid #c88655;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.logo-cookie::before,
+.logo-cookie::after {
+    content: "";
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #573326;
+}
+
+.logo-cookie::before {
+    top: 10px;
+    left: 10px;
+    box-shadow:
+        18px 3px #573326,
+        7px 18px #573326,
+        25px 21px #573326;
+}
+
+.logo-cookie::after {
+    top: 30px;
+    left: 16px;
+    box-shadow:
+        15px -12px #573326;
+}
+
+.logo-text strong {
+    display: block;
+    font-size: 25px;
+    letter-spacing: 2px;
+}
+
+.logo-text span {
+    display: block;
+    color: var(--cinza);
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.cart-top {
+    background: var(--marrom);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.cart-top:hover {
+    background: var(--marrom-claro);
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+    max-width: 1200px;
+    margin: auto;
+    padding: 38px 20px 25px;
+}
+
+.hero h1 {
+    font-size: 38px;
+    margin-bottom: 8px;
+}
+
+.hero p {
+    color: var(--cinza);
+    font-size: 16px;
+}
+
+/* =========================
+   PRODUTOS
+========================= */
+
+.products {
+    max-width: 1200px;
+    margin: auto;
+    padding: 10px 20px 120px;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.product-card {
+    background: var(--branco);
+    border: 1px solid var(--borda);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(60, 30, 15, 0.06);
+}
+
+.product-image {
+    height: 220px;
+    background: var(--bege-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cookie-placeholder {
+    font-size: 90px;
+}
+
+.product-info {
+    padding: 20px;
+}
+
+.product-name {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.product-description {
+    color: var(--cinza);
+    font-size: 14px;
+    line-height: 1.45;
+    min-height: 42px;
+    margin-bottom: 15px;
+}
+
+.product-price {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+.product-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.quantity {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.quantity button {
+    width: 40px;
+    height: 44px;
+    border: none;
+    background: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.quantity span {
+    min-width: 30px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.add-button {
+    flex: 1;
+    height: 44px;
+    border: none;
+    border-radius: 10px;
+    background: var(--marrom);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.add-button:hover {
+    background: var(--marrom-claro);
+    transform: translateY(-1px);
+}
+
+/* =========================
+   CARRINHO FLUTUANTE
+========================= */
+
+.cart-floating {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    z-index: 200;
+}
+
+.cart-button {
+    border: none;
+    background: var(--marrom);
+    color: white;
+    border-radius: 40px;
+    padding: 16px 22px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(50, 28, 20, .25);
+}
+
+.cart-button:hover {
+    background: var(--marrom-claro);
+}
+
+/* =========================
+   MODAL CARRINHO
+========================= */
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.cart-modal {
+    background: white;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 20px;
+    padding: 25px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    font-size: 25px;
+}
+
+.close-button {
+    border: none;
+    background: #f4eee9;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* =========================
+   ITENS DO CARRINHO
+========================= */
+
+.cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 30px 10px;
+    color: var(--cinza);
+}
+
+.cart-item {
+    border: 1px solid var(--borda);
+    border-radius: 14px;
+    padding: 14px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+}
+
+.cart-item-name {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.cart-item-price {
+    color: var(--cinza);
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cart-item-controls button {
+    border: 1px solid var(--borda);
+    background: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.remove-item {
+    color: #a33;
+    border: none !important;
+}
+
+.cart-total {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--borda);
+    display: flex;
+    justify-content: space-between;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* =========================
+   DADOS DO CLIENTE
+========================= */
+
+.customer-form {
+    margin-top: 25px;
+}
+
+.customer-form h3 {
+    margin-bottom: 15px;
+}
+
+.form-group {
+    margin-bottom: 13px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--borda);
+    border-radius: 9px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: var(--marrom);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+/* =========================
+   FINALIZAR
+========================= */
+
+.finish-button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    background: var(--marrom);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.finish-button:hover {
+    background: var(--marrom-claro);
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media (max-width: 850px) {
+
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .hero h1 {
+        font-size: 32px;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .header-inner {
+        padding: 14px;
+    }
+
+    .logo-text strong {
+        font-size: 21px;
+    }
+
+    .logo-text span {
+        font-size: 11px;
+    }
+
+    .cart-top {
+        padding: 10px 13px;
+        font-size: 12px;
+    }
+
+    .hero {
+        padding: 28px 15px 18px;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    .products {
+        padding: 10px 15px 110px;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .product-image {
+        height: 240px;
+    }
+
+    .cart-floating {
+        right: 15px;
+        bottom: 15px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
 </head>
-
 
 <body>
 
+<!-- =========================
+     CABEÇALHO
+========================= -->
 
-<!-- ==============================
-     HEADER
-============================== -->
+<header>
 
-<header class="header">
+    <div class="header-inner">
 
-    <div class="header-content">
+        <div class="logo">
 
-        <div>
-            <div class="logo">KUKI</div>
-            <div class="logo-subtitle">
-                Cookies artesanais
+            <div class="logo-cookie"></div>
+
+            <div class="logo-text">
+                <strong>KUKI</strong>
+                <span>Cookies Artesanais</span>
             </div>
+
         </div>
 
-        <button
-            class="header-cart"
-            onclick="abrirCarrinho()"
-        >
+        <button class="cart-top" onclick="openCart()">
             🛒 Meu pedido
-            <span id="contador-header">0</span>
+            <span id="topCartCount">0</span>
         </button>
 
     </div>
@@ -704,222 +569,571 @@
 </header>
 
 
+<!-- =========================
+     TÍTULO
+========================= -->
 
-<!-- ==============================
-     CONTEÚDO
-============================== -->
+<section class="hero">
 
-<main class="container">
+    <h1>Faça seu pedido 🍪</h1>
 
+    <p>
+        Escolha seus cookies favoritos e monte seu pedido.
+    </p>
 
-    <section class="hero">
-
-        <h1>
-            Faça seu pedido 🍪
-        </h1>
-
-        <p>
-            Escolha seus cookies favoritos e monte seu pedido.
-        </p>
-
-    </section>
+</section>
 
 
-    <h2 class="section-title">
-        Nossos cookies
-    </h2>
+<!-- =========================
+     PRODUTOS
+========================= -->
+
+<main class="products">
+
+<div class="products-grid">
 
 
-    <section
-        class="produtos"
-        id="lista-produtos"
-    >
-    </section>
+<!-- TRADICIONAL -->
 
+<div class="product-card">
 
-</main>
+    <div class="product-image">
+        <div class="cookie-placeholder">🍪</div>
+    </div>
 
+    <div class="product-info">
 
+        <div class="product-name">
+            TRADICIONAL
+        </div>
 
-<!-- ==============================
-     BARRA DO CARRINHO
-============================== -->
+        <div class="product-description">
+            Chocolate ao leite e gotas de chocolate.
+        </div>
 
-<div class="carrinho-barra">
+        <div class="product-price">
+            R$ 10,90
+        </div>
 
-    <div class="carrinho-info">
+        <div class="product-actions">
 
-        <small>
-            SEU PEDIDO
-        </small>
+            <div class="quantity">
+                <button onclick="changeQty(1,-1)">−</button>
+                <span id="qty-1">0</span>
+                <button onclick="changeQty(1,1)">+</button>
+            </div>
 
-        <div
-            class="carrinho-total"
-            id="total-barra"
-        >
-            R$ 0,00
+            <button class="add-button"
+                    onclick="addProduct(1)">
+                ADICIONAR
+            </button>
+
         </div>
 
     </div>
 
+</div>
 
-    <button
-        class="btn-ver-pedido"
-        onclick="abrirCarrinho()"
-    >
-        VER PEDIDO
+
+<!-- RED -->
+
+<div class="product-card">
+
+    <div class="product-image">
+        <div class="cookie-placeholder">🍪</div>
+    </div>
+
+    <div class="product-info">
+
+        <div class="product-name">
+            RED
+        </div>
+
+        <div class="product-description">
+            Massa vermelha com muito chocolate branco.
+        </div>
+
+        <div class="product-price">
+            R$ 13,90
+        </div>
+
+        <div class="product-actions">
+
+            <div class="quantity">
+                <button onclick="changeQty(2,-1)">−</button>
+                <span id="qty-2">0</span>
+                <button onclick="changeQty(2,1)">+</button>
+            </div>
+
+            <button class="add-button"
+                    onclick="addProduct(2)">
+                ADICIONAR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- BLACK -->
+
+<div class="product-card">
+
+    <div class="product-image">
+        <div class="cookie-placeholder">🍪</div>
+    </div>
+
+    <div class="product-info">
+
+        <div class="product-name">
+            BLACK
+        </div>
+
+        <div class="product-description">
+            Massa 100% cacau com chocolate branco e ao leite.
+        </div>
+
+        <div class="product-price">
+            R$ 13,90
+        </div>
+
+        <div class="product-actions">
+
+            <div class="quantity">
+                <button onclick="changeQty(3,-1)">−</button>
+                <span id="qty-3">0</span>
+                <button onclick="changeQty(3,1)">+</button>
+            </div>
+
+            <button class="add-button"
+                    onclick="addProduct(3)">
+                ADICIONAR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- NUTELLA -->
+
+<div class="product-card">
+
+    <div class="product-image">
+        <div class="cookie-placeholder">🍪</div>
+    </div>
+
+    <div class="product-info">
+
+        <div class="product-name">
+            NUTELLA
+        </div>
+
+        <div class="product-description">
+            Massa tradicional com muito recheio de Nutella.
+        </div>
+
+        <div class="product-price">
+            R$ 15,90
+        </div>
+
+        <div class="product-actions">
+
+            <div class="quantity">
+                <button onclick="changeQty(4,-1)">−</button>
+                <span id="qty-4">0</span>
+                <button onclick="changeQty(4,1)">+</button>
+            </div>
+
+            <button class="add-button"
+                    onclick="addProduct(4)">
+                ADICIONAR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- BUENO -->
+
+<div class="product-card">
+
+    <div class="product-image">
+        <div class="cookie-placeholder">🍪</div>
+    </div>
+
+    <div class="product-info">
+
+        <div class="product-name">
+            BUENO
+        </div>
+
+        <div class="product-description">
+            Cookie com recheio cremoso e delicioso.
+        </div>
+
+        <div class="product-price">
+            R$ 17,90
+        </div>
+
+        <div class="product-actions">
+
+            <div class="quantity">
+                <button onclick="changeQty(5,-1)">−</button>
+                <span id="qty-5">0</span>
+                <button onclick="changeQty(5,1)">+</button>
+            </div>
+
+            <button class="add-button"
+                    onclick="addProduct(5)">
+                ADICIONAR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CREAM -->
+
+<div class="product-card">
+
+    <div class="product-image">
+        <div class="cookie-placeholder">🍪</div>
+    </div>
+
+    <div class="product-info">
+
+        <div class="product-name">
+            CREAM
+        </div>
+
+        <div class="product-description">
+            Cookie com recheio cremoso e sabor irresistível.
+        </div>
+
+        <div class="product-price">
+            R$ 15,90
+        </div>
+
+        <div class="product-actions">
+
+            <div class="quantity">
+                <button onclick="changeQty(6,-1)">−</button>
+                <span id="qty-6">0</span>
+                <button onclick="changeQty(6,1)">+</button>
+            </div>
+
+            <button class="add-button"
+                    onclick="addProduct(6)">
+                ADICIONAR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+</main>
+
+
+<!-- =========================
+     BOTÃO CARRINHO
+========================= -->
+
+<div class="cart-floating">
+
+    <button class="cart-button"
+            onclick="openCart()">
+
+        🛒 Ver pedido
+        (<span id="floatingCartCount">0</span>)
+
     </button>
 
 </div>
 
 
-
-<!-- ==============================
+<!-- =========================
      MODAL
-============================== -->
+========================= -->
 
-<div
-    class="modal"
-    id="modal-carrinho"
->
+<div id="cartModal"
+     class="modal-overlay"
+     onclick="closeOutside(event)">
 
-    <div class="modal-conteudo">
-
+    <div class="cart-modal">
 
         <div class="modal-header">
 
-            <h2>
-                🛒 Meu pedido
-            </h2>
+            <h2>Seu pedido</h2>
 
-            <button
-                class="btn-fechar"
-                onclick="fecharCarrinho()"
-            >
+            <button class="close-button"
+                    onclick="closeCart()">
                 ×
             </button>
 
         </div>
 
 
-        <div id="itens-carrinho">
+        <div id="cartItems"
+             class="cart-items">
+
+            <div class="empty-cart">
+                Seu pedido está vazio.
+            </div>
+
         </div>
 
 
-        <div
-            class="resumo"
-            id="resumo-carrinho"
-        >
+        <div class="cart-total">
 
-            <div class="resumo-linha">
+            <span>Total</span>
 
-                <span>
-                    Total
-                </span>
+            <span id="cartTotal">
+                R$ 0,00
+            </span>
 
-                <span id="total-modal">
-                    R$ 0,00
-                </span>
+        </div>
+
+
+        <!-- DADOS DO CLIENTE -->
+
+        <div class="customer-form">
+
+            <h3>Seus dados</h3>
+
+
+            <div class="form-group">
+
+                <label>
+                    Nome *
+                </label>
+
+                <input
+                    type="text"
+                    id="customerName"
+                    placeholder="Digite seu nome">
 
             </div>
 
 
-            <button
-                class="btn-finalizar"
-                onclick="finalizarPedido()"
-            >
-                CONTINUAR PEDIDO
+            <div class="form-group">
+
+                <label>
+                    WhatsApp *
+                </label>
+
+                <input
+                    type="tel"
+                    id="customerPhone"
+                    placeholder="(85) 99999-9999">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Forma de pagamento
+                </label>
+
+                <select id="payment">
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    <option value="PIX">
+                        PIX
+                    </option>
+
+                    <option value="DINHEIRO">
+                        Dinheiro
+                    </option>
+
+                    <option value="CARTAO">
+                        Cartão na entrega
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Tipo de entrega
+                </label>
+
+                <select id="delivery">
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    <option value="ENTREGA">
+                        Entrega
+                    </option>
+
+                    <option value="RETIRADA">
+                        Retirada na loja
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Endereço
+                </label>
+
+                <input
+                    type="text"
+                    id="address"
+                    placeholder="Rua, avenida...">
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        Número
+                    </label>
+
+                    <input
+                        type="text"
+                        id="number"
+                        placeholder="Número">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Bairro
+                    </label>
+
+                    <input
+                        type="text"
+                        id="neighborhood"
+                        placeholder="Bairro">
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Observação
+                </label>
+
+                <textarea
+                    id="observation"
+                    rows="3"
+                    placeholder="Alguma observação sobre o pedido?"></textarea>
+
+            </div>
+
+
+            <button class="finish-button"
+                    onclick="finishOrder()">
+
+                FINALIZAR PEDIDO
+
             </button>
 
         </div>
-
 
     </div>
 
 </div>
 
 
-
 <script>
 
+/* =========================
+   PRODUTOS
+========================= */
 
-/* ==========================================
-   PRODUTOS TEMPORÁRIOS
+const products = {
 
-   Depois substituiremos por dados
-   vindos do Google Sheets.
-========================================== */
-
-
-const produtos = [
-
-    {
-        id: "1",
-        nome: "TRADICIONAL",
-        descricao: "Chocolate ao leite e gotas de chocolate.",
-        preco: 10.90,
-        imagem: ""
+    1: {
+        id: 1,
+        name: "TRADICIONAL",
+        price: 10.90
     },
 
-    {
-        id: "2",
-        nome: "RED",
-        descricao: "Massa vermelha com muito chocolate branco.",
-        preco: 13.90,
-        imagem: ""
+    2: {
+        id: 2,
+        name: "RED",
+        price: 13.90
     },
 
-    {
-        id: "3",
-        nome: "BLACK",
-        descricao: "Massa 100% cacau com chocolate branco e ao leite.",
-        preco: 13.90,
-        imagem: ""
+    3: {
+        id: 3,
+        name: "BLACK",
+        price: 13.90
     },
 
-    {
-        id: "4",
-        nome: "NUTELLA",
-        descricao: "Massa tradicional com muito recheio de Nutella.",
-        preco: 15.90,
-        imagem: ""
+    4: {
+        id: 4,
+        name: "NUTELLA",
+        price: 15.90
     },
 
-    {
-        id: "5",
-        nome: "BUENO",
-        descricao: "Cookie com recheio cremoso e delicioso.",
-        preco: 17.90,
-        imagem: ""
+    5: {
+        id: 5,
+        name: "BUENO",
+        price: 17.90
     },
 
-    {
-        id: "6",
-        nome: "CREAM",
-        descricao: "Cookie com recheio cremoso e sabor irresistível.",
-        preco: 15.90,
-        imagem: ""
+    6: {
+        id: 6,
+        name: "CREAM",
+        price: 15.90
     }
 
-];
+};
 
 
-
-/* ==========================================
+/* =========================
    CARRINHO
-========================================== */
+========================= */
 
-let carrinho = [];
+let cart = {};
 
 
+/* =========================
+   FORMATAÇÃO
+========================= */
 
-/* ==========================================
-   FORMATAÇÃO DE DINHEIRO
-========================================== */
+function money(value) {
 
-function formatarPreco(valor) {
-
-    return valor.toLocaleString(
+    return value.toLocaleString(
         "pt-BR",
         {
             style: "currency",
@@ -930,518 +1144,532 @@ function formatarPreco(valor) {
 }
 
 
+/* =========================
+   QUANTIDADE NA TELA
+========================= */
 
-/* ==========================================
-   RENDERIZAR PRODUTOS
-========================================== */
+function changeQty(id, amount) {
 
-function renderizarProdutos() {
+    const element =
+        document.getElementById("qty-" + id);
 
-    const container =
-        document.getElementById(
-            "lista-produtos"
-        );
+    let current =
+        parseInt(element.innerText) || 0;
 
-    container.innerHTML = "";
+    current += amount;
 
+    if (current < 0) {
+        current = 0;
+    }
 
-    produtos.forEach(produto => {
-
-        const itemCarrinho =
-            carrinho.find(
-                item => item.id === produto.id
-            );
-
-
-        const quantidade =
-            itemCarrinho
-                ? itemCarrinho.quantidade
-                : 0;
-
-
-        const imagem = produto.imagem
-            ? `
-                <img
-                    src="${produto.imagem}"
-                    alt="${produto.nome}"
-                >
-              `
-            : `
-                <div class="cookie-placeholder">
-                    🍪
-                </div>
-              `;
-
-
-        container.innerHTML += `
-
-            <article class="produto">
-
-
-                <div class="produto-imagem">
-
-                    ${imagem}
-
-                </div>
-
-
-                <div class="produto-info">
-
-
-                    <h3 class="produto-nome">
-                        ${produto.nome}
-                    </h3>
-
-
-                    <p class="produto-descricao">
-                        ${produto.descricao}
-                    </p>
-
-
-                    <div class="produto-bottom">
-
-
-                        <div class="produto-preco">
-                            ${formatarPreco(produto.preco)}
-                        </div>
-
-
-                        <div class="quantidade">
-
-                            <button
-                                onclick="alterarQuantidade('${produto.id}', -1)"
-                            >
-                                −
-                            </button>
-
-                            <span id="qtd-${produto.id}">
-                                ${quantidade}
-                            </span>
-
-                            <button
-                                onclick="alterarQuantidade('${produto.id}', 1)"
-                            >
-                                +
-                            </button>
-
-                        </div>
-
-
-                    </div>
-
-
-                    <button
-                        class="btn-adicionar ${quantidade > 0 ? "adicionado" : ""}"
-                        onclick="adicionarProduto('${produto.id}')"
-                    >
-
-                        ${
-                            quantidade > 0
-                                ? "✓ ADICIONADO"
-                                : "ADICIONAR AO PEDIDO"
-                        }
-
-                    </button>
-
-
-                </div>
-
-
-            </article>
-
-        `;
-
-    });
+    element.innerText = current;
 
 }
 
 
+/* =========================
+   ADICIONAR
+========================= */
 
-/* ==========================================
-   ADICIONAR PRODUTO
-========================================== */
+function addProduct(id) {
 
-function adicionarProduto(id) {
+    const quantityElement =
+        document.getElementById("qty-" + id);
 
-    const produto =
-        produtos.find(
-            item => item.id === id
+    const quantity =
+        parseInt(quantityElement.innerText) || 0;
+
+    if (quantity <= 0) {
+
+        alert(
+            "Escolha pelo menos 1 unidade."
         );
 
-
-    if (!produto) {
         return;
     }
 
 
-    const existente =
-        carrinho.find(
-            item => item.id === id
-        );
+    if (!cart[id]) {
+
+        cart[id] = {
+            ...products[id],
+            quantity: 0
+        };
+
+    }
 
 
-    if (existente) {
+    cart[id].quantity += quantity;
 
-        existente.quantidade++;
+
+    quantityElement.innerText = 0;
+
+
+    updateCart();
+
+    openCart();
+
+}
+
+
+/* =========================
+   ALTERAR NO CARRINHO
+========================= */
+
+function changeCartQty(id, amount) {
+
+    if (!cart[id]) {
+        return;
+    }
+
+    cart[id].quantity += amount;
+
+    if (cart[id].quantity <= 0) {
+
+        delete cart[id];
+
+    }
+
+    updateCart();
+
+}
+
+
+/* =========================
+   REMOVER
+========================= */
+
+function removeProduct(id) {
+
+    delete cart[id];
+
+    updateCart();
+
+}
+
+
+/* =========================
+   ATUALIZAR CARRINHO
+========================= */
+
+function updateCart() {
+
+    const container =
+        document.getElementById("cartItems");
+
+    const ids =
+        Object.keys(cart);
+
+
+    if (ids.length === 0) {
+
+        container.innerHTML = `
+            <div class="empty-cart">
+                Seu pedido está vazio.
+            </div>
+        `;
 
     } else {
 
-        carrinho.push({
+        container.innerHTML = "";
 
-            id: produto.id,
 
-            nome: produto.nome,
+        ids.forEach(id => {
 
-            preco: produto.preco,
+            const item = cart[id];
 
-            imagem: produto.imagem,
+            const subtotal =
+                item.price * item.quantity;
 
-            quantidade: 1
+
+            const div =
+                document.createElement("div");
+
+            div.className = "cart-item";
+
+
+            div.innerHTML = `
+
+                <div>
+
+                    <div class="cart-item-name">
+                        ${item.name}
+                    </div>
+
+                    <div class="cart-item-price">
+                        ${item.quantity} x
+                        ${money(item.price)}
+                        =
+                        ${money(subtotal)}
+                    </div>
+
+                </div>
+
+
+                <div class="cart-item-controls">
+
+                    <button
+                        onclick="changeCartQty(${id},-1)">
+                        −
+                    </button>
+
+                    <strong>
+                        ${item.quantity}
+                    </strong>
+
+                    <button
+                        onclick="changeCartQty(${id},1)">
+                        +
+                    </button>
+
+                    <button
+                        class="remove-item"
+                        onclick="removeProduct(${id})">
+                        🗑
+                    </button>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(div);
 
         });
 
     }
 
 
-    atualizarCarrinho();
-
-}
-
-
-
-/* ==========================================
-   ALTERAR QUANTIDADE
-========================================== */
-
-function alterarQuantidade(id, valor) {
-
-    const existente =
-        carrinho.find(
-            item => item.id === id
-        );
-
-
-    if (!existente && valor > 0) {
-
-        adicionarProduto(id);
-
-        return;
-
-    }
-
-
-    if (!existente) {
-        return;
-    }
-
-
-    existente.quantidade += valor;
-
-
-    if (existente.quantidade <= 0) {
-
-        carrinho =
-            carrinho.filter(
-                item => item.id !== id
-            );
-
-    }
-
-
-    atualizarCarrinho();
-
-}
-
-
-
-/* ==========================================
-   REMOVER
-========================================== */
-
-function removerProduto(id) {
-
-    carrinho =
-        carrinho.filter(
-            item => item.id !== id
-        );
-
-
-    atualizarCarrinho();
-
-}
-
-
-
-/* ==========================================
-   CALCULAR TOTAL
-========================================== */
-
-function calcularTotal() {
-
-    return carrinho.reduce(
-
-        (total, item) => {
-
-            return total +
-                (item.preco * item.quantidade);
-
-        },
-
-        0
-
-    );
-
-}
-
-
-
-/* ==========================================
-   QUANTIDADE TOTAL
-========================================== */
-
-function calcularQuantidade() {
-
-    return carrinho.reduce(
-
-        (total, item) => {
-
-            return total + item.quantidade;
-
-        },
-
-        0
-
-    );
-
-}
-
-
-
-/* ==========================================
-   ATUALIZAR CARRINHO
-========================================== */
-
-function atualizarCarrinho() {
-
-    renderizarProdutos();
-
-
-    const quantidade =
-        calcularQuantidade();
-
-
     const total =
-        calcularTotal();
+        calculateTotal();
 
 
-    document.getElementById(
-        "contador-header"
-    ).textContent = quantidade;
+    document.getElementById("cartTotal")
+        .innerText = money(total);
 
 
-    document.getElementById(
-        "total-barra"
-    ).textContent =
-        formatarPreco(total);
+    const count =
+        calculateCount();
 
 
-    document.getElementById(
-        "total-modal"
-    ).textContent =
-        formatarPreco(total);
+    document.getElementById("topCartCount")
+        .innerText = count;
 
 
-    renderizarItensCarrinho();
+    document.getElementById("floatingCartCount")
+        .innerText = count;
 
 }
 
 
+/* =========================
+   TOTAL
+========================= */
 
-/* ==========================================
-   RENDERIZAR ITENS DO CARRINHO
-========================================== */
+function calculateTotal() {
 
-function renderizarItensCarrinho() {
-
-    const container =
-        document.getElementById(
-            "itens-carrinho"
-        );
+    let total = 0;
 
 
-    if (carrinho.length === 0) {
+    Object.values(cart)
+        .forEach(item => {
 
-        container.innerHTML = `
+            total +=
+                item.price * item.quantity;
 
-            <div class="carrinho-vazio">
+        });
 
-                <div class="icone">
-                    🍪
-                </div>
 
-                <p>
-                    Seu pedido está vazio.
-                </p>
+    return total;
 
-                <p>
-                    Escolha seus cookies favoritos!
-                </p>
+}
 
-            </div>
 
-        `;
+/* =========================
+   QUANTIDADE TOTAL
+========================= */
 
-        return;
+function calculateCount() {
+
+    let count = 0;
+
+
+    Object.values(cart)
+        .forEach(item => {
+
+            count += item.quantity;
+
+        });
+
+
+    return count;
+
+}
+
+
+/* =========================
+   ABRIR CARRINHO
+========================= */
+
+function openCart() {
+
+    document
+        .getElementById("cartModal")
+        .classList
+        .add("active");
+
+}
+
+
+/* =========================
+   FECHAR
+========================= */
+
+function closeCart() {
+
+    document
+        .getElementById("cartModal")
+        .classList
+        .remove("active");
+
+}
+
+
+/* =========================
+   CLICAR FORA
+========================= */
+
+function closeOutside(event) {
+
+    if (
+        event.target.id === "cartModal"
+    ) {
+
+        closeCart();
 
     }
 
-
-    container.innerHTML = "";
-
-
-    carrinho.forEach(item => {
-
-
-        const subtotal =
-            item.preco * item.quantidade;
-
-
-        const imagem = item.imagem
-
-            ? `
-                <img
-                    src="${item.imagem}"
-                    alt="${item.nome}"
-                >
-              `
-
-            : `
-                🍪
-              `;
-
-
-        container.innerHTML += `
-
-            <div class="item-carrinho">
-
-
-                <div class="item-foto">
-                    ${imagem}
-                </div>
-
-
-                <div class="item-dados">
-
-                    <div class="item-nome">
-                        ${item.nome}
-                    </div>
-
-                    <div class="item-preco">
-
-                        ${item.quantidade}
-                        ×
-                        ${formatarPreco(item.preco)}
-
-                    </div>
-
-
-                    <button
-                        class="item-remover"
-                        onclick="removerProduto('${item.id}')"
-                    >
-                        Remover
-                    </button>
-
-                </div>
-
-
-                <div class="item-total">
-
-                    ${formatarPreco(subtotal)}
-
-                </div>
-
-
-            </div>
-
-        `;
-
-    });
-
 }
 
 
-
-/* ==========================================
-   ABRIR CARRINHO
-========================================== */
-
-function abrirCarrinho() {
-
-    document
-        .getElementById("modal-carrinho")
-        .classList
-        .add("aberto");
-
-
-    renderizarItensCarrinho();
-
-}
-
-
-
-/* ==========================================
-   FECHAR CARRINHO
-========================================== */
-
-function fecharCarrinho() {
-
-    document
-        .getElementById("modal-carrinho")
-        .classList
-        .remove("aberto");
-
-}
-
-
-
-/* ==========================================
+/* =========================
    FINALIZAR
-========================================== */
+========================= */
 
-function finalizarPedido() {
+function finishOrder() {
 
-    if (carrinho.length === 0) {
+    if (
+        Object.keys(cart).length === 0
+    ) {
 
         alert(
-            "Adicione pelo menos um cookie ao pedido."
+            "Adicione pelo menos um produto ao pedido."
         );
 
         return;
 
     }
+
+
+    const name =
+        document
+            .getElementById("customerName")
+            .value
+            .trim();
+
+
+    const phone =
+        document
+            .getElementById("customerPhone")
+            .value
+            .trim();
+
+
+    if (!name) {
+
+        alert(
+            "Digite seu nome."
+        );
+
+        return;
+
+    }
+
+
+    if (!phone) {
+
+        alert(
+            "Digite seu WhatsApp."
+        );
+
+        return;
+
+    }
+
+
+    const payment =
+        document
+            .getElementById("payment")
+            .value;
+
+
+    const delivery =
+        document
+            .getElementById("delivery")
+            .value;
+
+
+    let message =
+        "PEDIDO KUKI\n\n";
+
+
+    message +=
+        "Cliente: " +
+        name +
+        "\n";
+
+
+    message +=
+        "WhatsApp: " +
+        phone +
+        "\n\n";
+
+
+    message +=
+        "ITENS DO PEDIDO:\n";
+
+
+    Object.values(cart)
+        .forEach(item => {
+
+            message +=
+                item.quantity +
+                "x " +
+                item.name +
+                " - " +
+                money(
+                    item.price *
+                    item.quantity
+                ) +
+                "\n";
+
+        });
+
+
+    message +=
+        "\nTOTAL: " +
+        money(
+            calculateTotal()
+        );
+
+
+    if (payment) {
+
+        message +=
+            "\nPagamento: " +
+            payment;
+
+    }
+
+
+    if (delivery) {
+
+        message +=
+            "\nEntrega: " +
+            delivery;
+
+    }
+
+
+    const address =
+        document
+            .getElementById("address")
+            .value
+            .trim();
+
+
+    const number =
+        document
+            .getElementById("number")
+            .value
+            .trim();
+
+
+    const neighborhood =
+        document
+            .getElementById("neighborhood")
+            .value
+            .trim();
+
+
+    if (address) {
+
+        message +=
+            "\nEndereço: " +
+            address;
+
+    }
+
+
+    if (number) {
+
+        message +=
+            ", Nº " +
+            number;
+
+    }
+
+
+    if (neighborhood) {
+
+        message +=
+            ", " +
+            neighborhood;
+
+    }
+
+
+    const observation =
+        document
+            .getElementById("observation")
+            .value
+            .trim();
+
+
+    if (observation) {
+
+        message +=
+            "\nObservação: " +
+            observation;
+
+    }
+
+
+    /*
+       POR ENQUANTO:
+       apenas mostramos o pedido.
+
+       Na próxima etapa vamos ligar
+       isso ao AppSheet / Google Sheets
+       e depois ao WhatsApp.
+    */
 
 
     alert(
-        "Perfeito! Agora vamos preencher seus dados para finalizar o pedido."
+        "Pedido montado com sucesso!\n\n" +
+        message
     );
 
 }
 
 
+/* =========================
+   INICIALIZA
+========================= */
 
-/* ==========================================
-   INICIALIZAÇÃO
-========================================== */
-
-renderizarProdutos();
-
-atualizarCarrinho();
-
+updateCart();
 
 </script>
 
-
 </body>
-
 </html>
