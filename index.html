@@ -6,422 +6,406 @@
 <title>KUKI | Cookies Artesanais</title>
 
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+:root{
+    --wine:#b30b2e;
+    --wine-dark:#8e0623;
+    --wine-soft:#d93050;
+    --cream:#fff2e3;
+    --cream-2:#f9e5d1;
+    --cream-3:#f5d7bd;
+    --brown:#4b271f;
+    --text:#3a211a;
+    --muted:#80675d;
+    --white:#fffdfb;
+    --border:#ead1be;
+    --shadow:0 10px 30px rgba(80,35,20,.10);
 }
 
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f8f1e9;
-    color: #241713;
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:var(--cream);
+    color:var(--text);
 }
 
-header {
-    background: #fff;
-    border-bottom: 1px solid #eadbd0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+button,input,textarea,select{font:inherit}
+
+button{cursor:pointer}
+
+header{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    background:rgba(255,253,251,.97);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
 }
 
-.header {
-    max-width: 1200px;
-    margin: auto;
-    padding: 16px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.header{
+    max-width:1200px;
+    margin:auto;
+    padding:12px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.brand{
+    display:flex;
+    align-items:center;
+    min-width:0;
 }
 
-.cookie {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: #d69b69;
-    border: 4px solid #c88655;
-    position: relative;
-    flex: 0 0 auto;
+.brand img{
+    width:155px;
+    max-width:46vw;
+    height:auto;
+    display:block;
+    object-fit:contain;
 }
 
-.cookie:before {
-    content: "";
-    position: absolute;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #573326;
-    top: 9px;
-    left: 9px;
-    box-shadow:
-        18px 3px #573326,
-        7px 18px #573326,
-        25px 21px #573326;
+.cart-top{
+    border:0;
+    background:var(--wine);
+    color:#fff;
+    border-radius:999px;
+    padding:13px 20px;
+    font-weight:800;
+    box-shadow:0 6px 16px rgba(179,11,46,.22);
+    white-space:nowrap;
 }
 
-.cookie:after {
-    content: "";
-    position: absolute;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #573326;
-    top: 30px;
-    left: 16px;
-    box-shadow: 15px -12px #573326;
+.cart-top:hover{background:var(--wine-dark)}
+
+.hero{
+    max-width:1200px;
+    margin:auto;
+    padding:42px 20px 18px;
 }
 
-.logo strong {
-    display: block;
-    font-size: 25px;
-    letter-spacing: 2px;
+.hero h1{
+    color:var(--wine);
+    font-size:clamp(30px,4vw,48px);
+    line-height:1;
+    margin-bottom:12px;
+    letter-spacing:-1px;
 }
 
-.logo span {
-    font-size: 13px;
-    color: #756a65;
+.hero p{
+    color:var(--muted);
+    font-size:16px;
 }
 
-button {
-    font-family: inherit;
-    font-weight: bold;
-    cursor: pointer;
+.products{
+    max-width:1200px;
+    margin:auto;
+    padding:12px 20px 70px;
 }
 
-.cart-top,
-.add,
-.finish {
-    background: #321c14;
-    color: #fff;
-    border: 0;
+.grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:22px;
 }
 
-.cart-top {
-    padding: 12px 20px;
-    border-radius: 30px;
-    white-space: nowrap;
+.card{
+    background:var(--white);
+    border:1px solid var(--border);
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    transition:transform .2s ease,box-shadow .2s ease;
 }
 
-.hero {
-    max-width: 1200px;
-    margin: auto;
-    padding: 35px 20px 20px;
+.card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 16px 32px rgba(80,35,20,.14);
 }
 
-.hero h1 {
-    font-size: 38px;
-    margin-bottom: 8px;
+.photo{
+    height:255px;
+    background:var(--cream-2);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    border-bottom:1px solid var(--border);
 }
 
-.hero p {
-    color: #756a65;
+.photo img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    padding:10px;
+    display:block;
 }
 
-.products {
-    max-width: 1200px;
-    margin: auto;
-    padding: 10px 20px 80px;
+.info{padding:20px}
+
+.name{
+    color:var(--wine);
+    font-weight:900;
+    font-size:23px;
+    letter-spacing:.4px;
+    margin-bottom:7px;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+.desc{
+    color:var(--muted);
+    min-height:44px;
+    font-size:14px;
+    line-height:1.45;
+    margin-bottom:14px;
 }
 
-.card {
-    background: #fff;
-    border: 1px solid #eadbd0;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 5px 20px rgba(60,30,15,.06);
+.price{
+    color:var(--brown);
+    font-size:24px;
+    font-weight:900;
+    margin-bottom:16px;
 }
 
-.photo {
-    height: 220px;
-    background: #f0e1d1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-.photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 10px;
-    display: block;
+.actions{
+    display:flex;
+    gap:10px;
 }
 
-.info {
-    padding: 20px;
+.qty{
+    display:flex;
+    align-items:center;
+    overflow:hidden;
+    border:1px solid var(--border);
+    border-radius:11px;
+    background:#fff;
 }
 
-.name {
-    font-size: 22px;
-    font-weight: 800;
-    margin-bottom: 8px;
+.qty button{
+    width:40px;
+    height:44px;
+    border:0;
+    background:#fff;
+    color:var(--wine);
+    font-size:20px;
+    font-weight:900;
 }
 
-.desc {
-    color: #756a65;
-    font-size: 14px;
-    line-height: 1.45;
-    min-height: 42px;
-    margin-bottom: 15px;
+.qty span{
+    min-width:28px;
+    text-align:center;
+    font-weight:800;
 }
 
-.price {
-    font-size: 22px;
-    font-weight: 800;
-    margin-bottom: 15px;
+.add{
+    flex:1;
+    border:0;
+    border-radius:11px;
+    background:var(--wine);
+    color:#fff;
+    font-weight:900;
 }
 
-.actions {
-    display: flex;
-    gap: 8px;
+.add:hover{background:var(--wine-dark)}
+
+.overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:2000;
+    background:rgba(46,15,8,.54);
+    align-items:center;
+    justify-content:center;
+    padding:16px;
 }
 
-.qty {
-    display: flex;
-    align-items: center;
-    border: 1px solid #eadbd0;
-    border-radius: 10px;
-    overflow: hidden;
+.overlay.active{display:flex}
+
+.modal{
+    width:100%;
+    max-width:590px;
+    max-height:94vh;
+    overflow:auto;
+    background:var(--white);
+    border-radius:24px;
+    border:1px solid var(--border);
+    padding:25px;
+    box-shadow:0 24px 70px rgba(40,15,5,.28);
 }
 
-.qty button {
-    width: 40px;
-    height: 44px;
-    border: 0;
-    background: #fff;
-    font-size: 20px;
+.modalhead{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-bottom:18px;
 }
 
-.qty span {
-    min-width: 30px;
-    text-align: center;
-    font-weight: bold;
+.modalhead h2{
+    color:var(--wine);
+    font-size:28px;
 }
 
-.add {
-    flex: 1;
-    border-radius: 10px;
+.close{
+    width:40px;
+    height:40px;
+    border:0;
+    border-radius:50%;
+    background:var(--cream-2);
+    color:var(--wine);
+    font-size:24px;
+    font-weight:900;
 }
 
-.overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.55);
-    z-index: 500;
-    align-items: center;
-    justify-content: center;
-    padding: 15px;
+.items{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
 }
 
-.overlay.active {
-    display: flex;
+.empty{
+    padding:26px;
+    text-align:center;
+    color:var(--muted);
+    border:1px dashed var(--border);
+    border-radius:14px;
 }
 
-.modal {
-    background: #fff;
-    width: 100%;
-    max-width: 560px;
-    max-height: 92vh;
-    overflow-y: auto;
-    border-radius: 20px;
-    padding: 25px;
+.item{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:12px;
+    align-items:center;
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    background:#fff;
 }
 
-.modalhead {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+.itemname{
+    color:var(--wine);
+    font-weight:900;
 }
 
-.close {
-    border: 0;
-    background: #f4eee9;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    font-size: 20px;
+.itemprice{
+    margin-top:5px;
+    color:var(--muted);
+    font-size:14px;
 }
 
-.items {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+.controls{
+    display:flex;
+    align-items:center;
+    gap:7px;
 }
 
-.empty {
-    text-align: center;
-    padding: 30px;
-    color: #756a65;
+.controls button{
+    width:31px;
+    height:31px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--wine);
+    font-weight:900;
 }
 
-.item {
-    border: 1px solid #eadbd0;
-    border-radius: 14px;
-    padding: 14px;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 10px;
+.controls .remove{
+    border:0;
+    background:transparent;
+    color:#a33;
 }
 
-.itemname {
-    font-weight: bold;
+.total{
+    display:flex;
+    justify-content:space-between;
+    margin-top:18px;
+    padding-top:17px;
+    border-top:2px solid var(--cream-3);
+    color:var(--brown);
+    font-size:22px;
+    font-weight:900;
 }
 
-.itemprice {
-    color: #756a65;
-    font-size: 14px;
-    margin-top: 5px;
+.form{
+    margin-top:24px;
 }
 
-.controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.form h3{
+    color:var(--wine);
+    margin-bottom:4px;
+    font-size:21px;
 }
 
-.controls button {
-    border: 1px solid #eadbd0;
-    background: #fff;
-    width: 30px;
-    height: 30px;
-    border-radius: 7px;
+.required-note{
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:15px;
 }
 
-.remove {
-    color: #a33 !important;
-    border: 0 !important;
-}
+.group{margin-bottom:13px}
 
-.total {
-    margin-top: 20px;
-    padding-top: 18px;
-    border-top: 1px solid #eadbd0;
-    display: flex;
-    justify-content: space-between;
-    font-size: 22px;
-    font-weight: bold;
-}
-
-.form {
-    margin-top: 25px;
-}
-
-.form h3 {
-    margin-bottom: 4px;
-}
-
-.required-note {
-    color: #756a65;
-    font-size: 12px;
-    margin-bottom: 15px;
-}
-
-.group {
-    margin-bottom: 13px;
-}
-
-.group label {
-    display: block;
-    font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 6px;
+.group label{
+    display:block;
+    margin-bottom:6px;
+    font-size:13px;
+    font-weight:900;
+    color:var(--text);
 }
 
 .group input,
 .group textarea,
-.group select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #eadbd0;
-    border-radius: 9px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    background: #fff;
+.group select{
+    width:100%;
+    padding:12px 13px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:#fff;
+    color:var(--text);
 }
 
 .group input:focus,
 .group textarea:focus,
-.group select:focus {
-    outline: none;
-    border-color: #321c14;
+.group select:focus{
+    outline:none;
+    border-color:var(--wine);
+    box-shadow:0 0 0 3px rgba(179,11,46,.08);
 }
 
-.row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+.row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
 }
 
-.finish {
-    width: 100%;
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 12px;
-    font-size: 16px;
+.finish{
+    width:100%;
+    margin-top:18px;
+    border:0;
+    border-radius:12px;
+    padding:15px;
+    background:var(--wine);
+    color:#fff;
+    font-size:16px;
+    font-weight:900;
 }
 
-.finish:disabled {
-    opacity: .6;
-    cursor: wait;
+.finish:hover{background:var(--wine-dark)}
+.finish:disabled{opacity:.6;cursor:wait}
+
+@media(max-width:900px){
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-@media(max-width:850px) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .hero h1 {
-        font-size: 32px;
-    }
-}
-
-@media(max-width:600px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
-
-    .hero h1 {
-        font-size: 28px;
-    }
-
-    .products {
-        padding: 10px 15px 70px;
-    }
-
-    .row {
-        grid-template-columns: 1fr;
-    }
-
-    .header {
-        padding: 12px 15px;
-    }
-
-    .logo strong {
-        font-size: 22px;
-    }
-
-    .logo span {
-        font-size: 12px;
-    }
-
-    .cart-top {
-        padding: 10px 14px;
-    }
+@media(max-width:620px){
+    .header{padding:10px 14px}
+    .brand img{width:135px}
+    .cart-top{padding:11px 14px}
+    .hero{padding:32px 15px 14px}
+    .products{padding:10px 15px 55px}
+    .grid{grid-template-columns:1fr;gap:16px}
+    .photo{height:260px}
+    .row{grid-template-columns:1fr}
+    .modal{padding:20px}
 }
 </style>
 </head>
@@ -430,18 +414,12 @@ button {
 
 <header>
     <div class="header">
-        <div class="logo">
-            <div class="cookie"></div>
-            <div>
-                <strong>KUKI</strong>
-                <span>Cookies Artesanais</span>
-            </div>
-        </div>
+        <a class="brand" href="#" aria-label="KUKI">
+            <img src="images/logo-kuki.png" alt="KUKI Cookies">
+        </a>
 
-        <!-- ÚNICO botão do carrinho -->
         <button class="cart-top" type="button" onclick="openCart()">
-            🛒 Meu pedido
-            <span id="topCount">0</span>
+            🛒 Meu pedido <span id="topCount">0</span>
         </button>
     </div>
 </header>
@@ -460,13 +438,7 @@ button {
 
         <div class="modalhead">
             <h2>Meu pedido</h2>
-
-            <button
-                class="close"
-                type="button"
-                onclick="closeCart()">
-                ×
-            </button>
+            <button class="close" type="button" onclick="closeCart()">×</button>
         </div>
 
         <div id="items" class="items"></div>
@@ -482,21 +454,12 @@ button {
 
             <div class="group">
                 <label for="name">Nome *</label>
-                <input
-                    id="name"
-                    type="text"
-                    placeholder="Digite seu nome"
-                    autocomplete="name">
+                <input id="name" type="text" placeholder="Digite seu nome" autocomplete="name">
             </div>
 
             <div class="group">
                 <label for="phone">WhatsApp *</label>
-                <input
-                    id="phone"
-                    type="tel"
-                    placeholder="(85) 99999-9999"
-                    inputmode="tel"
-                    autocomplete="tel">
+                <input id="phone" type="tel" placeholder="(85) 99999-9999" inputmode="tel" autocomplete="tel">
             </div>
 
             <div class="group">
@@ -520,45 +483,27 @@ button {
 
             <div class="group">
                 <label for="address">Endereço *</label>
-                <input
-                    id="address"
-                    type="text"
-                    placeholder="Rua, avenida..."
-                    autocomplete="street-address">
+                <input id="address" type="text" placeholder="Rua, avenida..." autocomplete="street-address">
             </div>
 
             <div class="row">
                 <div class="group">
                     <label for="number">Número *</label>
-                    <input
-                        id="number"
-                        type="text"
-                        placeholder="Número">
+                    <input id="number" type="text" placeholder="Número">
                 </div>
 
                 <div class="group">
                     <label for="neighborhood">Bairro *</label>
-                    <input
-                        id="neighborhood"
-                        type="text"
-                        placeholder="Bairro"
-                        autocomplete="address-level3">
+                    <input id="neighborhood" type="text" placeholder="Bairro">
                 </div>
             </div>
 
             <div class="group">
                 <label for="observation">Observação</label>
-                <textarea
-                    id="observation"
-                    rows="3"
-                    placeholder="Alguma observação?"></textarea>
+                <textarea id="observation" rows="3" placeholder="Alguma observação?"></textarea>
             </div>
 
-            <button
-                id="finish"
-                class="finish"
-                type="button"
-                onclick="finishOrder()">
+            <button id="finish" class="finish" type="button" onclick="finishOrder()">
                 FINALIZAR PEDIDO
             </button>
         </div>
@@ -574,43 +519,49 @@ const products = [
         id: "1",
         name: "TRADICIONAL",
         price: 10.90,
-        desc: "Chocolate ao leite e gotas de chocolate.",
-        image: "images/tradicional.jpg"
+        desc: "Chocolate ao leite e gotas de chocolate",
+        image: "images/tradicional.jpg",
+        active: true
     },
     {
         id: "2",
         name: "RED",
         price: 13.90,
-        desc: "Massa vermelha com muito chocolate branco.",
-        image: "images/red.jpg"
+        desc: "Massa vermelha com muito chocolate branco",
+        image: "images/red.jpg",
+        active: true
     },
     {
         id: "3",
         name: "BLACK",
         price: 13.90,
-        desc: "Massa 100% cacau com chocolate branco e ao leite.",
-        image: "images/black.jpg"
+        desc: "Massa 100% cacau com chocolate branco e chocolate ao leite",
+        image: "images/black.jpg",
+        active: true
     },
     {
         id: "4",
         name: "NUTELLA",
         price: 15.90,
-        desc: "Massa tradicional com muito recheio de Nutella.",
-        image: "images/nutella.jpg"
+        desc: "Massa tradicional com muito recheio de Nutella",
+        image: "images/nutella.jpg",
+        active: true
     },
     {
         id: "5",
         name: "BUENO",
         price: 17.90,
-        desc: "Cookie com recheio cremoso e delicioso.",
-        image: "images/bueno.jpg"
+        desc: "Cookie com recheio cremoso e o delicioso sabor bueno",
+        image: "images/bueno.jpg",
+        active: true
     },
     {
         id: "6",
         name: "CREAM",
         price: 15.90,
-        desc: "Cookie com recheio cremoso e sabor irresistível.",
-        image: "images/cream.jpg"
+        desc: "Cookie com recheio cremoso e sabor irresistível",
+        image: "images/cream.jpg",
+        active: true
     }
 ];
 
@@ -624,34 +575,32 @@ function money(value) {
 }
 
 function renderProducts() {
+    const activeProducts =
+        products.filter(function(item) {
+            return item.active;
+        });
+
     document.getElementById("products").innerHTML =
-        products.map(function(product) {
+        activeProducts.map(function(product) {
             return `
                 <div class="card">
-                    <div class="photo"><img src="${product.image}" alt="${product.name}" loading="lazy"></div>
+                    <div class="photo">
+                        <img
+                            src="${product.image}"
+                            alt="${product.name}"
+                            loading="lazy">
+                    </div>
 
                     <div class="info">
                         <div class="name">${product.name}</div>
-
                         <div class="desc">${product.desc}</div>
-
                         <div class="price">${money(product.price)}</div>
 
                         <div class="actions">
                             <div class="qty">
-                                <button
-                                    type="button"
-                                    onclick="changeQty('${product.id}', -1)">
-                                    −
-                                </button>
-
+                                <button type="button" onclick="changeQty('${product.id}',-1)">−</button>
                                 <span id="q${product.id}">0</span>
-
-                                <button
-                                    type="button"
-                                    onclick="changeQty('${product.id}', 1)">
-                                    +
-                                </button>
+                                <button type="button" onclick="changeQty('${product.id}',1)">+</button>
                             </div>
 
                             <button
@@ -668,17 +617,12 @@ function renderProducts() {
 }
 
 function changeQty(id, amount) {
-    const element =
-        document.getElementById("q" + id);
-
-    let value =
-        parseInt(element.textContent, 10) || 0;
+    const element = document.getElementById("q" + id);
+    let value = parseInt(element.textContent,10) || 0;
 
     value += amount;
 
-    if (value < 0) {
-        value = 0;
-    }
+    if(value < 0) value = 0;
 
     element.textContent = value;
 }
@@ -690,22 +634,22 @@ function add(id) {
             10
         ) || 0;
 
-    if (quantity <= 0) {
+    if(quantity <= 0){
         alert("Escolha pelo menos 1 unidade.");
         return;
     }
 
     const product =
-        products.find(function(item) {
+        products.find(function(item){
             return item.id === id;
         });
 
-    if (!product) {
+    if(!product){
         alert("Produto não encontrado.");
         return;
     }
 
-    if (!cart[id]) {
+    if(!cart[id]){
         cart[id] = {
             ...product,
             quantity: 0
@@ -717,154 +661,115 @@ function add(id) {
     document.getElementById("q" + id).textContent = 0;
 
     updateCart();
-
-    // Não abre o carrinho automaticamente.
-    // O cliente pode continuar escolhendo outros produtos.
 }
 
 function changeCart(id, amount) {
-    if (!cart[id]) {
-        return;
-    }
+    if(!cart[id]) return;
 
     cart[id].quantity += amount;
 
-    if (cart[id].quantity <= 0) {
+    if(cart[id].quantity <= 0){
         delete cart[id];
     }
 
     updateCart();
 }
 
-function removeItem(id) {
+function removeItem(id){
     delete cart[id];
     updateCart();
 }
 
-function calculateTotal() {
+function calculateTotal(){
     return Object.values(cart).reduce(
-        function(total, item) {
-            return total + (item.price * item.quantity);
+        function(total,item){
+            return total + item.price * item.quantity;
         },
         0
     );
 }
 
-function calculateCount() {
+function calculateCount(){
     return Object.values(cart).reduce(
-        function(total, item) {
+        function(total,item){
             return total + item.quantity;
         },
         0
     );
 }
 
-function updateCart() {
-    const container =
-        document.getElementById("items");
+function updateCart(){
+    const container = document.getElementById("items");
+    const ids = Object.keys(cart);
 
-    const ids =
-        Object.keys(cart);
-
-    if (ids.length === 0) {
+    if(ids.length === 0){
         container.innerHTML =
             '<div class="empty">Seu pedido está vazio.</div>';
-    } else {
+    }else{
         container.innerHTML =
-            ids.map(function(id) {
+            ids.map(function(id){
                 const item = cart[id];
-
-                const subtotal =
-                    item.price * item.quantity;
+                const subtotal = item.price * item.quantity;
 
                 return `
                     <div class="item">
                         <div>
                             <div class="itemname">${item.name}</div>
-
                             <div class="itemprice">
-                                ${item.quantity} x
-                                ${money(item.price)}
-                                =
-                                ${money(subtotal)}
+                                ${item.quantity} x ${money(item.price)}
+                                = ${money(subtotal)}
                             </div>
                         </div>
 
                         <div class="controls">
-                            <button
-                                type="button"
-                                onclick="changeCart('${id}', -1)">
-                                −
-                            </button>
-
+                            <button type="button" onclick="changeCart('${id}',-1)">−</button>
                             <strong>${item.quantity}</strong>
-
-                            <button
-                                type="button"
-                                onclick="changeCart('${id}', 1)">
-                                +
-                            </button>
-
-                            <button
-                                type="button"
-                                class="remove"
-                                onclick="removeItem('${id}')">
-                                🗑
-                            </button>
+                            <button type="button" onclick="changeCart('${id}',1)">+</button>
+                            <button type="button" class="remove" onclick="removeItem('${id}')">🗑</button>
                         </div>
                     </div>
                 `;
             }).join("");
     }
 
-    document.getElementById("total").textContent =
-        money(calculateTotal());
-
-    document.getElementById("topCount").textContent =
-        calculateCount();
+    document.getElementById("total").textContent = money(calculateTotal());
+    document.getElementById("topCount").textContent = calculateCount();
 }
 
-function openCart() {
-    document
-        .getElementById("overlay")
-        .classList.add("active");
-
+function openCart(){
+    document.getElementById("overlay").classList.add("active");
     updateCart();
 }
 
-function closeCart() {
-    document
-        .getElementById("overlay")
-        .classList.remove("active");
+function closeCart(){
+    document.getElementById("overlay").classList.remove("active");
 }
 
-function outside(event) {
-    if (event.target.id === "overlay") {
+function outside(event){
+    if(event.target.id === "overlay"){
         closeCart();
     }
 }
 
-function normalizePhone(phone) {
-    return String(phone || "")
-        .replace(/\D/g, "");
+function normalizePhone(phone){
+    return String(phone || "").replace(/\D/g,"");
 }
 
-function normalizePhoneForOrder(phone) {
+function normalizePhoneForOrder(phone){
     const digits = normalizePhone(phone);
 
-    if (
+    if(
         digits.startsWith("55") &&
         (digits.length === 12 || digits.length === 13)
-    ) {
+    ){
         return digits.substring(2);
     }
 
     return digits;
 }
 
-function isValidPhone(phone) {
-    const digits =
-        normalizePhone(phone);
+function isValidPhone(phone){
+    const digits = normalizePhone(phone);
 
     return (
         digits.length === 10 ||
@@ -876,151 +781,118 @@ function isValidPhone(phone) {
     );
 }
 
-async function finishOrder() {
-    if (Object.keys(cart).length === 0) {
+async function finishOrder(){
+    if(Object.keys(cart).length === 0){
         alert("Adicione pelo menos um produto ao pedido.");
         return;
     }
 
-    const name =
-        document.getElementById("name").value.trim();
+    const name = document.getElementById("name").value.trim();
+    const phoneInput = document.getElementById("phone").value.trim();
+    const payment = document.getElementById("payment").value.trim();
+    const delivery = document.getElementById("delivery").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const number = document.getElementById("number").value.trim();
+    const neighborhood = document.getElementById("neighborhood").value.trim();
+    const observation = document.getElementById("observation").value.trim();
 
-    const phoneInput =
-        document.getElementById("phone").value.trim();
-
-    const payment =
-        document.getElementById("payment").value.trim();
-
-    const delivery =
-        document.getElementById("delivery").value.trim();
-
-    const address =
-        document.getElementById("address").value.trim();
-
-    const number =
-        document.getElementById("number").value.trim();
-
-    const neighborhood =
-        document.getElementById("neighborhood").value.trim();
-
-    const observation =
-        document.getElementById("observation").value.trim();
-
-    // =========================
-    // VALIDAÇÕES
-    // =========================
-
-    if (!name) {
+    if(!name){
         alert("Digite seu nome.");
         document.getElementById("name").focus();
         return;
     }
 
-    if (!phoneInput) {
+    if(!phoneInput){
         alert("Digite seu WhatsApp.");
         document.getElementById("phone").focus();
         return;
     }
 
-    if (!isValidPhone(phoneInput)) {
+    if(!isValidPhone(phoneInput)){
         alert("Digite um WhatsApp válido.");
         document.getElementById("phone").focus();
         return;
     }
 
-    // O n8n já acrescenta o DDI 55.
-    // Portanto enviamos para o n8n o número nacional.
-    const phone =
-        normalizePhoneForOrder(phoneInput);
+    const phone = normalizePhoneForOrder(phoneInput);
 
-    if (!payment) {
+    if(!payment){
         alert("Selecione a forma de pagamento.");
         document.getElementById("payment").focus();
         return;
     }
 
-    if (!delivery) {
+    if(!delivery){
         alert("Selecione o tipo de entrega.");
         document.getElementById("delivery").focus();
         return;
     }
 
-    if (!address) {
+    if(!address){
         alert("Digite o endereço.");
         document.getElementById("address").focus();
         return;
     }
 
-    if (!number) {
+    if(!number){
         alert("Digite o número.");
         document.getElementById("number").focus();
         return;
     }
 
-    if (!neighborhood) {
+    if(!neighborhood){
         alert("Digite o bairro.");
         document.getElementById("neighborhood").focus();
         return;
     }
 
-    // =========================
-    // PEDIDO
-    // =========================
-
     const order = {
         origem: "SITE_KUKI",
 
-        cliente: {
-            nome: name,
-            whatsapp: phone
+        cliente:{
+            nome:name,
+            whatsapp:phone
         },
 
-        itens: Object.values(cart).map(function(item) {
+        itens:Object.values(cart).map(function(item){
             return {
-                produto_id: item.id,
-                produto: item.name,
-                quantidade: item.quantity,
-                preco_unitario: item.price,
-                valor_item:
-                    item.price * item.quantity
+                produto_id:item.id,
+                produto:item.name,
+                quantidade:item.quantity,
+                preco_unitario:item.price,
+                valor_item:item.price * item.quantity
             };
         }),
 
-        pagamento: payment,
-        entrega: delivery,
-        endereco: address,
-        numero: number,
-        bairro: neighborhood,
-        observacao: observation,
-        total: calculateTotal(),
-        data: new Date().toISOString()
+        pagamento:payment,
+        entrega:delivery,
+        endereco:address,
+        numero:number,
+        bairro:neighborhood,
+        observacao:observation,
+        total:calculateTotal(),
+        data:new Date().toISOString()
     };
 
-    const button =
-        document.getElementById("finish");
+    const button = document.getElementById("finish");
 
     button.disabled = true;
-    button.textContent =
-        "ENVIANDO PEDIDO...";
+    button.textContent = "ENVIANDO PEDIDO...";
 
-    try {
-        const response =
-            await fetch(WEBHOOK_URL, {
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "application/json"
+    try{
+        const response = await fetch(
+            WEBHOOK_URL,
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
                 },
+                body:JSON.stringify(order)
+            }
+        );
 
-                body:
-                    JSON.stringify(order)
-            });
-
-        if (!response.ok) {
-            throw new Error(
-                "HTTP " + response.status
-            );
+        if(!response.ok){
+            throw new Error("HTTP " + response.status);
         }
 
         alert(
@@ -1042,21 +914,16 @@ async function finishOrder() {
         document.getElementById("neighborhood").value = "";
         document.getElementById("observation").value = "";
 
-    } catch (error) {
-        console.error(
-            "Erro ao enviar pedido:",
-            error
-        );
+    }catch(error){
+        console.error("Erro ao enviar pedido:",error);
 
         alert(
             "Não foi possível enviar o pedido.\n\n" +
             "Verifique sua conexão e tente novamente."
         );
-
-    } finally {
+    }finally{
         button.disabled = false;
-        button.textContent =
-            "FINALIZAR PEDIDO";
+        button.textContent = "FINALIZAR PEDIDO";
     }
 }
 
