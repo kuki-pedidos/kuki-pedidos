@@ -7,17 +7,18 @@
 
 <style>
 :root{
-    --brand:#9f102d;
-    --brand-dark:#820b24;
-    --cream:#fff6e9;
-    --cream-2:#faebda;
-    --cream-3:#f3dfca;
-    --brown:#4b2b20;
-    --text:#3a241c;
-    --muted:#7c685d;
-    --white:#fffdfa;
-    --border:#ead9c8;
-    --shadow:0 10px 30px rgba(76,42,26,.08);
+    --wine:#b30b2e;
+    --wine-dark:#8e0623;
+    --wine-soft:#d93050;
+    --cream:#fff2e3;
+    --cream-2:#f9e5d1;
+    --cream-3:#f5d7bd;
+    --brown:#4b271f;
+    --text:#3a211a;
+    --muted:#80675d;
+    --white:#fffdfb;
+    --border:#ead1be;
+    --shadow:0 10px 30px rgba(80,35,20,.10);
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -36,7 +37,7 @@ header{
     position:sticky;
     top:0;
     z-index:1000;
-    background:rgba(255,250,242,.98);
+    background:rgba(255,253,251,.97);
     backdrop-filter:blur(12px);
     border-bottom:1px solid var(--border);
 }
@@ -67,7 +68,7 @@ header{
 
 .cart-top{
     border:0;
-    background:var(--brand);
+    background:var(--wine);
     color:#fff;
     border-radius:999px;
     padding:13px 20px;
@@ -76,7 +77,7 @@ header{
     white-space:nowrap;
 }
 
-.cart-top:hover{background:var(--brand-dark)}
+.cart-top:hover{background:var(--wine-dark)}
 
 .hero{
     max-width:1200px;
@@ -85,7 +86,7 @@ header{
 }
 
 .hero h1{
-    color:var(--brand);
+    color:var(--wine);
     font-size:clamp(30px,4vw,48px);
     line-height:1;
     margin-bottom:12px;
@@ -96,6 +97,16 @@ header{
     color:var(--muted);
     font-size:16px;
 }
+
+.store-status{
+    max-width:1200px;
+    margin:0 auto;
+    padding:0 20px 8px;
+    font-size:14px;
+    font-weight:800;
+}
+.store-status.open{color:#167a3f}
+.store-status.closed{color:var(--wine)}
 
 .products{
     max-width:1200px;
@@ -144,7 +155,7 @@ header{
 .info{padding:20px}
 
 .name{
-    color:var(--brand);
+    color:var(--wine);
     font-weight:900;
     font-size:23px;
     letter-spacing:.4px;
@@ -187,7 +198,7 @@ header{
     height:44px;
     border:0;
     background:#fff;
-    color:var(--brand);
+    color:var(--wine);
     font-size:20px;
     font-weight:900;
 }
@@ -202,12 +213,12 @@ header{
     flex:1;
     border:0;
     border-radius:11px;
-    background:var(--brand);
+    background:var(--wine);
     color:#fff;
     font-weight:900;
 }
 
-.add:hover{background:var(--brand-dark)}
+.add:hover{background:var(--wine-dark)}
 
 .overlay{
     display:none;
@@ -243,7 +254,7 @@ header{
 }
 
 .modalhead h2{
-    color:var(--brand);
+    color:var(--wine);
     font-size:28px;
 }
 
@@ -253,7 +264,7 @@ header{
     border:0;
     border-radius:50%;
     background:var(--cream-2);
-    color:var(--brand);
+    color:var(--wine);
     font-size:24px;
     font-weight:900;
 }
@@ -284,7 +295,7 @@ header{
 }
 
 .itemname{
-    color:var(--brand);
+    color:var(--wine);
     font-weight:900;
 }
 
@@ -306,7 +317,7 @@ header{
     border-radius:8px;
     border:1px solid var(--border);
     background:#fff;
-    color:var(--brand);
+    color:var(--wine);
     font-weight:900;
 }
 
@@ -332,7 +343,7 @@ header{
 }
 
 .form h3{
-    color:var(--brand);
+    color:var(--wine);
     margin-bottom:4px;
     font-size:21px;
 }
@@ -368,7 +379,7 @@ header{
 .group textarea:focus,
 .group select:focus{
     outline:none;
-    border-color:var(--brand);
+    border-color:var(--wine);
     box-shadow:0 0 0 3px rgba(179,11,46,.08);
 }
 
@@ -384,13 +395,13 @@ header{
     border:0;
     border-radius:12px;
     padding:15px;
-    background:var(--brand);
+    background:var(--wine);
     color:#fff;
     font-size:16px;
     font-weight:900;
 }
 
-.finish:hover{background:var(--brand-dark)}
+.finish:hover{background:var(--wine-dark)}
 .finish:disabled{opacity:.6;cursor:wait}
 
 @media(max-width:900px){
@@ -403,8 +414,17 @@ header{
     .cart-top{padding:11px 14px}
     .hero{padding:32px 15px 14px}
     .products{padding:10px 15px 55px}
-    .grid{grid-template-columns:1fr;gap:16px}
-    .photo{height:260px}
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .photo{height:150px}
+    .photo img{padding:6px}
+    .info{padding:11px}
+    .name{font-size:15px;margin-bottom:6px}
+    .desc{font-size:11px;min-height:48px;margin-bottom:8px}
+    .price{font-size:16px;margin-bottom:10px}
+    .actions{gap:6px;flex-direction:column}
+    .qty{justify-content:center}
+    .qty button{width:34px;height:36px}
+    .add{min-height:38px;font-size:12px}
     .row{grid-template-columns:1fr}
     .modal{padding:20px}
 }
@@ -420,15 +440,17 @@ header{
         </a>
 
         <button class="cart-top" type="button" onclick="openCart()">
-            🛒 Meu pedido <span id="topCount">0</span>
+            🛒 Faça seu pedido <span id="topCount">0</span>
         </button>
     </div>
 </header>
 
 <section class="hero">
-    <h1>Faça seu pedido 🍪</h1>
+    <h1>Faça seu pedido</h1>
     <p>Escolha seus cookies favoritos e monte seu pedido.</p>
 </section>
+
+<div id="storeStatus" class="store-status" role="status"></div>
 
 <main class="products">
     <div class="grid" id="products"></div>
@@ -500,6 +522,11 @@ header{
             </div>
 
             <div class="group">
+                <label for="city">Cidade</label>
+                <input id="city" type="text" placeholder="Digite sua cidade" autocomplete="address-level2">
+            </div>
+
+            <div class="group">
                 <label for="observation">Observação</label>
                 <textarea id="observation" rows="3" placeholder="Alguma observação?"></textarea>
             </div>
@@ -512,6 +539,53 @@ header{
 </div>
 
 <script>
+// HORÁRIOS DA LOJA — altere apenas este bloco quando necessário.
+// Dias: 0=domingo, 1=segunda, ... 6=sábado.
+const STORE_HOURS = {
+    0: { open: "11:30", close: "17:00" }, // Domingo
+    1: { open: "13:30", close: "17:00" }, // Segunda
+    2: { open: "13:30", close: "17:00" }, // Terça
+    3: { open: "13:30", close: "17:00" }, // Quarta
+    4: { open: "13:30", close: "17:00" }, // Quinta
+    5: { open: "13:30", close: "17:00" }, // Sexta
+    6: { open: "13:30", close: "17:00" }  // Sábado
+};
+
+function getMinutes(time){
+    const [hour, minute] = time.split(":").map(Number);
+    return hour * 60 + minute;
+}
+
+function getStoreState(){
+    const now = new Date();
+    const schedule = STORE_HOURS[now.getDay()];
+
+    if(!schedule){
+        return { open:false, message:"Hoje a KUKI está fechada." };
+    }
+
+    const current = now.getHours() * 60 + now.getMinutes();
+    const opening = getMinutes(schedule.open);
+    const closing = getMinutes(schedule.close);
+    const isOpen = current >= opening && current < closing;
+
+    return {
+        open:isOpen,
+        message:isOpen
+            ? `🟢 Estamos abertos até ${schedule.close}.`
+            : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.open} às ${schedule.close}.`
+    };
+}
+
+function updateStoreStatus(){
+    const state = getStoreState();
+    const element = document.getElementById("storeStatus");
+    if(!element) return state;
+    element.textContent = state.message;
+    element.className = "store-status " + (state.open ? "open" : "closed");
+    return state;
+}
+
 const WEBHOOK_URL =
     "https://rikasolucoes.app.n8n.cloud/webhook/kuki-pedido-site";
 
@@ -783,6 +857,12 @@ function isValidPhone(phone){
 }
 
 async function finishOrder(){
+    const storeState = getStoreState();
+    if(!storeState.open){
+        alert("A KUKI está fechada no momento. Não é possível finalizar pedidos agora.");
+        return;
+    }
+
     if(Object.keys(cart).length === 0){
         alert("Adicione pelo menos um produto ao pedido.");
         return;
@@ -795,6 +875,7 @@ async function finishOrder(){
     const address = document.getElementById("address").value.trim();
     const number = document.getElementById("number").value.trim();
     const neighborhood = document.getElementById("neighborhood").value.trim();
+    const city = document.getElementById("city").value.trim();
     const observation = document.getElementById("observation").value.trim();
 
     if(!name){
@@ -870,6 +951,7 @@ async function finishOrder(){
         endereco:address,
         numero:number,
         bairro:neighborhood,
+        cidade:city,
         observacao:observation,
         total:calculateTotal(),
         data:new Date().toISOString()
@@ -913,6 +995,7 @@ async function finishOrder(){
         document.getElementById("address").value = "";
         document.getElementById("number").value = "";
         document.getElementById("neighborhood").value = "";
+        document.getElementById("city").value = "";
         document.getElementById("observation").value = "";
 
     }catch(error){
@@ -930,6 +1013,8 @@ async function finishOrder(){
 
 renderProducts();
 updateCart();
+updateStoreStatus();
+setInterval(updateStoreStatus, 60000);
 </script>
 
 </body>
