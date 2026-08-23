@@ -572,7 +572,7 @@ function getStoreState(){
     return {
         open:isOpen,
         message:isOpen
-            ? `🟢 Estamos abertos até ${schedule.close}.`
+            ? `🟢 Estamos abertos até ${schedule.close} hs`
             : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.open} às ${schedule.close}.`
     };
 }
