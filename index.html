@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KUKI | Faça seu pedido</title>
+<title>KUKI | Cookies Artesanais</title>
 
 <style>
 * {
@@ -48,6 +48,7 @@ header {
     background: #d69b69;
     border: 4px solid #c88655;
     position: relative;
+    flex: 0 0 auto;
 }
 
 .cookie:before {
@@ -89,12 +90,12 @@ header {
 }
 
 button {
+    font-family: inherit;
     font-weight: bold;
     cursor: pointer;
 }
 
 .cart-top,
-.cart-button,
 .add,
 .finish {
     background: #321c14;
@@ -103,8 +104,9 @@ button {
 }
 
 .cart-top {
-    padding: 12px 18px;
+    padding: 12px 20px;
     border-radius: 30px;
+    white-space: nowrap;
 }
 
 .hero {
@@ -125,7 +127,7 @@ button {
 .products {
     max-width: 1200px;
     margin: auto;
-    padding: 10px 20px 120px;
+    padding: 10px 20px 80px;
 }
 
 .grid {
@@ -207,19 +209,6 @@ button {
     border-radius: 10px;
 }
 
-.floating {
-    position: fixed;
-    right: 25px;
-    bottom: 25px;
-    z-index: 200;
-}
-
-.cart-button {
-    border-radius: 40px;
-    padding: 16px 22px;
-    box-shadow: 0 8px 25px rgba(50,28,20,.25);
-}
-
 .overlay {
     display: none;
     position: fixed;
@@ -239,7 +228,7 @@ button {
     background: #fff;
     width: 100%;
     max-width: 560px;
-    max-height: 90vh;
+    max-height: 92vh;
     overflow-y: auto;
     border-radius: 20px;
     padding: 25px;
@@ -326,6 +315,12 @@ button {
 }
 
 .form h3 {
+    margin-bottom: 4px;
+}
+
+.required-note {
+    color: #756a65;
+    font-size: 12px;
     margin-bottom: 15px;
 }
 
@@ -349,6 +344,7 @@ button {
     border-radius: 9px;
     font-family: Arial, sans-serif;
     font-size: 14px;
+    background: #fff;
 }
 
 .group input:focus,
@@ -377,12 +373,6 @@ button {
     cursor: wait;
 }
 
-.required-note {
-    color: #756a65;
-    font-size: 12px;
-    margin-top: 8px;
-}
-
 @media(max-width:850px) {
     .grid {
         grid-template-columns: repeat(2, 1fr);
@@ -403,16 +393,11 @@ button {
     }
 
     .products {
-        padding: 10px 15px 110px;
+        padding: 10px 15px 70px;
     }
 
     .row {
         grid-template-columns: 1fr;
-    }
-
-    .floating {
-        right: 15px;
-        bottom: 15px;
     }
 
     .header {
@@ -423,8 +408,12 @@ button {
         font-size: 22px;
     }
 
+    .logo span {
+        font-size: 12px;
+    }
+
     .cart-top {
-        padding: 10px 13px;
+        padding: 10px 14px;
     }
 }
 </style>
@@ -442,7 +431,8 @@ button {
             </div>
         </div>
 
-        <button class="cart-top" onclick="openCart()">
+        <!-- ÚNICO botão do carrinho -->
+        <button class="cart-top" type="button" onclick="openCart()">
             🛒 Meu pedido
             <span id="topCount">0</span>
         </button>
@@ -458,19 +448,18 @@ button {
     <div class="grid" id="products"></div>
 </main>
 
-<div class="floating">
-    <button class="cart-button" onclick="openCart()">
-        🛒 Ver pedido
-        (<span id="floatCount">0</span>)
-    </button>
-</div>
-
 <div id="overlay" class="overlay" onclick="outside(event)">
     <div class="modal">
 
         <div class="modalhead">
-            <h2>Seu pedido</h2>
-            <button class="close" onclick="closeCart()">×</button>
+            <h2>Meu pedido</h2>
+
+            <button
+                class="close"
+                type="button"
+                onclick="closeCart()">
+                ×
+            </button>
         </div>
 
         <div id="items" class="items"></div>
@@ -482,24 +471,29 @@ button {
 
         <div class="form">
             <h3>Seus dados</h3>
-            <p class="required-note">* Campos obrigatórios</p>
+            <div class="required-note">* Campos obrigatórios</div>
 
             <div class="group">
-                <label>Nome *</label>
-                <input id="name" placeholder="Digite seu nome" autocomplete="name">
+                <label for="name">Nome *</label>
+                <input
+                    id="name"
+                    type="text"
+                    placeholder="Digite seu nome"
+                    autocomplete="name">
             </div>
 
             <div class="group">
-                <label>WhatsApp *</label>
+                <label for="phone">WhatsApp *</label>
                 <input
                     id="phone"
+                    type="tel"
                     placeholder="(85) 99999-9999"
                     inputmode="tel"
                     autocomplete="tel">
             </div>
 
             <div class="group">
-                <label>Forma de pagamento *</label>
+                <label for="payment">Forma de pagamento *</label>
                 <select id="payment">
                     <option value="">Selecione</option>
                     <option value="PIX">PIX</option>
@@ -509,7 +503,7 @@ button {
             </div>
 
             <div class="group">
-                <label>Tipo de entrega *</label>
+                <label for="delivery">Tipo de entrega *</label>
                 <select id="delivery">
                     <option value="">Selecione</option>
                     <option value="ENTREGA">Entrega</option>
@@ -518,35 +512,49 @@ button {
             </div>
 
             <div class="group">
-                <label>Endereço *</label>
-                <input id="address" placeholder="Rua, avenida..." autocomplete="street-address">
+                <label for="address">Endereço *</label>
+                <input
+                    id="address"
+                    type="text"
+                    placeholder="Rua, avenida..."
+                    autocomplete="street-address">
             </div>
 
             <div class="row">
                 <div class="group">
-                    <label>Número *</label>
-                    <input id="number" placeholder="Número">
+                    <label for="number">Número *</label>
+                    <input
+                        id="number"
+                        type="text"
+                        placeholder="Número">
                 </div>
 
                 <div class="group">
-                    <label>Bairro *</label>
-                    <input id="neighborhood" placeholder="Bairro" autocomplete="address-level3">
+                    <label for="neighborhood">Bairro *</label>
+                    <input
+                        id="neighborhood"
+                        type="text"
+                        placeholder="Bairro"
+                        autocomplete="address-level3">
                 </div>
             </div>
 
             <div class="group">
-                <label>Observação</label>
+                <label for="observation">Observação</label>
                 <textarea
                     id="observation"
                     rows="3"
                     placeholder="Alguma observação?"></textarea>
             </div>
 
-            <button id="finish" class="finish" onclick="finishOrder()">
+            <button
+                id="finish"
+                class="finish"
+                type="button"
+                onclick="finishOrder()">
                 FINALIZAR PEDIDO
             </button>
         </div>
-
     </div>
 </div>
 
@@ -604,31 +612,31 @@ function money(value) {
 
 function renderProducts() {
     document.getElementById("products").innerHTML =
-        products.map(function(p) {
+        products.map(function(product) {
             return `
                 <div class="card">
                     <div class="photo">🍪</div>
 
                     <div class="info">
-                        <div class="name">${p.name}</div>
+                        <div class="name">${product.name}</div>
 
-                        <div class="desc">${p.desc}</div>
+                        <div class="desc">${product.desc}</div>
 
-                        <div class="price">${money(p.price)}</div>
+                        <div class="price">${money(product.price)}</div>
 
                         <div class="actions">
                             <div class="qty">
                                 <button
                                     type="button"
-                                    onclick="changeQty('${p.id}', -1)">
+                                    onclick="changeQty('${product.id}', -1)">
                                     −
                                 </button>
 
-                                <span id="q${p.id}">0</span>
+                                <span id="q${product.id}">0</span>
 
                                 <button
                                     type="button"
-                                    onclick="changeQty('${p.id}', 1)">
+                                    onclick="changeQty('${product.id}', 1)">
                                     +
                                 </button>
                             </div>
@@ -636,7 +644,7 @@ function renderProducts() {
                             <button
                                 type="button"
                                 class="add"
-                                onclick="add('${p.id}')">
+                                onclick="add('${product.id}')">
                                 ADICIONAR
                             </button>
                         </div>
@@ -647,9 +655,11 @@ function renderProducts() {
 }
 
 function changeQty(id, amount) {
-    const element = document.getElementById("q" + id);
+    const element =
+        document.getElementById("q" + id);
 
-    let value = parseInt(element.textContent, 10) || 0;
+    let value =
+        parseInt(element.textContent, 10) || 0;
 
     value += amount;
 
@@ -673,8 +683,8 @@ function add(id) {
     }
 
     const product =
-        products.find(function(p) {
-            return p.id === id;
+        products.find(function(item) {
+            return item.id === id;
         });
 
     if (!product) {
@@ -695,9 +705,8 @@ function add(id) {
 
     updateCart();
 
-    // IMPORTANTE:
-    // não abre o carrinho automaticamente.
-    // O cliente pode continuar adicionando produtos.
+    // Não abre o carrinho automaticamente.
+    // O cliente pode continuar escolhendo outros produtos.
 }
 
 function changeCart(id, amount) {
@@ -720,22 +729,29 @@ function removeItem(id) {
 }
 
 function calculateTotal() {
-    return Object.values(cart)
-        .reduce(function(total, item) {
+    return Object.values(cart).reduce(
+        function(total, item) {
             return total + (item.price * item.quantity);
-        }, 0);
+        },
+        0
+    );
 }
 
 function calculateCount() {
-    return Object.values(cart)
-        .reduce(function(total, item) {
+    return Object.values(cart).reduce(
+        function(total, item) {
             return total + item.quantity;
-        }, 0);
+        },
+        0
+    );
 }
 
 function updateCart() {
-    const container = document.getElementById("items");
-    const ids = Object.keys(cart);
+    const container =
+        document.getElementById("items");
+
+    const ids =
+        Object.keys(cart);
 
     if (ids.length === 0) {
         container.innerHTML =
@@ -744,7 +760,9 @@ function updateCart() {
         container.innerHTML =
             ids.map(function(id) {
                 const item = cart[id];
-                const subtotal = item.price * item.quantity;
+
+                const subtotal =
+                    item.price * item.quantity;
 
                 return `
                     <div class="item">
@@ -791,15 +809,14 @@ function updateCart() {
 
     document.getElementById("topCount").textContent =
         calculateCount();
-
-    document.getElementById("floatCount").textContent =
-        calculateCount();
 }
 
 function openCart() {
     document
         .getElementById("overlay")
         .classList.add("active");
+
+    updateCart();
 }
 
 function closeCart() {
@@ -815,14 +832,35 @@ function outside(event) {
 }
 
 function normalizePhone(phone) {
-    return String(phone || "").replace(/\D/g, "");
+    return String(phone || "")
+        .replace(/\D/g, "");
+}
+
+function normalizePhoneForOrder(phone) {
+    const digits = normalizePhone(phone);
+
+    if (
+        digits.startsWith("55") &&
+        (digits.length === 12 || digits.length === 13)
+    ) {
+        return digits.substring(2);
+    }
+
+    return digits;
 }
 
 function isValidPhone(phone) {
-    const digits = normalizePhone(phone);
+    const digits =
+        normalizePhone(phone);
 
-    // Aceita números com 10 ou 11 dígitos nacionais.
-    return digits.length === 10 || digits.length === 11;
+    return (
+        digits.length === 10 ||
+        digits.length === 11 ||
+        (
+            digits.startsWith("55") &&
+            (digits.length === 12 || digits.length === 13)
+        )
+    );
 }
 
 async function finishOrder() {
@@ -834,7 +872,7 @@ async function finishOrder() {
     const name =
         document.getElementById("name").value.trim();
 
-    const phone =
+    const phoneInput =
         document.getElementById("phone").value.trim();
 
     const payment =
@@ -856,7 +894,7 @@ async function finishOrder() {
         document.getElementById("observation").value.trim();
 
     // =========================
-    // CAMPOS OBRIGATÓRIOS
+    // VALIDAÇÕES
     // =========================
 
     if (!name) {
@@ -865,17 +903,22 @@ async function finishOrder() {
         return;
     }
 
-    if (!phone) {
+    if (!phoneInput) {
         alert("Digite seu WhatsApp.");
         document.getElementById("phone").focus();
         return;
     }
 
-    if (!isValidPhone(phone)) {
+    if (!isValidPhone(phoneInput)) {
         alert("Digite um WhatsApp válido.");
         document.getElementById("phone").focus();
         return;
     }
+
+    // O n8n já acrescenta o DDI 55.
+    // Portanto enviamos para o n8n o número nacional.
+    const phone =
+        normalizePhoneForOrder(phoneInput);
 
     if (!payment) {
         alert("Selecione a forma de pagamento.");
@@ -907,6 +950,10 @@ async function finishOrder() {
         return;
     }
 
+    // =========================
+    // PEDIDO
+    // =========================
+
     const order = {
         origem: "SITE_KUKI",
 
@@ -921,7 +968,8 @@ async function finishOrder() {
                 produto: item.name,
                 quantidade: item.quantity,
                 preco_unitario: item.price,
-                valor_item: item.price * item.quantity
+                valor_item:
+                    item.price * item.quantity
             };
         }),
 
@@ -939,19 +987,27 @@ async function finishOrder() {
         document.getElementById("finish");
 
     button.disabled = true;
-    button.textContent = "ENVIANDO PEDIDO...";
+    button.textContent =
+        "ENVIANDO PEDIDO...";
 
     try {
-        const response = await fetch(WEBHOOK_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(order)
-        });
+        const response =
+            await fetch(WEBHOOK_URL, {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:
+                    JSON.stringify(order)
+            });
 
         if (!response.ok) {
-            throw new Error("HTTP " + response.status);
+            throw new Error(
+                "HTTP " + response.status
+            );
         }
 
         alert(
@@ -964,7 +1020,6 @@ async function finishOrder() {
         updateCart();
         closeCart();
 
-        // Limpa o formulário após envio
         document.getElementById("name").value = "";
         document.getElementById("phone").value = "";
         document.getElementById("payment").value = "";
@@ -975,7 +1030,10 @@ async function finishOrder() {
         document.getElementById("observation").value = "";
 
     } catch (error) {
-        console.error("Erro ao enviar pedido:", error);
+        console.error(
+            "Erro ao enviar pedido:",
+            error
+        );
 
         alert(
             "Não foi possível enviar o pedido.\n\n" +
@@ -984,7 +1042,8 @@ async function finishOrder() {
 
     } finally {
         button.disabled = false;
-        button.textContent = "FINALIZAR PEDIDO";
+        button.textContent =
+            "FINALIZAR PEDIDO";
     }
 }
 
