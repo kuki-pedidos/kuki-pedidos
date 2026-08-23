@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>KUKI | Faça seu pedido</title>
 
 <style>
@@ -20,7 +19,7 @@ body {
 }
 
 header {
-    background: #ffffff;
+    background: #fff;
     border-bottom: 1px solid #eadbd0;
     position: sticky;
     top: 0;
@@ -99,7 +98,7 @@ button {
 .add,
 .finish {
     background: #321c14;
-    color: white;
+    color: #fff;
     border: 0;
 }
 
@@ -352,6 +351,13 @@ button {
     font-size: 14px;
 }
 
+.group input:focus,
+.group textarea:focus,
+.group select:focus {
+    outline: none;
+    border-color: #321c14;
+}
+
 .row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -371,9 +377,15 @@ button {
     cursor: wait;
 }
 
+.required-note {
+    color: #756a65;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
 @media(max-width:850px) {
     .grid {
-        grid-template-columns: repeat(2,1fr);
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .hero h1 {
@@ -402,6 +414,18 @@ button {
         right: 15px;
         bottom: 15px;
     }
+
+    .header {
+        padding: 12px 15px;
+    }
+
+    .logo strong {
+        font-size: 22px;
+    }
+
+    .cart-top {
+        padding: 10px 13px;
+    }
 }
 </style>
 </head>
@@ -410,10 +434,8 @@ button {
 
 <header>
     <div class="header">
-
         <div class="logo">
             <div class="cookie"></div>
-
             <div>
                 <strong>KUKI</strong>
                 <span>Cookies Artesanais</span>
@@ -424,860 +446,550 @@ button {
             🛒 Meu pedido
             <span id="topCount">0</span>
         </button>
-
     </div>
 </header>
 
-
 <section class="hero">
-
     <h1>Faça seu pedido 🍪</h1>
-
-    <p>
-        Escolha seus cookies favoritos e monte seu pedido.
-    </p>
-
+    <p>Escolha seus cookies favoritos e monte seu pedido.</p>
 </section>
 
-
 <main class="products">
-
     <div class="grid" id="products"></div>
-
 </main>
 
-
 <div class="floating">
-
     <button class="cart-button" onclick="openCart()">
-
         🛒 Ver pedido
         (<span id="floatCount">0</span>)
-
     </button>
-
 </div>
 
-
-<div id="overlay"
-     class="overlay"
-     onclick="outside(event)">
-
+<div id="overlay" class="overlay" onclick="outside(event)">
     <div class="modal">
 
         <div class="modalhead">
-
             <h2>Seu pedido</h2>
-
-            <button
-                class="close"
-                onclick="closeCart()">
-
-                ×
-
-            </button>
-
+            <button class="close" onclick="closeCart()">×</button>
         </div>
 
-
-        <div
-            id="items"
-            class="items">
-        </div>
-
+        <div id="items" class="items"></div>
 
         <div class="total">
-
             <span>Total</span>
-
-            <span id="total">
-                R$ 0,00
-            </span>
-
+            <span id="total">R$ 0,00</span>
         </div>
 
-
         <div class="form">
-
             <h3>Seus dados</h3>
-
+            <p class="required-note">* Campos obrigatórios</p>
 
             <div class="group">
-
                 <label>Nome *</label>
-
-                <input
-                    id="name"
-                    placeholder="Digite seu nome">
-
+                <input id="name" placeholder="Digite seu nome" autocomplete="name">
             </div>
 
-
             <div class="group">
-
                 <label>WhatsApp *</label>
-
                 <input
                     id="phone"
-                    placeholder="(85) 99999-9999">
-
+                    placeholder="(85) 99999-9999"
+                    inputmode="tel"
+                    autocomplete="tel">
             </div>
 
-
             <div class="group">
-
-                <label>Forma de pagamento</label>
-
+                <label>Forma de pagamento *</label>
                 <select id="payment">
-
-                    <option value="">
-                        Selecione
-                    </option>
-
-                    <option value="PIX">
-                        PIX
-                    </option>
-
-                    <option value="DINHEIRO">
-                        Dinheiro
-                    </option>
-
-                    <option value="CARTAO">
-                        Cartão
-                    </option>
-
+                    <option value="">Selecione</option>
+                    <option value="PIX">PIX</option>
+                    <option value="DINHEIRO">Dinheiro</option>
+                    <option value="CARTAO">Cartão</option>
                 </select>
-
             </div>
 
-
             <div class="group">
-
-                <label>Tipo de entrega</label>
-
+                <label>Tipo de entrega *</label>
                 <select id="delivery">
-
-                    <option value="">
-                        Selecione
-                    </option>
-
-                    <option value="ENTREGA">
-                        Entrega
-                    </option>
-
-                    <option value="RETIRADA">
-                        Retirada
-                    </option>
-
+                    <option value="">Selecione</option>
+                    <option value="ENTREGA">Entrega</option>
+                    <option value="RETIRADA">Retirada</option>
                 </select>
-
             </div>
-
 
             <div class="group">
-
-                <label>Endereço</label>
-
-                <input
-                    id="address"
-                    placeholder="Rua, avenida...">
-
+                <label>Endereço *</label>
+                <input id="address" placeholder="Rua, avenida..." autocomplete="street-address">
             </div>
-
 
             <div class="row">
-
                 <div class="group">
-
-                    <label>Número</label>
-
-                    <input
-                        id="number"
-                        placeholder="Número">
-
+                    <label>Número *</label>
+                    <input id="number" placeholder="Número">
                 </div>
 
-
                 <div class="group">
-
-                    <label>Bairro</label>
-
-                    <input
-                        id="neighborhood"
-                        placeholder="Bairro">
-
+                    <label>Bairro *</label>
+                    <input id="neighborhood" placeholder="Bairro" autocomplete="address-level3">
                 </div>
-
             </div>
 
-
             <div class="group">
-
                 <label>Observação</label>
-
                 <textarea
                     id="observation"
                     rows="3"
-                    placeholder="Alguma observação?">
-                </textarea>
-
+                    placeholder="Alguma observação?"></textarea>
             </div>
 
-
-            <button
-                id="finish"
-                class="finish"
-                onclick="finishOrder()">
-
+            <button id="finish" class="finish" onclick="finishOrder()">
                 FINALIZAR PEDIDO
-
             </button>
-
         </div>
 
     </div>
-
 </div>
 
-
 <script>
-
 const WEBHOOK_URL =
-"https://rikasolucoes.app.n8n.cloud/webhook-test/kuki-pedido-site";
-
+    "https://rikasolucoes.app.n8n.cloud/webhook/kuki-pedido-site";
 
 const products = [
-
     {
-        id:"1",
-        name:"TRADICIONAL",
-        price:10.90,
-        desc:"Chocolate ao leite e gotas de chocolate."
+        id: "1",
+        name: "TRADICIONAL",
+        price: 10.90,
+        desc: "Chocolate ao leite e gotas de chocolate."
     },
-
     {
-        id:"2",
-        name:"RED",
-        price:13.90,
-        desc:"Massa vermelha com muito chocolate branco."
+        id: "2",
+        name: "RED",
+        price: 13.90,
+        desc: "Massa vermelha com muito chocolate branco."
     },
-
     {
-        id:"3",
-        name:"BLACK",
-        price:13.90,
-        desc:"Massa 100% cacau com chocolate branco e ao leite."
+        id: "3",
+        name: "BLACK",
+        price: 13.90,
+        desc: "Massa 100% cacau com chocolate branco e ao leite."
     },
-
     {
-        id:"4",
-        name:"NUTELLA",
-        price:15.90,
-        desc:"Massa tradicional com muito recheio de Nutella."
+        id: "4",
+        name: "NUTELLA",
+        price: 15.90,
+        desc: "Massa tradicional com muito recheio de Nutella."
     },
-
     {
-        id:"5",
-        name:"BUENO",
-        price:17.90,
-        desc:"Cookie com recheio cremoso e delicioso."
+        id: "5",
+        name: "BUENO",
+        price: 17.90,
+        desc: "Cookie com recheio cremoso e delicioso."
     },
-
     {
-        id:"6",
-        name:"CREAM",
-        price:15.90,
-        desc:"Cookie com recheio cremoso e sabor irresistível."
+        id: "6",
+        name: "CREAM",
+        price: 15.90,
+        desc: "Cookie com recheio cremoso e sabor irresistível."
     }
-
 ];
-
 
 let cart = {};
 
-
 function money(value) {
-
-    return value.toLocaleString(
-        "pt-BR",
-        {
-            style:"currency",
-            currency:"BRL"
-        }
-    );
-
+    return value.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    });
 }
-
 
 function renderProducts() {
-
     document.getElementById("products").innerHTML =
-    products.map(function(p) {
+        products.map(function(p) {
+            return `
+                <div class="card">
+                    <div class="photo">🍪</div>
 
-        return `
+                    <div class="info">
+                        <div class="name">${p.name}</div>
 
-        <div class="card">
+                        <div class="desc">${p.desc}</div>
 
-            <div class="photo">
-                🍪
-            </div>
+                        <div class="price">${money(p.price)}</div>
 
+                        <div class="actions">
+                            <div class="qty">
+                                <button
+                                    type="button"
+                                    onclick="changeQty('${p.id}', -1)">
+                                    −
+                                </button>
 
-            <div class="info">
+                                <span id="q${p.id}">0</span>
 
-                <div class="name">
-                    ${p.name}
-                </div>
+                                <button
+                                    type="button"
+                                    onclick="changeQty('${p.id}', 1)">
+                                    +
+                                </button>
+                            </div>
 
-
-                <div class="desc">
-                    ${p.desc}
-                </div>
-
-
-                <div class="price">
-                    ${money(p.price)}
-                </div>
-
-
-                <div class="actions">
-
-                    <div class="qty">
-
-                        <button
-                            onclick="changeQty('${p.id}',-1)">
-                            −
-                        </button>
-
-
-                        <span id="q${p.id}">
-                            0
-                        </span>
-
-
-                        <button
-                            onclick="changeQty('${p.id}',1)">
-                            +
-                        </button>
-
+                            <button
+                                type="button"
+                                class="add"
+                                onclick="add('${p.id}')">
+                                ADICIONAR
+                            </button>
+                        </div>
                     </div>
-
-
-                    <button
-                        class="add"
-                        onclick="add('${p.id}')">
-
-                        ADICIONAR
-
-                    </button>
-
                 </div>
-
-            </div>
-
-        </div>
-
-        `;
-
-    }).join("");
-
+            `;
+        }).join("");
 }
 
-
 function changeQty(id, amount) {
+    const element = document.getElementById("q" + id);
 
-    const element =
-        document.getElementById("q" + id);
-
-    let value =
-        parseInt(element.textContent) || 0;
+    let value = parseInt(element.textContent, 10) || 0;
 
     value += amount;
 
-    if(value < 0) {
+    if (value < 0) {
         value = 0;
     }
 
     element.textContent = value;
-
 }
 
-
 function add(id) {
-
     const quantity =
         parseInt(
-            document.getElementById("q" + id).textContent
+            document.getElementById("q" + id).textContent,
+            10
         ) || 0;
 
-
-    if(quantity <= 0) {
-
-        alert(
-            "Escolha pelo menos 1 unidade."
-        );
-
+    if (quantity <= 0) {
+        alert("Escolha pelo menos 1 unidade.");
         return;
-
     }
-
 
     const product =
         products.find(function(p) {
-
             return p.id === id;
-
         });
 
-
-    if(!cart[id]) {
-
-        cart[id] = {
-            ...product,
-            quantity:0
-        };
-
+    if (!product) {
+        alert("Produto não encontrado.");
+        return;
     }
 
+    if (!cart[id]) {
+        cart[id] = {
+            ...product,
+            quantity: 0
+        };
+    }
 
     cart[id].quantity += quantity;
 
-
-    document.getElementById(
-        "q" + id
-    ).textContent = 0;
-
+    document.getElementById("q" + id).textContent = 0;
 
     updateCart();
 
-    openCart();
-
+    // IMPORTANTE:
+    // não abre o carrinho automaticamente.
+    // O cliente pode continuar adicionando produtos.
 }
 
-
 function changeCart(id, amount) {
-
-    if(!cart[id]) {
+    if (!cart[id]) {
         return;
     }
-
 
     cart[id].quantity += amount;
 
-
-    if(cart[id].quantity <= 0) {
-
+    if (cart[id].quantity <= 0) {
         delete cart[id];
-
     }
 
-
     updateCart();
-
 }
-
 
 function removeItem(id) {
-
     delete cart[id];
-
     updateCart();
-
 }
-
 
 function calculateTotal() {
-
     return Object.values(cart)
-        .reduce(function(total,item) {
-
-            return total +
-                item.price *
-                item.quantity;
-
-        },0);
-
+        .reduce(function(total, item) {
+            return total + (item.price * item.quantity);
+        }, 0);
 }
-
 
 function calculateCount() {
-
     return Object.values(cart)
-        .reduce(function(total,item) {
-
-            return total +
-                item.quantity;
-
-        },0);
-
+        .reduce(function(total, item) {
+            return total + item.quantity;
+        }, 0);
 }
-
 
 function updateCart() {
+    const container = document.getElementById("items");
+    const ids = Object.keys(cart);
 
-    const container =
-        document.getElementById("items");
-
-    const ids =
-        Object.keys(cart);
-
-
-    if(ids.length === 0) {
-
+    if (ids.length === 0) {
         container.innerHTML =
             '<div class="empty">Seu pedido está vazio.</div>';
-
-    }
-
-    else {
-
+    } else {
         container.innerHTML =
             ids.map(function(id) {
-
-                const item =
-                    cart[id];
-
-                const subtotal =
-                    item.price *
-                    item.quantity;
-
+                const item = cart[id];
+                const subtotal = item.price * item.quantity;
 
                 return `
+                    <div class="item">
+                        <div>
+                            <div class="itemname">${item.name}</div>
 
-                <div class="item">
-
-                    <div>
-
-                        <div class="itemname">
-                            ${item.name}
+                            <div class="itemprice">
+                                ${item.quantity} x
+                                ${money(item.price)}
+                                =
+                                ${money(subtotal)}
+                            </div>
                         </div>
 
-                        <div class="itemprice">
+                        <div class="controls">
+                            <button
+                                type="button"
+                                onclick="changeCart('${id}', -1)">
+                                −
+                            </button>
 
-                            ${item.quantity}
-                            x
-                            ${money(item.price)}
-                            =
-                            ${money(subtotal)}
+                            <strong>${item.quantity}</strong>
 
+                            <button
+                                type="button"
+                                onclick="changeCart('${id}', 1)">
+                                +
+                            </button>
+
+                            <button
+                                type="button"
+                                class="remove"
+                                onclick="removeItem('${id}')">
+                                🗑
+                            </button>
                         </div>
-
                     </div>
-
-
-                    <div class="controls">
-
-                        <button
-                            onclick="changeCart('${id}',-1)">
-                            −
-                        </button>
-
-
-                        <strong>
-                            ${item.quantity}
-                        </strong>
-
-
-                        <button
-                            onclick="changeCart('${id}',1)">
-                            +
-                        </button>
-
-
-                        <button
-                            class="remove"
-                            onclick="removeItem('${id}')">
-
-                            🗑
-
-                        </button>
-
-                    </div>
-
-                </div>
-
                 `;
-
             }).join("");
-
     }
 
-
-    document.getElementById(
-        "total"
-    ).textContent =
+    document.getElementById("total").textContent =
         money(calculateTotal());
 
-
-    document.getElementById(
-        "topCount"
-    ).textContent =
+    document.getElementById("topCount").textContent =
         calculateCount();
 
-
-    document.getElementById(
-        "floatCount"
-    ).textContent =
+    document.getElementById("floatCount").textContent =
         calculateCount();
-
 }
 
-
 function openCart() {
-
     document
         .getElementById("overlay")
         .classList.add("active");
-
 }
 
-
 function closeCart() {
-
     document
         .getElementById("overlay")
         .classList.remove("active");
-
 }
-
 
 function outside(event) {
-
-    if(event.target.id === "overlay") {
-
+    if (event.target.id === "overlay") {
         closeCart();
-
     }
-
 }
 
+function normalizePhone(phone) {
+    return String(phone || "").replace(/\D/g, "");
+}
+
+function isValidPhone(phone) {
+    const digits = normalizePhone(phone);
+
+    // Aceita números com 10 ou 11 dígitos nacionais.
+    return digits.length === 10 || digits.length === 11;
+}
 
 async function finishOrder() {
-
-
-    if(Object.keys(cart).length === 0) {
-
-        alert(
-            "Adicione pelo menos um produto ao pedido."
-        );
-
+    if (Object.keys(cart).length === 0) {
+        alert("Adicione pelo menos um produto ao pedido.");
         return;
-
     }
-
 
     const name =
-        document.getElementById("name")
-        .value
-        .trim();
-
+        document.getElementById("name").value.trim();
 
     const phone =
-        document.getElementById("phone")
-        .value
-        .trim();
+        document.getElementById("phone").value.trim();
 
+    const payment =
+        document.getElementById("payment").value.trim();
 
-    if(!name) {
+    const delivery =
+        document.getElementById("delivery").value.trim();
 
-        alert(
-            "Digite seu nome."
-        );
+    const address =
+        document.getElementById("address").value.trim();
 
+    const number =
+        document.getElementById("number").value.trim();
+
+    const neighborhood =
+        document.getElementById("neighborhood").value.trim();
+
+    const observation =
+        document.getElementById("observation").value.trim();
+
+    // =========================
+    // CAMPOS OBRIGATÓRIOS
+    // =========================
+
+    if (!name) {
+        alert("Digite seu nome.");
+        document.getElementById("name").focus();
         return;
-
     }
 
-
-    if(!phone) {
-
-        alert(
-            "Digite seu WhatsApp."
-        );
-
+    if (!phone) {
+        alert("Digite seu WhatsApp.");
+        document.getElementById("phone").focus();
         return;
-
     }
 
+    if (!isValidPhone(phone)) {
+        alert("Digite um WhatsApp válido.");
+        document.getElementById("phone").focus();
+        return;
+    }
+
+    if (!payment) {
+        alert("Selecione a forma de pagamento.");
+        document.getElementById("payment").focus();
+        return;
+    }
+
+    if (!delivery) {
+        alert("Selecione o tipo de entrega.");
+        document.getElementById("delivery").focus();
+        return;
+    }
+
+    if (!address) {
+        alert("Digite o endereço.");
+        document.getElementById("address").focus();
+        return;
+    }
+
+    if (!number) {
+        alert("Digite o número.");
+        document.getElementById("number").focus();
+        return;
+    }
+
+    if (!neighborhood) {
+        alert("Digite o bairro.");
+        document.getElementById("neighborhood").focus();
+        return;
+    }
 
     const order = {
-
-        origem:"SITE_KUKI",
-
+        origem: "SITE_KUKI",
 
         cliente: {
-
-            nome:name,
-
-            whatsapp:phone
-
+            nome: name,
+            whatsapp: phone
         },
 
+        itens: Object.values(cart).map(function(item) {
+            return {
+                produto_id: item.id,
+                produto: item.name,
+                quantidade: item.quantity,
+                preco_unitario: item.price,
+                valor_item: item.price * item.quantity
+            };
+        }),
 
-        itens:
-
-            Object.values(cart)
-            .map(function(item) {
-
-                return {
-
-                    produto_id:item.id,
-
-                    produto:item.name,
-
-                    quantidade:item.quantity,
-
-                    preco_unitario:item.price,
-
-                    valor_item:
-                        item.price *
-                        item.quantity
-
-                };
-
-            }),
-
-
-        pagamento:
-            document.getElementById(
-                "payment"
-            ).value,
-
-
-        entrega:
-            document.getElementById(
-                "delivery"
-            ).value,
-
-
-        endereco:
-            document.getElementById(
-                "address"
-            ).value.trim(),
-
-
-        numero:
-            document.getElementById(
-                "number"
-            ).value.trim(),
-
-
-        bairro:
-            document.getElementById(
-                "neighborhood"
-            ).value.trim(),
-
-
-        observacao:
-            document.getElementById(
-                "observation"
-            ).value.trim(),
-
-
-        total:
-            calculateTotal(),
-
-
-        data:
-            new Date().toISOString()
-
+        pagamento: payment,
+        entrega: delivery,
+        endereco: address,
+        numero: number,
+        bairro: neighborhood,
+        observacao: observation,
+        total: calculateTotal(),
+        data: new Date().toISOString()
     };
-
 
     const button =
         document.getElementById("finish");
 
-
     button.disabled = true;
-
-    button.textContent =
-        "ENVIANDO PEDIDO...";
-
+    button.textContent = "ENVIANDO PEDIDO...";
 
     try {
+        const response = await fetch(WEBHOOK_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(order)
+        });
 
-
-        const response =
-            await fetch(
-
-                WEBHOOK_URL,
-
-                {
-
-                    method:"POST",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify(order)
-
-                }
-
-            );
-
-
-        if(!response.ok) {
-
-            throw new Error(
-                "HTTP " +
-                response.status
-            );
-
+        if (!response.ok) {
+            throw new Error("HTTP " + response.status);
         }
-
 
         alert(
             "Pedido enviado com sucesso! 🍪\n\n" +
-            "Obrigado, " +
-            name +
-            "!"
+            "Obrigado, " + name + "!"
         );
-
 
         cart = {};
 
         updateCart();
-
         closeCart();
 
+        // Limpa o formulário após envio
+        document.getElementById("name").value = "";
+        document.getElementById("phone").value = "";
+        document.getElementById("payment").value = "";
+        document.getElementById("delivery").value = "";
+        document.getElementById("address").value = "";
+        document.getElementById("number").value = "";
+        document.getElementById("neighborhood").value = "";
+        document.getElementById("observation").value = "";
 
-    }
-
-    catch(error) {
-
-        console.error(
-            "Erro:",
-            error
-        );
-
+    } catch (error) {
+        console.error("Erro ao enviar pedido:", error);
 
         alert(
             "Não foi possível enviar o pedido.\n\n" +
             "Verifique sua conexão e tente novamente."
         );
 
-    }
-
-
-    finally {
-
+    } finally {
         button.disabled = false;
-
-        button.textContent =
-            "FINALIZAR PEDIDO";
-
+        button.textContent = "FINALIZAR PEDIDO";
     }
-
 }
 
-
 renderProducts();
-
 updateCart();
-
 </script>
 
 </body>
