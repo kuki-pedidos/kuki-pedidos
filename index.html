@@ -599,6 +599,24 @@ body{
     }
 }
 
+
+/* GUARD RAILS DE SEGURANÇA */
+.hp-field{
+    position:absolute !important;
+    left:-9999px !important;
+    width:1px !important;
+    height:1px !important;
+    overflow:hidden !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+}
+.security-note{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:8px;
+    line-height:1.35;
+}
+
 </style>
 </head>
 
@@ -675,7 +693,13 @@ body{
 
             <div class="group">
                 <label for="name">Nome *</label>
-                <input id="name" type="text" placeholder="Digite seu nome" autocomplete="name">
+                
+<div class="hp-field" aria-hidden="true">
+    <label for="website">Deixe este campo vazio</label>
+    <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+</div>
+
+<input id="name" type="text" placeholder="Digite seu nome" autocomplete="name">
             </div>
 
             <div class="group">
@@ -1289,14 +1313,20 @@ async function lookupCustomerByPhone(){
     phoneInput.classList.add("customer-loading");
 
     try{
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+
         const response = await fetch(CLIENT_LOOKUP_WEBHOOK_URL,{
             method:"POST",
+            signal:controller.signal,
             headers:{"Content-Type":"application/json"},
             body:JSON.stringify({
                 telefone:phone,
                 whatsapp:phone
             })
         });
+
+        clearTimeout(timeout);
 
         if(!response.ok) throw new Error("HTTP " + response.status);
 
@@ -1393,7 +1423,167 @@ if(cepInput){
     cepInput.addEventListener("blur", searchCep);
 }
 
+
+/* =========================================================
+   GUARD RAILS KUKI - CAMADA CLIENT-SIDE
+   Observação: validação real também deve existir no n8n.
+   ========================================================= */
+
+const SECURITY = {
+    ORDER_COOLDOWN_MS: 8000,          // evita repetição acidental/spam imediato
+    MAX_NAME_LENGTH: 80,
+    MAX_TEXT_LENGTH: 300,
+    MAX_ADDRESS_LENGTH: 120,
+    MAX_CART_QUANTITY_PER_ITEM: 30,
+    MAX_CART_ITEMS: 20,
+    MAX_ORDER_TOTAL: 5000
+};
+
+let lastOrderAttemptAt = 0;
+
+function sanitizeText(value, maxLength){
+    return String(value ?? "")
+        .replace(/[\u0000-\u001F\u007F]/g, " ")
+        .replace(/[<>]/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, maxLength);
+}
+
+function sanitizeDigits(value, maxLength){
+    return String(value ?? "")
+        .replace(/\D/g, "")
+        .slice(0, maxLength);
+}
+
+function safeNumber(value, fallback = 0){
+    const n = Number(value);
+    return Number.isFinite(n) ? n : fallback;
+}
+
+function isSafeOrder(){
+    const items = Object.values(cart || {});
+
+    if(items.length === 0 || items.length > SECURITY.MAX_CART_ITEMS){
+        return {ok:false, message:"Quantidade de itens inválida."};
+    }
+
+    for(const item of items){
+        const quantity = safeNumber(item.quantity);
+        const price = safeNumber(item.price);
+
+        if(!Number.isInteger(quantity) || quantity < 1 ||
+           quantity > SECURITY.MAX_CART_QUANTITY_PER_ITEM){
+            return {ok:false, message:"Quantidade inválida no carrinho."};
+        }
+
+        if(price < 0 || price > SECURITY.MAX_ORDER_TOTAL){
+            return {ok:false, message:"Preço inválido no pedido."};
+        }
+    }
+
+    const total = safeNumber(calculateTotal());
+    if(total <= 0 || total > SECURITY.MAX_ORDER_TOTAL){
+        return {ok:false, message:"Valor total inválido."};
+    }
+
+    return {ok:true};
+}
+
+function isBotSubmission(){
+    const hp = document.getElementById("website");
+    return !!(hp && hp.value.trim());
+}
+
+function makeRequestId(){
+    if(window.crypto && crypto.randomUUID){
+        return crypto.randomUUID();
+    }
+    return "kuki-" + Date.now() + "-" + Math.random().toString(36).slice(2);
+}
+
+function cleanCheckoutFields(){
+    const fields = {
+        name: ["name", SECURITY.MAX_NAME_LENGTH],
+        cep: ["cep", 8],
+        address: ["address", SECURITY.MAX_ADDRESS_LENGTH],
+        number: ["number", 15],
+        neighborhood: ["neighborhood", 80],
+        city: ["city", 80],
+        observation: ["observation", SECURITY.MAX_TEXT_LENGTH]
+    };
+
+    const name = document.getElementById(fields.name[0]);
+    if(name) name.value = sanitizeText(name.value, fields.name[1]);
+
+    const cep = document.getElementById(fields.cep[0]);
+    if(cep) cep.value = formatCep(sanitizeDigits(cep.value, fields.cep[1]));
+
+    const address = document.getElementById(fields.address[0]);
+    if(address) address.value = sanitizeText(address.value, fields.address[1]);
+
+    const number = document.getElementById(fields.number[0]);
+    if(number) number.value = sanitizeText(number.value, fields.number[1]);
+
+    const neighborhood = document.getElementById(fields.neighborhood[0]);
+    if(neighborhood) neighborhood.value = sanitizeText(neighborhood.value, fields.neighborhood[1]);
+
+    const city = document.getElementById(fields.city[0]);
+    if(city) city.value = sanitizeText(city.value, fields.city[1]);
+
+    const observation = document.getElementById(fields.observation[0]);
+    if(observation) observation.value = sanitizeText(observation.value, fields.observation[1]);
+}
+
+function addInputGuardRails(){
+    const maxMap = {
+        name: SECURITY.MAX_NAME_LENGTH,
+        address: SECURITY.MAX_ADDRESS_LENGTH,
+        number: 15,
+        neighborhood: 80,
+        city: 80,
+        observation: SECURITY.MAX_TEXT_LENGTH
+    };
+
+    Object.entries(maxMap).forEach(([id, max]) => {
+        const el = document.getElementById(id);
+        if(el){
+            el.setAttribute("maxlength", String(max));
+        }
+    });
+
+    const phone = document.getElementById("phone");
+    if(phone) phone.setAttribute("inputmode", "tel");
+
+    const cep = document.getElementById("cep");
+    if(cep) cep.setAttribute("inputmode", "numeric");
+}
+
+addInputGuardRails();
+
+
 async function finishOrder(){
+    cleanCheckoutFields();
+
+    // Honeypot: bloqueia envios automatizados simples.
+    if(isBotSubmission()){
+        console.warn("Envio bloqueado pelo guard rail anti-bot.");
+        return;
+    }
+
+    // Cooldown contra clique repetido e spam local.
+    const now = Date.now();
+    if(now - lastOrderAttemptAt < SECURITY.ORDER_COOLDOWN_MS){
+        alert("Aguarde alguns segundos antes de enviar novamente.");
+        return;
+    }
+
+    const orderSafety = isSafeOrder();
+    if(!orderSafety.ok){
+        alert(orderSafety.message);
+        return;
+    }
+
     const storeState = getStoreState();
     if(!storeState.open){
         alert("A KUKI está fechada no momento. Não é possível finalizar pedidos agora.");
@@ -1473,6 +1663,7 @@ async function finishOrder(){
     }
 
     const order = {
+        request_id: makeRequestId(),
         origem: "SITE_KUKI",
 
         cliente:{
@@ -1504,20 +1695,28 @@ async function finishOrder(){
 
     const button = document.getElementById("finish");
 
+    lastOrderAttemptAt = Date.now();
     button.disabled = true;
     button.textContent = "ENVIANDO PEDIDO...";
 
     try{
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+
         const response = await fetch(
             WEBHOOK_URL,
             {
                 method:"POST",
+                signal:controller.signal,
                 headers:{
-                    "Content-Type":"application/json"
+                    "Content-Type":"application/json",
+                    "X-Requested-With":"KUKI-SITE"
                 },
                 body:JSON.stringify(order)
             }
         );
+
+        clearTimeout(timeout);
 
         if(!response.ok){
             throw new Error("HTTP " + response.status);
