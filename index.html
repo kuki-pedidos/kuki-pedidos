@@ -447,7 +447,8 @@ header{
 @media(max-width:620px){
     .header{padding:10px 14px}
     .brand img{width:135px}
-    .cart-top{padding:11px 14px}
+    .cart-top,.history-top{padding:11px 12px;font-size:12px}
+    .header-actions{gap:6px}
     .hero{padding:32px 15px 14px}
     .products{padding:10px 15px 55px}
     .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -477,9 +478,12 @@ header{
             <img src="images/logo-kuki-transparente.png" alt="KUKI Cookies">
         </a>
 
-        <button class="cart-top" type="button" onclick="openCart()">
-            🛒 Finalizar pedido <span id="topCount">0</span>
-        </button>
+        <div class="header-actions">
+            <button class="history-top" type="button" onclick="openHistory()">📋 Meus pedidos</button>
+            <button class="cart-top" type="button" onclick="openCart()">
+                🛒 Finalizar pedido <span id="topCount">0</span>
+            </button>
+        </div>
     </div>
 </header>
 
@@ -581,6 +585,27 @@ header{
     </div>
 </div>
 
+<!-- HISTÓRICO DE PEDIDOS -->
+<div id="historyOverlay" class="overlay" onclick="outsideHistory(event)">
+    <div class="modal">
+        <div class="modalhead">
+            <div>
+                <h2>Meus pedidos</h2>
+                <div class="required-note">Consulte seu histórico pelo WhatsApp cadastrado.</div>
+            </div>
+            <button class="close" type="button" onclick="closeHistory()">×</button>
+        </div>
+
+        <div class="group">
+            <label for="historyPhone">WhatsApp</label>
+            <input id="historyPhone" type="tel" placeholder="(85) 99999-9999" inputmode="tel" autocomplete="tel">
+        </div>
+
+        <button id="searchHistory" class="finish" type="button" onclick="loadHistory()">CONSULTAR PEDIDOS</button>
+        <div id="historyResult" class="history-result"></div>
+    </div>
+</div>
+
 <script>
 // HORÁRIOS DA LOJA — altere apenas este bloco quando necessário.
 // Dias: 0=domingo, 1=segunda, ... 6=sábado.
@@ -631,6 +656,10 @@ function updateStoreStatus(){
 
 const WEBHOOK_URL =
     "https://rikasolucoes.app.n8n.cloud/webhook/kuki-pedido-site";
+
+// Webhook que retornará os pedidos do cliente pelo WhatsApp.
+const HISTORY_WEBHOOK_URL =
+    "https://rikasolucoes.app.n8n.cloud/webhook/kuki-historico-pedidos";
 
 const products = [
     {
@@ -906,6 +935,95 @@ function isValidPhone(phone){
     );
 }
 
+function openHistory(){
+    document.getElementById("historyOverlay").classList.add("active");
+    document.getElementById("historyResult").innerHTML = "";
+    const savedPhone = localStorage.getItem("kuki_whatsapp") || "";
+    if(savedPhone) document.getElementById("historyPhone").value = savedPhone;
+}
+
+function closeHistory(){
+    document.getElementById("historyOverlay").classList.remove("active");
+}
+
+function outsideHistory(event){
+    if(event.target.id === "historyOverlay") closeHistory();
+}
+
+function formatHistoryDate(value){
+    if(!value) return "Data não informada";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString("pt-BR");
+}
+
+function getHistoryOrders(data){
+    if(Array.isArray(data)) return data;
+    if(Array.isArray(data && data.pedidos)) return data.pedidos;
+    if(Array.isArray(data && data.data)) return data.data;
+    if(Array.isArray(data && data.body)) return data.body;
+    return [];
+}
+
+function renderHistory(orders){
+    const container = document.getElementById("historyResult");
+    if(!orders.length){
+        container.innerHTML = '<div class="history-empty">Nenhum pedido encontrado para este WhatsApp.</div>';
+        return;
+    }
+    container.innerHTML = orders.map(function(order){
+        const items = Array.isArray(order.itens) ? order.itens.map(function(item){
+            return `${item.quantidade || 1}x ${item.produto || item.nome || "Produto"}`;
+        }).join(", ") : "";
+        const total = Number(order.VALOR_TOTAL ?? order.valor_total ?? order.total ?? 0);
+        return `<div class="order-history-card">
+            <div class="order-history-head">
+                <div class="order-history-number">${order.NUMERO_PEDIDO || order.numero_pedido || order.ID || order.id || "Pedido"}</div>
+                <div class="order-history-status">${order.STATUS || order.status || "EM PROCESSAMENTO"}</div>
+            </div>
+            <div class="order-history-info">
+                <div><strong>Data:</strong> ${formatHistoryDate(order.DATA || order.data)}</div>
+                ${items ? `<div><strong>Itens:</strong> ${items}</div>` : ""}
+                <div><strong>Entrega:</strong> ${order.TIPO_ENTREGA || order.tipo_entrega || "-"}</div>
+                <div><strong>Pagamento:</strong> ${order.FORMA_PAGAMENTO || order.forma_pagamento || "-"}</div>
+            </div>
+            <div class="order-history-total">Total: ${money(total)}</div>
+        </div>`;
+    }).join("");
+}
+
+async function loadHistory(){
+    const input = document.getElementById("historyPhone");
+    const result = document.getElementById("historyResult");
+    const button = document.getElementById("searchHistory");
+    const phoneInput = input.value.trim();
+    if(!phoneInput || !isValidPhone(phoneInput)){
+        alert("Digite um WhatsApp válido.");
+        input.focus();
+        return;
+    }
+    const phone = normalizePhoneForOrder(phoneInput);
+    localStorage.setItem("kuki_whatsapp", phone);
+    button.disabled = true;
+    button.textContent = "CONSULTANDO...";
+    result.innerHTML = '<div class="history-loading">Buscando seus pedidos...</div>';
+    try{
+        const response = await fetch(HISTORY_WEBHOOK_URL,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({telefone:phone, whatsapp:phone})
+        });
+        if(!response.ok) throw new Error("HTTP " + response.status);
+        const data = await response.json();
+        renderHistory(getHistoryOrders(data));
+    }catch(error){
+        console.error("Erro ao consultar histórico:", error);
+        result.innerHTML = '<div class="history-empty">Não foi possível consultar os pedidos agora. Tente novamente.</div>';
+    }finally{
+        button.disabled = false;
+        button.textContent = "CONSULTAR PEDIDOS";
+    }
+}
+
 function showAddedFeedback(productName, quantity){
     const cartButton = document.querySelector(".cart-top");
     const toast = document.getElementById("cartToast");
@@ -1122,6 +1240,8 @@ async function finishOrder(){
         if(!response.ok){
             throw new Error("HTTP " + response.status);
         }
+
+        localStorage.setItem("kuki_whatsapp", phone);
 
         alert(
             "Pedido enviado com sucesso! 🍪\n\n" +
