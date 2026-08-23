@@ -98,6 +98,16 @@ header{
     font-size:16px;
 }
 
+.store-status{
+    max-width:1200px;
+    margin:0 auto;
+    padding:0 20px 8px;
+    font-size:14px;
+    font-weight:800;
+}
+.store-status.open{color:#167a3f}
+.store-status.closed{color:var(--wine)}
+
 .products{
     max-width:1200px;
     margin:auto;
@@ -125,7 +135,7 @@ header{
 }
 
 .photo{
-    height:255px;
+    height:290px;
     background:var(--cream-2);
     display:flex;
     align-items:center;
@@ -138,7 +148,7 @@ header{
     width:100%;
     height:100%;
     object-fit:contain;
-    padding:12px;
+    padding:4px;
     display:block;
 }
 
@@ -404,8 +414,17 @@ header{
     .cart-top{padding:11px 14px}
     .hero{padding:32px 15px 14px}
     .products{padding:10px 15px 55px}
-    .grid{grid-template-columns:1fr;gap:16px}
-    .photo{height:260px}
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .photo{height:185px}
+    .photo img{padding:2px}
+    .info{padding:11px}
+    .name{font-size:15px;margin-bottom:6px}
+    .desc{font-size:11px;min-height:48px;margin-bottom:8px}
+    .price{font-size:16px;margin-bottom:10px}
+    .actions{gap:6px;flex-direction:column}
+    .qty{justify-content:center}
+    .qty button{width:34px;height:36px}
+    .add{min-height:38px;font-size:12px}
     .row{grid-template-columns:1fr}
     .modal{padding:20px}
 }
@@ -427,9 +446,11 @@ header{
 </header>
 
 <section class="hero">
-    <h1>Faça seu pedido 🍪</h1>
+    <h1>Faça seu pedido</h1>
     <p>Escolha seus cookies favoritos e monte seu pedido.</p>
 </section>
+
+<div id="storeStatus" class="store-status" role="status"></div>
 
 <main class="products">
     <div class="grid" id="products"></div>
@@ -501,6 +522,11 @@ header{
             </div>
 
             <div class="group">
+                <label for="city">Cidade</label>
+                <input id="city" type="text" placeholder="Digite sua cidade" autocomplete="address-level2">
+            </div>
+
+            <div class="group">
                 <label for="observation">Observação</label>
                 <textarea id="observation" rows="3" placeholder="Alguma observação?"></textarea>
             </div>
@@ -513,6 +539,53 @@ header{
 </div>
 
 <script>
+// HORÁRIOS DA LOJA — altere apenas este bloco quando necessário.
+// Dias: 0=domingo, 1=segunda, ... 6=sábado.
+const STORE_HOURS = {
+    0: { open: "11:30", close: "17:00" }, // Domingo
+    1: { open: "13:30", close: "17:00" }, // Segunda
+    2: { open: "13:30", close: "17:00" }, // Terça
+    3: { open: "13:30", close: "17:00" }, // Quarta
+    4: { open: "13:30", close: "17:00" }, // Quinta
+    5: { open: "13:30", close: "17:00" }, // Sexta
+    6: { open: "13:30", close: "17:00" }  // Sábado
+};
+
+function getMinutes(time){
+    const [hour, minute] = time.split(":").map(Number);
+    return hour * 60 + minute;
+}
+
+function getStoreState(){
+    const now = new Date();
+    const schedule = STORE_HOURS[now.getDay()];
+
+    if(!schedule){
+        return { open:false, message:"Hoje a KUKI está fechada." };
+    }
+
+    const current = now.getHours() * 60 + now.getMinutes();
+    const opening = getMinutes(schedule.open);
+    const closing = getMinutes(schedule.close);
+    const isOpen = current >= opening && current < closing;
+
+    return {
+        open:isOpen,
+        message:isOpen
+            ? `🟢 Estamos abertos até ${schedule.close} hs`
+            : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.open} às ${schedule.close}.`
+    };
+}
+
+function updateStoreStatus(){
+    const state = getStoreState();
+    const element = document.getElementById("storeStatus");
+    if(!element) return state;
+    element.textContent = state.message;
+    element.className = "store-status " + (state.open ? "open" : "closed");
+    return state;
+}
+
 const WEBHOOK_URL =
     "https://rikasolucoes.app.n8n.cloud/webhook/kuki-pedido-site";
 
@@ -784,6 +857,12 @@ function isValidPhone(phone){
 }
 
 async function finishOrder(){
+    const storeState = getStoreState();
+    if(!storeState.open){
+        alert("A KUKI está fechada no momento. Não é possível finalizar pedidos agora.");
+        return;
+    }
+
     if(Object.keys(cart).length === 0){
         alert("Adicione pelo menos um produto ao pedido.");
         return;
@@ -796,6 +875,7 @@ async function finishOrder(){
     const address = document.getElementById("address").value.trim();
     const number = document.getElementById("number").value.trim();
     const neighborhood = document.getElementById("neighborhood").value.trim();
+    const city = document.getElementById("city").value.trim();
     const observation = document.getElementById("observation").value.trim();
 
     if(!name){
@@ -871,6 +951,7 @@ async function finishOrder(){
         endereco:address,
         numero:number,
         bairro:neighborhood,
+        cidade:city,
         observacao:observation,
         total:calculateTotal(),
         data:new Date().toISOString()
@@ -914,6 +995,7 @@ async function finishOrder(){
         document.getElementById("address").value = "";
         document.getElementById("number").value = "";
         document.getElementById("neighborhood").value = "";
+        document.getElementById("city").value = "";
         document.getElementById("observation").value = "";
 
     }catch(error){
@@ -931,6 +1013,8 @@ async function finishOrder(){
 
 renderProducts();
 updateCart();
+updateStoreStatus();
+setInterval(updateStoreStatus, 60000);
 </script>
 
 </body>
