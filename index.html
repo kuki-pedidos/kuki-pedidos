@@ -7,18 +7,17 @@
 
 <style>
 :root{
-    --wine:#b30b2e;
-    --wine-dark:#8e0623;
-    --wine-soft:#d93050;
-    --cream:#fff2e3;
-    --cream-2:#f9e5d1;
-    --cream-3:#f5d7bd;
-    --brown:#4b271f;
-    --text:#3a211a;
-    --muted:#80675d;
-    --white:#fffdfb;
-    --border:#ead1be;
-    --shadow:0 10px 30px rgba(80,35,20,.10);
+    --brand:#9f102d;
+    --brand-dark:#820b24;
+    --cream:#fff6e9;
+    --cream-2:#faebda;
+    --cream-3:#f3dfca;
+    --brown:#4b2b20;
+    --text:#3a241c;
+    --muted:#7c685d;
+    --white:#fffdfa;
+    --border:#ead9c8;
+    --shadow:0 10px 30px rgba(76,42,26,.08);
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -37,7 +36,7 @@ header{
     position:sticky;
     top:0;
     z-index:1000;
-    background:rgba(255,253,251,.97);
+    background:rgba(255,250,242,.98);
     backdrop-filter:blur(12px);
     border-bottom:1px solid var(--border);
 }
@@ -68,7 +67,7 @@ header{
 
 .cart-top{
     border:0;
-    background:var(--wine);
+    background:var(--brand);
     color:#fff;
     border-radius:999px;
     padding:13px 20px;
@@ -77,7 +76,7 @@ header{
     white-space:nowrap;
 }
 
-.cart-top:hover{background:var(--wine-dark)}
+.cart-top:hover{background:var(--brand-dark)}
 
 .hero{
     max-width:1200px;
@@ -86,7 +85,7 @@ header{
 }
 
 .hero h1{
-    color:var(--wine);
+    color:var(--brand);
     font-size:clamp(30px,4vw,48px);
     line-height:1;
     margin-bottom:12px;
@@ -138,18 +137,19 @@ header{
     width:100%;
     height:100%;
     object-fit:contain;
-    padding:10px;
+    padding:12px;
     display:block;
 }
 
 .info{padding:20px}
 
 .name{
-    color:var(--wine);
+    color:var(--brand);
     font-weight:900;
     font-size:23px;
     letter-spacing:.4px;
-    margin-bottom:7px;
+    margin-bottom:8px;
+    text-align:center;
 }
 
 .desc{
@@ -158,6 +158,7 @@ header{
     font-size:14px;
     line-height:1.45;
     margin-bottom:14px;
+    text-align:center;
 }
 
 .price{
@@ -186,7 +187,7 @@ header{
     height:44px;
     border:0;
     background:#fff;
-    color:var(--wine);
+    color:var(--brand);
     font-size:20px;
     font-weight:900;
 }
@@ -201,12 +202,12 @@ header{
     flex:1;
     border:0;
     border-radius:11px;
-    background:var(--wine);
+    background:var(--brand);
     color:#fff;
     font-weight:900;
 }
 
-.add:hover{background:var(--wine-dark)}
+.add:hover{background:var(--brand-dark)}
 
 .overlay{
     display:none;
@@ -242,7 +243,7 @@ header{
 }
 
 .modalhead h2{
-    color:var(--wine);
+    color:var(--brand);
     font-size:28px;
 }
 
@@ -252,7 +253,7 @@ header{
     border:0;
     border-radius:50%;
     background:var(--cream-2);
-    color:var(--wine);
+    color:var(--brand);
     font-size:24px;
     font-weight:900;
 }
@@ -283,7 +284,7 @@ header{
 }
 
 .itemname{
-    color:var(--wine);
+    color:var(--brand);
     font-weight:900;
 }
 
@@ -305,7 +306,7 @@ header{
     border-radius:8px;
     border:1px solid var(--border);
     background:#fff;
-    color:var(--wine);
+    color:var(--brand);
     font-weight:900;
 }
 
@@ -331,7 +332,7 @@ header{
 }
 
 .form h3{
-    color:var(--wine);
+    color:var(--brand);
     margin-bottom:4px;
     font-size:21px;
 }
@@ -367,7 +368,7 @@ header{
 .group textarea:focus,
 .group select:focus{
     outline:none;
-    border-color:var(--wine);
+    border-color:var(--brand);
     box-shadow:0 0 0 3px rgba(179,11,46,.08);
 }
 
@@ -383,13 +384,13 @@ header{
     border:0;
     border-radius:12px;
     padding:15px;
-    background:var(--wine);
+    background:var(--brand);
     color:#fff;
     font-size:16px;
     font-weight:900;
 }
 
-.finish:hover{background:var(--wine-dark)}
+.finish:hover{background:var(--brand-dark)}
 .finish:disabled{opacity:.6;cursor:wait}
 
 @media(max-width:900px){
@@ -415,7 +416,7 @@ header{
 <header>
     <div class="header">
         <a class="brand" href="#" aria-label="KUKI">
-            <img src="images/logo-kuki.png" alt="KUKI Cookies">
+            <img src="images/logo-kuki-transparente.png" alt="KUKI Cookies">
         </a>
 
         <button class="cart-top" type="button" onclick="openCart()">
@@ -520,7 +521,7 @@ const products = [
         name: "TRADICIONAL",
         price: 10.90,
         desc: "Chocolate ao leite e gotas de chocolate",
-        image: "images/tradicional.jpg",
+        image: "images/tradicional.png",
         active: true
     },
     {
@@ -528,7 +529,7 @@ const products = [
         name: "RED",
         price: 13.90,
         desc: "Massa vermelha com muito chocolate branco",
-        image: "images/red.jpg",
+        image: "images/red.png",
         active: true
     },
     {
@@ -536,7 +537,7 @@ const products = [
         name: "BLACK",
         price: 13.90,
         desc: "Massa 100% cacau com chocolate branco e chocolate ao leite",
-        image: "images/black.jpg",
+        image: "images/black.png",
         active: true
     },
     {
@@ -544,7 +545,7 @@ const products = [
         name: "NUTELLA",
         price: 15.90,
         desc: "Massa tradicional com muito recheio de Nutella",
-        image: "images/nutella.jpg",
+        image: "images/nutella.png",
         active: true
     },
     {
@@ -552,7 +553,7 @@ const products = [
         name: "BUENO",
         price: 17.90,
         desc: "Cookie com recheio cremoso e o delicioso sabor bueno",
-        image: "images/bueno.jpg",
+        image: "images/bueno.png",
         active: true
     },
     {
@@ -560,7 +561,7 @@ const products = [
         name: "CREAM",
         price: 15.90,
         desc: "Cookie com recheio cremoso e sabor irresistível",
-        image: "images/cream.jpg",
+        image: "images/cream.png",
         active: true
     }
 ];
