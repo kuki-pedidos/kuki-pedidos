@@ -465,6 +465,86 @@ header{
     .row{grid-template-columns:1fr}
     .modal{padding:20px}
 }
+
+/* BOTÃO FIXO - MEUS PEDIDOS */
+.history-float{
+    position:fixed;
+    right:22px;
+    bottom:22px;
+    z-index:1500;
+    border:0;
+    border-radius:12px;
+    padding:15px 22px;
+    background:var(--wine);
+    color:#fff;
+    font-size:16px;
+    font-weight:900;
+    box-shadow:0 10px 24px rgba(80,35,20,.24);
+}
+.history-float:hover{background:var(--wine-dark)}
+
+.history-result{
+    margin-top:16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+.history-empty,.history-loading{
+    padding:16px;
+    border:1px dashed var(--border);
+    border-radius:12px;
+    color:var(--muted);
+    text-align:center;
+}
+.order-history-card{
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px;
+    background:#fff;
+}
+.order-history-head{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:flex-start;
+    margin-bottom:10px;
+}
+.order-history-number{
+    color:var(--wine);
+    font-weight:900;
+}
+.order-history-status{
+    background:var(--cream-2);
+    color:var(--brown);
+    border-radius:999px;
+    padding:5px 9px;
+    font-size:11px;
+    font-weight:900;
+}
+.order-history-info{
+    display:grid;
+    gap:5px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.45;
+}
+.order-history-total{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid var(--cream-3);
+    color:var(--brown);
+    font-weight:900;
+}
+
+@media(max-width:620px){
+    .history-float{
+        right:14px;
+        bottom:14px;
+        padding:13px 16px;
+        font-size:14px;
+    }
+}
+
 </style>
 </head>
 
@@ -479,7 +559,6 @@ header{
         </a>
 
         <div class="header-actions">
-            <button class="history-top" type="button" onclick="openHistory()">📋 Meus pedidos</button>
             <button class="cart-top" type="button" onclick="openCart()">
                 🛒 Finalizar pedido <span id="topCount">0</span>
             </button>
@@ -497,6 +576,12 @@ header{
 <main class="products">
     <div class="grid" id="products"></div>
 </main>
+
+
+<!-- BOTÃO MEUS PEDIDOS -->
+<button class="history-float" type="button" onclick="openHistory()">
+    📋 MEUS PEDIDOS
+</button>
 
 <div id="overlay" class="overlay" onclick="outside(event)">
     <div class="modal">
@@ -660,6 +745,11 @@ const WEBHOOK_URL =
 // Webhook que retornará os pedidos do cliente pelo WhatsApp.
 const HISTORY_WEBHOOK_URL =
     "https://rikasolucoes.app.n8n.cloud/webhook/kuki-historico-pedidos";
+
+// Webhook para identificar cliente pelo WhatsApp e preencher os dados salvos.
+// No n8n, ele deve retornar o cliente e a última forma de pagamento.
+const CLIENT_LOOKUP_WEBHOOK_URL =
+    "https://rikasolucoes.app.n8n.cloud/webhook/kuki-buscar-cliente";
 
 const products = [
     {
@@ -1046,6 +1136,127 @@ function showAddedFeedback(productName, quantity){
             toast.classList.remove("show");
         }, 2400);
     }
+}
+
+
+let customerLookupTimer = null;
+let lastCustomerLookupPhone = "";
+let customerLookupInProgress = false;
+
+function firstValue(obj, keys){
+    if(!obj || typeof obj !== "object") return "";
+    for(const key of keys){
+        if(obj[key] !== undefined && obj[key] !== null && String(obj[key]).trim() !== ""){
+            return obj[key];
+        }
+    }
+    return "";
+}
+
+function unwrapCustomerLookup(data){
+    if(Array.isArray(data)) return data[0] || null;
+    if(data && Array.isArray(data.data)) return data.data[0] || data;
+    if(data && Array.isArray(data.clientes)) return data.clientes[0] || data;
+    if(data && data.cliente) return data;
+    return data || null;
+}
+
+function fillCustomerData(data){
+    const payload = unwrapCustomerLookup(data);
+    if(!payload || payload.encontrado === false || payload.found === false) return false;
+
+    const customer = payload.cliente && typeof payload.cliente === "object"
+        ? payload.cliente
+        : payload;
+
+    const name = firstValue(customer, ["NOME","nome"]);
+    const cep = firstValue(customer, ["CEP","cep"]);
+    const address = firstValue(customer, ["ENDERECO","endereco","LOGRADOURO","logradouro"]);
+    const number = firstValue(customer, ["NUMERO","numero"]);
+    const neighborhood = firstValue(customer, ["BAIRRO","bairro"]);
+    const city = firstValue(customer, ["CIDADE","cidade"]);
+    const observation = firstValue(customer, ["OBSERVACAO_CLIENTE","OBSERVACAO","observacao"]);
+
+    const payment =
+        firstValue(payload, ["ULTIMA_FORMA_PAGAMENTO","ultima_forma_pagamento","FORMA_PAGAMENTO","forma_pagamento","PAGAMENTO","pagamento"]) ||
+        firstValue(customer, ["ULTIMA_FORMA_PAGAMENTO","ultima_forma_pagamento"]);
+
+    if(name) document.getElementById("name").value = name;
+    if(cep) document.getElementById("cep").value = formatCep(cep);
+    if(address) document.getElementById("address").value = address;
+    if(number) document.getElementById("number").value = number;
+    if(neighborhood) document.getElementById("neighborhood").value = neighborhood;
+    if(city) document.getElementById("city").value = city;
+    if(observation) document.getElementById("observation").value = observation;
+
+    if(payment){
+        const paymentSelect = document.getElementById("payment");
+        const normalized = String(payment).trim().toUpperCase();
+        const aliases = {
+            "CARTÃO":"CARTAO",
+            "CARTAO":"CARTAO",
+            "DINHEIRO":"DINHEIRO",
+            "PIX":"PIX"
+        };
+        paymentSelect.value = aliases[normalized] || normalized;
+    }
+
+    return true;
+}
+
+async function lookupCustomerByPhone(){
+    const phoneInput = document.getElementById("phone");
+    if(!phoneInput) return;
+
+    const rawPhone = phoneInput.value.trim();
+    if(!rawPhone || !isValidPhone(rawPhone)) return;
+
+    const phone = normalizePhoneForOrder(rawPhone);
+    if(customerLookupInProgress || phone === lastCustomerLookupPhone) return;
+
+    customerLookupInProgress = true;
+    phoneInput.classList.add("customer-loading");
+
+    try{
+        const response = await fetch(CLIENT_LOOKUP_WEBHOOK_URL,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({
+                telefone:phone,
+                whatsapp:phone
+            })
+        });
+
+        if(!response.ok) throw new Error("HTTP " + response.status);
+
+        const data = await response.json();
+        const found = fillCustomerData(data);
+
+        if(found){
+            lastCustomerLookupPhone = phone;
+            localStorage.setItem("kuki_whatsapp", phone);
+        }
+    }catch(error){
+        console.warn("Cliente não encontrado ou consulta indisponível:", error);
+    }finally{
+        customerLookupInProgress = false;
+        phoneInput.classList.remove("customer-loading");
+    }
+}
+
+function scheduleCustomerLookup(){
+    clearTimeout(customerLookupTimer);
+    customerLookupTimer = setTimeout(lookupCustomerByPhone, 700);
+}
+
+const phoneInputElement = document.getElementById("phone");
+if(phoneInputElement){
+    phoneInputElement.addEventListener("input", function(){
+        lastCustomerLookupPhone = "";
+        scheduleCustomerLookup();
+    });
+
+    phoneInputElement.addEventListener("blur", lookupCustomerByPhone);
 }
 
 function formatCep(value){
