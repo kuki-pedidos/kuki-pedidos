@@ -150,7 +150,14 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 90px;
+    overflow: hidden;
+}
+.photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 10px;
+    display: block;
 }
 
 .info {
@@ -567,37 +574,43 @@ const products = [
         id: "1",
         name: "TRADICIONAL",
         price: 10.90,
-        desc: "Chocolate ao leite e gotas de chocolate."
+        desc: "Chocolate ao leite e gotas de chocolate.",
+        image: "images/tradicional.jpg"
     },
     {
         id: "2",
         name: "RED",
         price: 13.90,
-        desc: "Massa vermelha com muito chocolate branco."
+        desc: "Massa vermelha com muito chocolate branco.",
+        image: "images/red.jpg"
     },
     {
         id: "3",
         name: "BLACK",
         price: 13.90,
-        desc: "Massa 100% cacau com chocolate branco e ao leite."
+        desc: "Massa 100% cacau com chocolate branco e ao leite.",
+        image: "images/black.jpg"
     },
     {
         id: "4",
         name: "NUTELLA",
         price: 15.90,
-        desc: "Massa tradicional com muito recheio de Nutella."
+        desc: "Massa tradicional com muito recheio de Nutella.",
+        image: "images/nutella.jpg"
     },
     {
         id: "5",
         name: "BUENO",
         price: 17.90,
-        desc: "Cookie com recheio cremoso e delicioso."
+        desc: "Cookie com recheio cremoso e delicioso.",
+        image: "images/bueno.jpg"
     },
     {
         id: "6",
         name: "CREAM",
         price: 15.90,
-        desc: "Cookie com recheio cremoso e sabor irresistível."
+        desc: "Cookie com recheio cremoso e sabor irresistível.",
+        image: "images/cream.jpg"
     }
 ];
 
@@ -615,7 +628,7 @@ function renderProducts() {
         products.map(function(product) {
             return `
                 <div class="card">
-                    <div class="photo">🍪</div>
+                    <div class="photo"><img src="${product.image}" alt="${product.name}" loading="lazy"></div>
 
                     <div class="info">
                         <div class="name">${product.name}</div>
