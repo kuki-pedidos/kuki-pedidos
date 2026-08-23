@@ -466,22 +466,58 @@ header{
     .modal{padding:20px}
 }
 
-/* BOTÃO FIXO - MEUS PEDIDOS */
-.history-float{
+/* RODAPÉ FIXO */
+.site-footer{
     position:fixed;
-    right:22px;
-    bottom:22px;
+    left:0;
+    right:0;
+    bottom:0;
     z-index:1500;
+    background:#fff;
+    border-top:1px solid var(--border);
+    box-shadow:0 -8px 24px rgba(80,35,20,.10);
+    padding:10px 22px;
+}
+.footer-content{
+    max-width:1180px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+}
+.history-float{
     border:0;
     border-radius:12px;
-    padding:15px 22px;
+    padding:14px 22px;
     background:var(--wine);
     color:#fff;
-    font-size:16px;
+    font-size:15px;
     font-weight:900;
-    box-shadow:0 10px 24px rgba(80,35,20,.24);
+    cursor:pointer;
+    box-shadow:0 6px 16px rgba(80,35,20,.20);
 }
 .history-float:hover{background:var(--wine-dark)}
+.instagram-link{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    color:var(--brown);
+    font-size:15px;
+    font-weight:800;
+    text-decoration:none;
+}
+.instagram-link:hover{
+    color:var(--wine);
+}
+.instagram-icon{
+    width:24px;
+    height:24px;
+    flex:0 0 24px;
+}
+body{
+    padding-bottom:76px;
+}
 
 .history-result{
     margin-top:16px;
@@ -537,11 +573,29 @@ header{
 }
 
 @media(max-width:620px){
+    .site-footer{
+        padding:9px 12px;
+    }
+    .footer-content{
+        gap:10px;
+    }
     .history-float{
-        right:14px;
-        bottom:14px;
-        padding:13px 16px;
-        font-size:14px;
+        padding:13px 14px;
+        font-size:12px;
+        white-space:nowrap;
+    }
+    .instagram-link{
+        font-size:12px;
+        gap:6px;
+        white-space:nowrap;
+    }
+    .instagram-icon{
+        width:21px;
+        height:21px;
+        flex-basis:21px;
+    }
+    body{
+        padding-bottom:70px;
     }
 }
 
@@ -578,10 +632,27 @@ header{
 </main>
 
 
-<!-- BOTÃO MEUS PEDIDOS -->
-<button class="history-float" type="button" onclick="openHistory()">
-    📋 MEUS PEDIDOS
-</button>
+<!-- RODAPÉ FIXO -->
+<footer class="site-footer">
+    <div class="footer-content">
+        <a class="instagram-link"
+           href="https://www.instagram.com/kukicookiees?igsi=ejd0dmI4Z2luMjI3"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Instagram da KUKI - Kukicookiees">
+            <svg class="instagram-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/>
+                <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/>
+            </svg>
+            <span>Kukicookiees</span>
+        </a>
+
+        <button class="history-float" type="button" onclick="openHistory()">
+            📋 MEUS PEDIDOS
+        </button>
+    </div>
+</footer>
 
 <div id="overlay" class="overlay" onclick="outside(event)">
     <div class="modal">
