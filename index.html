@@ -724,16 +724,12 @@ function add(id) {
         return;
     }
 
-    if(!cart[id]){
-        cart[id] = {
-            ...product,
-            quantity: 0
-        };
-    }
-
-    cart[id].quantity += quantity;
-
-    document.getElementById("q" + id).textContent = 0;
+    // A quantidade exibida no card representa a quantidade total
+    // desejada pelo cliente para esse produto.
+    cart[id] = {
+        ...product,
+        quantity: quantity
+    };
 
     updateCart();
 }
@@ -809,6 +805,16 @@ function updateCart(){
 
     document.getElementById("total").textContent = money(calculateTotal());
     document.getElementById("topCount").textContent = calculateCount();
+
+    // Mantém a quantidade mostrada nos cards igual à quantidade
+    // que realmente está no carrinho.
+    products.forEach(function(product){
+        const quantityElement = document.getElementById("q" + product.id);
+        if(quantityElement){
+            quantityElement.textContent =
+                cart[product.id] ? cart[product.id].quantity : 0;
+        }
+    });
 }
 
 function openCart(){
