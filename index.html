@@ -561,7 +561,7 @@ function getStoreState(){
     const schedule = STORE_HOURS[now.getDay()];
 
     if(!schedule){
-        return { open:false, message:"Hoje a KUKI está fechada." };
+        return { open:false, message:"Forno desligado por hoje! Voltamos amanhã com cookies fresquinhos.." };
     }
 
     const current = now.getHours() * 60 + now.getMinutes();
