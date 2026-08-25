@@ -404,6 +404,42 @@ header{
 .finish:hover{background:var(--wine-dark)}
 .finish:disabled{opacity:.6;cursor:wait}
 
+/* Feedback visual ao adicionar produto */
+@keyframes shake{
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-8px)}
+    40%{transform:translateX(8px)}
+    60%{transform:translateX(-6px)}
+    80%{transform:translateX(6px)}
+}
+
+.cart-added-shake{
+    animation:shake .45s ease;
+}
+
+.toast{
+    position:fixed;
+    left:50%;
+    top:88px;
+    transform:translateX(-50%) translateY(-20px);
+    z-index:3000;
+    background:var(--wine);
+    color:#fff;
+    padding:14px 22px;
+    border-radius:999px;
+    font-weight:900;
+    box-shadow:0 12px 28px rgba(80,35,20,.22);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s ease,transform .25s ease;
+    text-align:center;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
+
 @media(max-width:900px){
     .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
@@ -411,7 +447,8 @@ header{
 @media(max-width:620px){
     .header{padding:10px 14px}
     .brand img{width:135px}
-    .cart-top{padding:11px 14px}
+    .cart-top,.history-top{padding:11px 12px;font-size:12px}
+    .header-actions{gap:6px}
     .hero{padding:32px 15px 14px}
     .products{padding:10px 15px 55px}
     .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -428,10 +465,164 @@ header{
     .row{grid-template-columns:1fr}
     .modal{padding:20px}
 }
+
+/* RODAPÉ FIXO */
+.site-footer{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:1500;
+    background:#fff;
+    border-top:1px solid var(--border);
+    box-shadow:0 -8px 24px rgba(80,35,20,.10);
+    padding:10px 22px;
+}
+.footer-content{
+    max-width:1180px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+}
+.history-float{
+    border:0;
+    border-radius:12px;
+    padding:14px 22px;
+    background:var(--wine);
+    color:#fff;
+    font-size:15px;
+    font-weight:900;
+    cursor:pointer;
+    box-shadow:0 6px 16px rgba(80,35,20,.20);
+}
+.history-float:hover{background:var(--wine-dark)}
+.instagram-link{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    color:var(--brown);
+    font-size:15px;
+    font-weight:800;
+    text-decoration:none;
+}
+.instagram-link:hover{
+    color:var(--wine);
+}
+.instagram-icon{
+    width:24px;
+    height:24px;
+    flex:0 0 24px;
+}
+body{
+    padding-bottom:76px;
+}
+
+.history-result{
+    margin-top:16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+.history-empty,.history-loading{
+    padding:16px;
+    border:1px dashed var(--border);
+    border-radius:12px;
+    color:var(--muted);
+    text-align:center;
+}
+.order-history-card{
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px;
+    background:#fff;
+}
+.order-history-head{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:flex-start;
+    margin-bottom:10px;
+}
+.order-history-number{
+    color:var(--wine);
+    font-weight:900;
+}
+.order-history-status{
+    background:var(--cream-2);
+    color:var(--brown);
+    border-radius:999px;
+    padding:5px 9px;
+    font-size:11px;
+    font-weight:900;
+}
+.order-history-info{
+    display:grid;
+    gap:5px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.45;
+}
+.order-history-total{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid var(--cream-3);
+    color:var(--brown);
+    font-weight:900;
+}
+
+@media(max-width:620px){
+    .site-footer{
+        padding:9px 12px;
+    }
+    .footer-content{
+        gap:10px;
+    }
+    .history-float{
+        padding:13px 14px;
+        font-size:12px;
+        white-space:nowrap;
+    }
+    .instagram-link{
+        font-size:12px;
+        gap:6px;
+        white-space:nowrap;
+    }
+    .instagram-icon{
+        width:21px;
+        height:21px;
+        flex-basis:21px;
+    }
+    body{
+        padding-bottom:70px;
+    }
+}
+
+
+/* GUARD RAILS DE SEGURANÇA */
+.hp-field{
+    position:absolute !important;
+    left:-9999px !important;
+    width:1px !important;
+    height:1px !important;
+    overflow:hidden !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+}
+.security-note{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:8px;
+    line-height:1.35;
+}
+
 </style>
 </head>
 
 <body>
+
+<div id="cartToast" class="toast" role="status" aria-live="polite"></div>
 
 <header>
     <div class="header">
@@ -439,9 +630,11 @@ header{
             <img src="images/logo-kuki-transparente.png" alt="KUKI Cookies">
         </a>
 
-        <button class="cart-top" type="button" onclick="openCart()">
-            🛒 Finalizar pedido <span id="topCount">0</span>
-        </button>
+        <div class="header-actions">
+            <button class="cart-top" type="button" onclick="openCart()">
+                🛒 Finalizar pedido <span id="topCount">0</span>
+            </button>
+        </div>
     </div>
 </header>
 
@@ -455,6 +648,29 @@ header{
 <main class="products">
     <div class="grid" id="products"></div>
 </main>
+
+
+<!-- RODAPÉ FIXO -->
+<footer class="site-footer">
+    <div class="footer-content">
+        <a class="instagram-link"
+           href="https://www.instagram.com/kukicookiees?igsi=ejd0dmI4Z2luMjI3"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Instagram da KUKI - Kukicookiees">
+            <svg class="instagram-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/>
+                <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/>
+            </svg>
+            <span>Kukicookiees</span>
+        </a>
+
+        <button class="history-float" type="button" onclick="openHistory()">
+            📋 MEUS PEDIDOS
+        </button>
+    </div>
+</footer>
 
 <div id="overlay" class="overlay" onclick="outside(event)">
     <div class="modal">
@@ -477,7 +693,13 @@ header{
 
             <div class="group">
                 <label for="name">Nome *</label>
-                <input id="name" type="text" placeholder="Digite seu nome" autocomplete="name">
+                
+<div class="hp-field" aria-hidden="true">
+    <label for="website">Deixe este campo vazio</label>
+    <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+</div>
+
+<input id="name" type="text" placeholder="Digite seu nome" autocomplete="name">
             </div>
 
             <div class="group">
@@ -502,6 +724,11 @@ header{
                     <option value="ENTREGA">Entrega</option>
                     <option value="RETIRADA">Retirada</option>
                 </select>
+            </div>
+
+            <div class="group">
+                <label for="cep">CEP *</label>
+                <input id="cep" type="text" placeholder="00000-000" inputmode="numeric" autocomplete="postal-code" maxlength="9">
             </div>
 
             <div class="group">
@@ -538,12 +765,33 @@ header{
     </div>
 </div>
 
+<!-- HISTÓRICO DE PEDIDOS -->
+<div id="historyOverlay" class="overlay" onclick="outsideHistory(event)">
+    <div class="modal">
+        <div class="modalhead">
+            <div>
+                <h2>Meus pedidos</h2>
+                <div class="required-note">Consulte seu histórico pelo WhatsApp cadastrado.</div>
+            </div>
+            <button class="close" type="button" onclick="closeHistory()">×</button>
+        </div>
+
+        <div class="group">
+            <label for="historyPhone">WhatsApp</label>
+            <input id="historyPhone" type="tel" placeholder="(85) 99999-9999" inputmode="tel" autocomplete="tel">
+        </div>
+
+        <button id="searchHistory" class="finish" type="button" onclick="loadHistory()">CONSULTAR PEDIDOS</button>
+        <div id="historyResult" class="history-result"></div>
+    </div>
+</div>
+
 <script>
 // HORÁRIOS DA LOJA — altere apenas este bloco quando necessário.
 // Dias: 0=domingo, 1=segunda, ... 6=sábado.
 const STORE_HOURS = {
     0: { open: "11:30", close: "17:00" }, // Domingo
-    // Segunda-feira: loja fechada
+    1: { open: "13:30", close: "17:00" }, // Segunda
     2: { open: "13:30", close: "17:00" }, // Terça
     3: { open: "13:30", close: "17:00" }, // Quarta
     4: { open: "13:30", close: "17:00" }, // Quinta
@@ -561,7 +809,7 @@ function getStoreState(){
     const schedule = STORE_HOURS[now.getDay()];
 
     if(!schedule){
-        return { open:false, message:"Forno desligado por hoje! Voltamos amanhã com cookies fresquinhos.." };
+        return { open:false, message:"Hoje a KUKI está fechada." };
     }
 
     const current = now.getHours() * 60 + now.getMinutes();
@@ -572,8 +820,8 @@ function getStoreState(){
     return {
         open:isOpen,
         message:isOpen
-            ? `🟢 Estamos abertos até ${schedule.close}hs`
-            : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.open}hs às ${schedule.close}hs.`
+            ? `🟢 Estamos abertos até ${schedule.close} hs`
+            : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.open} às ${schedule.close}.`
     };
 }
 
@@ -588,6 +836,15 @@ function updateStoreStatus(){
 
 const WEBHOOK_URL =
     "https://rikasolucoes.app.n8n.cloud/webhook/kuki-pedido-site";
+
+// Webhook que retornará os pedidos do cliente pelo WhatsApp.
+const HISTORY_WEBHOOK_URL =
+    "https://rikasolucoes.app.n8n.cloud/webhook/kuki-historico-pedidos";
+
+// Webhook para identificar cliente pelo WhatsApp e preencher os dados salvos.
+// No n8n, ele deve retornar o cliente e a última forma de pagamento.
+const CLIENT_LOOKUP_WEBHOOK_URL =
+    "https://rikasolucoes.app.n8n.cloud/webhook/kuki-buscar-cliente";
 
 const products = [
     {
@@ -724,18 +981,15 @@ function add(id) {
         return;
     }
 
-    if(!cart[id]){
-        cart[id] = {
-            ...product,
-            quantity: 0
-        };
-    }
-
-    cart[id].quantity += quantity;
-
-    document.getElementById("q" + id).textContent = 0;
+    // A quantidade exibida no card representa a quantidade total
+    // desejada pelo cliente para esse produto.
+    cart[id] = {
+        ...product,
+        quantity: quantity
+    };
 
     updateCart();
+    showAddedFeedback(product.name, quantity);
 }
 
 function changeCart(id, amount) {
@@ -809,6 +1063,16 @@ function updateCart(){
 
     document.getElementById("total").textContent = money(calculateTotal());
     document.getElementById("topCount").textContent = calculateCount();
+
+    // Mantém a quantidade mostrada nos cards igual à quantidade
+    // que realmente está no carrinho.
+    products.forEach(function(product){
+        const quantityElement = document.getElementById("q" + product.id);
+        if(quantityElement){
+            quantityElement.textContent =
+                cart[product.id] ? cart[product.id].quantity : 0;
+        }
+    });
 }
 
 function openCart(){
@@ -856,7 +1120,470 @@ function isValidPhone(phone){
     );
 }
 
+function openHistory(){
+    document.getElementById("historyOverlay").classList.add("active");
+    document.getElementById("historyResult").innerHTML = "";
+    const savedPhone = localStorage.getItem("kuki_whatsapp") || "";
+    if(savedPhone) document.getElementById("historyPhone").value = savedPhone;
+}
+
+function closeHistory(){
+    document.getElementById("historyOverlay").classList.remove("active");
+}
+
+function outsideHistory(event){
+    if(event.target.id === "historyOverlay") closeHistory();
+}
+
+function formatHistoryDate(value){
+    if(!value) return "Data não informada";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString("pt-BR");
+}
+
+function getHistoryOrders(data){
+    if(Array.isArray(data)) return data;
+    if(Array.isArray(data && data.pedidos)) return data.pedidos;
+    if(Array.isArray(data && data.data)) return data.data;
+    if(Array.isArray(data && data.body)) return data.body;
+    return [];
+}
+
+function renderHistory(orders){
+    const container = document.getElementById("historyResult");
+    if(!orders.length){
+        container.innerHTML = '<div class="history-empty">Nenhum pedido encontrado para este WhatsApp.</div>';
+        return;
+    }
+    container.innerHTML = orders.map(function(order){
+        const items = Array.isArray(order.itens) ? order.itens.map(function(item){
+            return `${item.quantidade || 1}x ${item.produto || item.nome || "Produto"}`;
+        }).join(", ") : "";
+        const total = Number(order.VALOR_TOTAL ?? order.valor_total ?? order.total ?? 0);
+        return `<div class="order-history-card">
+            <div class="order-history-head">
+                <div class="order-history-number">${order.NUMERO_PEDIDO || order.numero_pedido || order.ID || order.id || "Pedido"}</div>
+                <div class="order-history-status">${order.STATUS || order.status || "EM PROCESSAMENTO"}</div>
+            </div>
+            <div class="order-history-info">
+                <div><strong>Data:</strong> ${formatHistoryDate(order.DATA || order.data)}</div>
+                ${items ? `<div><strong>Itens:</strong> ${items}</div>` : ""}
+                <div><strong>Entrega:</strong> ${order.TIPO_ENTREGA || order.tipo_entrega || "-"}</div>
+                <div><strong>Pagamento:</strong> ${order.FORMA_PAGAMENTO || order.forma_pagamento || "-"}</div>
+            </div>
+            <div class="order-history-total">Total: ${money(total)}</div>
+        </div>`;
+    }).join("");
+}
+
+async function loadHistory(){
+    const input = document.getElementById("historyPhone");
+    const result = document.getElementById("historyResult");
+    const button = document.getElementById("searchHistory");
+    const phoneInput = input.value.trim();
+    if(!phoneInput || !isValidPhone(phoneInput)){
+        alert("Digite um WhatsApp válido.");
+        input.focus();
+        return;
+    }
+    const phone = normalizePhoneForOrder(phoneInput);
+    localStorage.setItem("kuki_whatsapp", phone);
+    button.disabled = true;
+    button.textContent = "CONSULTANDO...";
+    result.innerHTML = '<div class="history-loading">Buscando seus pedidos...</div>';
+    try{
+        const response = await fetch(HISTORY_WEBHOOK_URL,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({telefone:phone, whatsapp:phone})
+        });
+        if(!response.ok) throw new Error("HTTP " + response.status);
+        const data = await response.json();
+        renderHistory(getHistoryOrders(data));
+    }catch(error){
+        console.error("Erro ao consultar histórico:", error);
+        result.innerHTML = '<div class="history-empty">Não foi possível consultar os pedidos agora. Tente novamente.</div>';
+    }finally{
+        button.disabled = false;
+        button.textContent = "CONSULTAR PEDIDOS";
+    }
+}
+
+function showAddedFeedback(productName, quantity){
+    const cartButton = document.querySelector(".cart-top");
+    const toast = document.getElementById("cartToast");
+
+    if(cartButton){
+        cartButton.classList.remove("cart-added-shake");
+        void cartButton.offsetWidth;
+        cartButton.classList.add("cart-added-shake");
+    }
+
+    if(toast){
+        const unitText = quantity === 1 ? "unidade" : "unidades";
+        toast.textContent = `🍪 ${quantity} ${unitText} de ${productName} adicionado${quantity === 1 ? "" : "s"} ao carrinho!`;
+        toast.classList.remove("show");
+        void toast.offsetWidth;
+        toast.classList.add("show");
+
+        clearTimeout(window.cartToastTimer);
+        window.cartToastTimer = setTimeout(function(){
+            toast.classList.remove("show");
+        }, 2400);
+    }
+}
+
+
+let customerLookupTimer = null;
+let lastCustomerLookupPhone = "";
+let customerLookupInProgress = false;
+
+function firstValue(obj, keys){
+    if(!obj || typeof obj !== "object") return "";
+    for(const key of keys){
+        if(obj[key] !== undefined && obj[key] !== null && String(obj[key]).trim() !== ""){
+            return obj[key];
+        }
+    }
+    return "";
+}
+
+function unwrapCustomerLookup(data){
+    if(Array.isArray(data)) return data[0] || null;
+    if(data && Array.isArray(data.data)) return data.data[0] || data;
+    if(data && Array.isArray(data.clientes)) return data.clientes[0] || data;
+    if(data && data.cliente) return data;
+    return data || null;
+}
+
+function fillCustomerData(data){
+    const payload = unwrapCustomerLookup(data);
+    if(!payload || payload.encontrado === false || payload.found === false) return false;
+
+    const customer = payload.cliente && typeof payload.cliente === "object"
+        ? payload.cliente
+        : payload;
+
+    const name = firstValue(customer, ["NOME","nome"]);
+    const cep = firstValue(customer, ["CEP","cep"]);
+    const address = firstValue(customer, ["ENDERECO","endereco","LOGRADOURO","logradouro"]);
+    const number = firstValue(customer, ["NUMERO","numero"]);
+    const neighborhood = firstValue(customer, ["BAIRRO","bairro"]);
+    const city = firstValue(customer, ["CIDADE","cidade"]);
+    const observation = firstValue(customer, ["OBSERVACAO_CLIENTE","OBSERVACAO","observacao"]);
+
+    const payment =
+        firstValue(payload, ["ULTIMA_FORMA_PAGAMENTO","ultima_forma_pagamento","FORMA_PAGAMENTO","forma_pagamento","PAGAMENTO","pagamento"]) ||
+        firstValue(customer, ["ULTIMA_FORMA_PAGAMENTO","ultima_forma_pagamento"]);
+
+    if(name) document.getElementById("name").value = name;
+    if(cep) document.getElementById("cep").value = formatCep(cep);
+    if(address) document.getElementById("address").value = address;
+    if(number) document.getElementById("number").value = number;
+    if(neighborhood) document.getElementById("neighborhood").value = neighborhood;
+    if(city) document.getElementById("city").value = city;
+    if(observation) document.getElementById("observation").value = observation;
+
+    if(payment){
+        const paymentSelect = document.getElementById("payment");
+        const normalized = String(payment).trim().toUpperCase();
+        const aliases = {
+            "CARTÃO":"CARTAO",
+            "CARTAO":"CARTAO",
+            "DINHEIRO":"DINHEIRO",
+            "PIX":"PIX"
+        };
+        paymentSelect.value = aliases[normalized] || normalized;
+    }
+
+    return true;
+}
+
+async function lookupCustomerByPhone(){
+    const phoneInput = document.getElementById("phone");
+    if(!phoneInput) return;
+
+    const rawPhone = phoneInput.value.trim();
+    if(!rawPhone || !isValidPhone(rawPhone)) return;
+
+    const phone = normalizePhoneForOrder(rawPhone);
+    if(customerLookupInProgress || phone === lastCustomerLookupPhone) return;
+
+    customerLookupInProgress = true;
+    phoneInput.classList.add("customer-loading");
+
+    try{
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+
+        const response = await fetch(CLIENT_LOOKUP_WEBHOOK_URL,{
+            method:"POST",
+            signal:controller.signal,
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({
+                telefone:phone,
+                whatsapp:phone
+            })
+        });
+
+        clearTimeout(timeout);
+
+        if(!response.ok) throw new Error("HTTP " + response.status);
+
+        const data = await response.json();
+        const found = fillCustomerData(data);
+
+        if(found){
+            lastCustomerLookupPhone = phone;
+            localStorage.setItem("kuki_whatsapp", phone);
+        }
+    }catch(error){
+        console.warn("Cliente não encontrado ou consulta indisponível:", error);
+    }finally{
+        customerLookupInProgress = false;
+        phoneInput.classList.remove("customer-loading");
+    }
+}
+
+function scheduleCustomerLookup(){
+    clearTimeout(customerLookupTimer);
+    customerLookupTimer = setTimeout(lookupCustomerByPhone, 700);
+}
+
+const phoneInputElement = document.getElementById("phone");
+if(phoneInputElement){
+    phoneInputElement.addEventListener("input", function(){
+        lastCustomerLookupPhone = "";
+        scheduleCustomerLookup();
+    });
+
+    phoneInputElement.addEventListener("blur", lookupCustomerByPhone);
+}
+
+function formatCep(value){
+    const digits = String(value || "").replace(/\D/g,"").slice(0,8);
+    if(digits.length > 5){
+        return digits.slice(0,5) + "-" + digits.slice(5);
+    }
+    return digits;
+}
+
+async function searchCep(){
+    const cepInput = document.getElementById("cep");
+    const cep = String(cepInput.value || "").replace(/\D/g,"");
+
+    if(cep.length !== 8) return;
+
+    const address = document.getElementById("address");
+    const neighborhood = document.getElementById("neighborhood");
+    const city = document.getElementById("city");
+
+    try{
+        cepInput.disabled = true;
+
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        if(!response.ok){
+            throw new Error("Falha ao consultar CEP");
+        }
+
+        const data = await response.json();
+
+        if(data.erro){
+            alert("CEP não encontrado. Confira o número informado.");
+            cepInput.focus();
+            return;
+        }
+
+        address.value = data.logradouro || "";
+        neighborhood.value = data.bairro || "";
+        city.value = data.localidade || "";
+
+        // Campos continuam editáveis caso o cliente precise corrigir/complementar.
+        if(!address.value){
+            address.focus();
+        }else{
+            document.getElementById("number").focus();
+        }
+
+    }catch(error){
+        console.error("Erro ao buscar CEP:", error);
+        alert("Não foi possível consultar o CEP agora. Você pode preencher o endereço manualmente.");
+    }finally{
+        cepInput.disabled = false;
+    }
+}
+
+const cepInput = document.getElementById("cep");
+
+if(cepInput){
+    cepInput.addEventListener("input", function(){
+        this.value = formatCep(this.value);
+    });
+
+    cepInput.addEventListener("blur", searchCep);
+}
+
+
+/* =========================================================
+   GUARD RAILS KUKI - CAMADA CLIENT-SIDE
+   Observação: validação real também deve existir no n8n.
+   ========================================================= */
+
+const SECURITY = {
+    ORDER_COOLDOWN_MS: 8000,          // evita repetição acidental/spam imediato
+    MAX_NAME_LENGTH: 80,
+    MAX_TEXT_LENGTH: 300,
+    MAX_ADDRESS_LENGTH: 120,
+    MAX_CART_QUANTITY_PER_ITEM: 30,
+    MAX_CART_ITEMS: 20,
+    MAX_ORDER_TOTAL: 5000
+};
+
+let lastOrderAttemptAt = 0;
+
+function sanitizeText(value, maxLength){
+    return String(value ?? "")
+        .replace(/[\u0000-\u001F\u007F]/g, " ")
+        .replace(/[<>]/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, maxLength);
+}
+
+function sanitizeDigits(value, maxLength){
+    return String(value ?? "")
+        .replace(/\D/g, "")
+        .slice(0, maxLength);
+}
+
+function safeNumber(value, fallback = 0){
+    const n = Number(value);
+    return Number.isFinite(n) ? n : fallback;
+}
+
+function isSafeOrder(){
+    const items = Object.values(cart || {});
+
+    if(items.length === 0 || items.length > SECURITY.MAX_CART_ITEMS){
+        return {ok:false, message:"Quantidade de itens inválida."};
+    }
+
+    for(const item of items){
+        const quantity = safeNumber(item.quantity);
+        const price = safeNumber(item.price);
+
+        if(!Number.isInteger(quantity) || quantity < 1 ||
+           quantity > SECURITY.MAX_CART_QUANTITY_PER_ITEM){
+            return {ok:false, message:"Quantidade inválida no carrinho."};
+        }
+
+        if(price < 0 || price > SECURITY.MAX_ORDER_TOTAL){
+            return {ok:false, message:"Preço inválido no pedido."};
+        }
+    }
+
+    const total = safeNumber(calculateTotal());
+    if(total <= 0 || total > SECURITY.MAX_ORDER_TOTAL){
+        return {ok:false, message:"Valor total inválido."};
+    }
+
+    return {ok:true};
+}
+
+function isBotSubmission(){
+    const hp = document.getElementById("website");
+    return !!(hp && hp.value.trim());
+}
+
+function makeRequestId(){
+    if(window.crypto && crypto.randomUUID){
+        return crypto.randomUUID();
+    }
+    return "kuki-" + Date.now() + "-" + Math.random().toString(36).slice(2);
+}
+
+function cleanCheckoutFields(){
+    const fields = {
+        name: ["name", SECURITY.MAX_NAME_LENGTH],
+        cep: ["cep", 8],
+        address: ["address", SECURITY.MAX_ADDRESS_LENGTH],
+        number: ["number", 15],
+        neighborhood: ["neighborhood", 80],
+        city: ["city", 80],
+        observation: ["observation", SECURITY.MAX_TEXT_LENGTH]
+    };
+
+    const name = document.getElementById(fields.name[0]);
+    if(name) name.value = sanitizeText(name.value, fields.name[1]);
+
+    const cep = document.getElementById(fields.cep[0]);
+    if(cep) cep.value = formatCep(sanitizeDigits(cep.value, fields.cep[1]));
+
+    const address = document.getElementById(fields.address[0]);
+    if(address) address.value = sanitizeText(address.value, fields.address[1]);
+
+    const number = document.getElementById(fields.number[0]);
+    if(number) number.value = sanitizeText(number.value, fields.number[1]);
+
+    const neighborhood = document.getElementById(fields.neighborhood[0]);
+    if(neighborhood) neighborhood.value = sanitizeText(neighborhood.value, fields.neighborhood[1]);
+
+    const city = document.getElementById(fields.city[0]);
+    if(city) city.value = sanitizeText(city.value, fields.city[1]);
+
+    const observation = document.getElementById(fields.observation[0]);
+    if(observation) observation.value = sanitizeText(observation.value, fields.observation[1]);
+}
+
+function addInputGuardRails(){
+    const maxMap = {
+        name: SECURITY.MAX_NAME_LENGTH,
+        address: SECURITY.MAX_ADDRESS_LENGTH,
+        number: 15,
+        neighborhood: 80,
+        city: 80,
+        observation: SECURITY.MAX_TEXT_LENGTH
+    };
+
+    Object.entries(maxMap).forEach(([id, max]) => {
+        const el = document.getElementById(id);
+        if(el){
+            el.setAttribute("maxlength", String(max));
+        }
+    });
+
+    const phone = document.getElementById("phone");
+    if(phone) phone.setAttribute("inputmode", "tel");
+
+    const cep = document.getElementById("cep");
+    if(cep) cep.setAttribute("inputmode", "numeric");
+}
+
+addInputGuardRails();
+
+
 async function finishOrder(){
+    cleanCheckoutFields();
+
+    // Honeypot: bloqueia envios automatizados simples.
+    if(isBotSubmission()){
+        console.warn("Envio bloqueado pelo guard rail anti-bot.");
+        return;
+    }
+
+    // Cooldown contra clique repetido e spam local.
+    const now = Date.now();
+    if(now - lastOrderAttemptAt < SECURITY.ORDER_COOLDOWN_MS){
+        alert("Aguarde alguns segundos antes de enviar novamente.");
+        return;
+    }
+
+    const orderSafety = isSafeOrder();
+    if(!orderSafety.ok){
+        alert(orderSafety.message);
+        return;
+    }
+
     const storeState = getStoreState();
     if(!storeState.open){
         alert("A KUKI está fechada no momento. Não é possível finalizar pedidos agora.");
@@ -870,6 +1597,7 @@ async function finishOrder(){
 
     const name = document.getElementById("name").value.trim();
     const phoneInput = document.getElementById("phone").value.trim();
+    const cep = document.getElementById("cep").value.trim();
     const payment = document.getElementById("payment").value.trim();
     const delivery = document.getElementById("delivery").value.trim();
     const address = document.getElementById("address").value.trim();
@@ -897,6 +1625,12 @@ async function finishOrder(){
     }
 
     const phone = normalizePhoneForOrder(phoneInput);
+
+    if(String(cep).replace(/\D/g,"").length !== 8){
+        alert("Digite um CEP válido.");
+        document.getElementById("cep").focus();
+        return;
+    }
 
     if(!payment){
         alert("Selecione a forma de pagamento.");
@@ -929,6 +1663,7 @@ async function finishOrder(){
     }
 
     const order = {
+        request_id: makeRequestId(),
         origem: "SITE_KUKI",
 
         cliente:{
@@ -948,6 +1683,7 @@ async function finishOrder(){
 
         pagamento:payment,
         entrega:delivery,
+        cep:cep,
         endereco:address,
         numero:number,
         bairro:neighborhood,
@@ -959,24 +1695,34 @@ async function finishOrder(){
 
     const button = document.getElementById("finish");
 
+    lastOrderAttemptAt = Date.now();
     button.disabled = true;
     button.textContent = "ENVIANDO PEDIDO...";
 
     try{
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+
         const response = await fetch(
             WEBHOOK_URL,
             {
                 method:"POST",
+                signal:controller.signal,
                 headers:{
-                    "Content-Type":"application/json"
+                    "Content-Type":"application/json",
+                    "X-Requested-With":"KUKI-SITE"
                 },
                 body:JSON.stringify(order)
             }
         );
 
+        clearTimeout(timeout);
+
         if(!response.ok){
             throw new Error("HTTP " + response.status);
         }
+
+        localStorage.setItem("kuki_whatsapp", phone);
 
         alert(
             "Pedido enviado com sucesso! 🍪\n\n" +
@@ -990,6 +1736,7 @@ async function finishOrder(){
 
         document.getElementById("name").value = "";
         document.getElementById("phone").value = "";
+        document.getElementById("cep").value = "";
         document.getElementById("payment").value = "";
         document.getElementById("delivery").value = "";
         document.getElementById("address").value = "";
