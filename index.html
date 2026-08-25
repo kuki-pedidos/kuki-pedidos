@@ -791,7 +791,9 @@ body{
 // Dias: 0=domingo, 1=segunda, ... 6=sábado.
 const STORE_HOURS = {
     0: { open: "11:30", close: "17:00" }, // Domingo
-    1: { open: "13:30", close: "17:00" }, // Segunda
+
+    // Segunda-feira: loja fechada
+
     2: { open: "13:30", close: "17:00" }, // Terça
     3: { open: "13:30", close: "17:00" }, // Quarta
     4: { open: "13:30", close: "17:00" }, // Quinta
@@ -806,10 +808,22 @@ function getMinutes(time){
 
 function getStoreState(){
     const now = new Date();
-    const schedule = STORE_HOURS[now.getDay()];
+    const day = now.getDay();
+    const schedule = STORE_HOURS[day];
+
+    // Segunda-feira
+    if(day === 1){
+        return {
+            open: false,
+            message: "🔴 Forno desligado por hoje!!! Amanhã estaremos de volta com cookies fresquinhos...."
+        };
+    }
 
     if(!schedule){
-        return { open:false, message:"Hoje a KUKI está fechada." };
+        return {
+            open: false,
+            message: "🔴 Hoje a KUKI está fechada."
+        };
     }
 
     const current = now.getHours() * 60 + now.getMinutes();
@@ -818,19 +832,22 @@ function getStoreState(){
     const isOpen = current >= opening && current < closing;
 
     return {
-        open:isOpen,
-        message:isOpen
+        open: isOpen,
+        message: isOpen
             ? `🟢 Estamos abertos até ${schedule.close} hs`
-            : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.open} às ${schedule.close}.`
+            : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.open} hs às ${schedule.close} hs.`
     };
 }
 
 function updateStoreStatus(){
     const state = getStoreState();
     const element = document.getElementById("storeStatus");
+
     if(!element) return state;
+
     element.textContent = state.message;
     element.className = "store-status " + (state.open ? "open" : "closed");
+
     return state;
 }
 
