@@ -539,36 +539,27 @@ body{
     background:#fff;
 }
 .order-history-head{
-    display:flex;
-    justify-content:space-between;
-    gap:10px;
-    align-items:flex-start;
     margin-bottom:10px;
 }
 .order-history-number{
     color:var(--wine);
     font-weight:900;
-}
-.order-history-status{
-    background:var(--cream-2);
-    color:var(--brown);
-    border-radius:999px;
-    padding:5px 9px;
-    font-size:11px;
-    font-weight:900;
+    font-size:20px;
+    letter-spacing:.4px;
 }
 .order-history-info{
     display:grid;
     gap:5px;
     color:var(--muted);
-    font-size:13px;
+    font-size:15px;
     line-height:1.45;
 }
 .order-history-total{
-    margin-top:10px;
-    padding-top:10px;
+    margin-top:12px;
+    padding-top:12px;
     border-top:1px solid var(--cream-3);
     color:var(--brown);
+    font-size:18px;
     font-weight:900;
 }
 
@@ -692,19 +683,17 @@ body{
             <div class="required-note">* Campos obrigatórios</div>
 
             <div class="group">
-                <label for="name">Nome *</label>
-                
-<div class="hp-field" aria-hidden="true">
-    <label for="website">Deixe este campo vazio</label>
-    <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
-</div>
-
-<input id="name" type="text" placeholder="Digite seu nome" autocomplete="name">
+                <label for="phone">WhatsApp *</label>
+                <input id="phone" type="tel" placeholder="(85) 99999-9999" inputmode="tel" autocomplete="tel">
             </div>
 
             <div class="group">
-                <label for="phone">WhatsApp *</label>
-                <input id="phone" type="tel" placeholder="(85) 99999-9999" inputmode="tel" autocomplete="tel">
+                <label for="name">Nome *</label>
+                <div class="hp-field" aria-hidden="true">
+                    <label for="website">Deixe este campo vazio</label>
+                    <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+                </div>
+                <input id="name" type="text" placeholder="Digite seu nome" autocomplete="name">
             </div>
 
             <div class="group">
@@ -787,134 +776,168 @@ body{
 </div>
 
 <script>
-// HORÁRIOS DA LOJA — carregados diretamente do Supabase (tabela HORARIOS).
-const SUPABASE_URL = 'https://delakuvbbayovkpxemgm.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_FqBkrIbKuNSmh78DidDpow_30o7P4kP';
+// HORÁRIOS DA LOJA
+// A fonte oficial é a tabela HORARIOS do Supabase.
+// O KUKI Pedidos consulta diretamente o Supabase, sem depender do n8n.
 
-let STORE_HOURS = {};
+let storeHours = null;
 let storeHoursLoaded = false;
-let storeHoursError = null;
+let storeHoursLoading = false;
+
+const DAY_TO_NAME = {
+    0:"DOMINGO",
+    1:"SEGUNDA",
+    2:"TERÇA",
+    3:"QUARTA",
+    4:"QUINTA",
+    5:"SEXTA",
+    6:"SÁBADO"
+};
 
 function normalizeDayName(value){
-    return String(value || '')
+    return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
         .trim()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .toUpperCase();
 }
 
-const DAY_MAP = {
-    'DOMINGO': 0,
-    'SEGUNDA': 1,
-    'TERCA': 2,
-    'QUARTA': 3,
-    'QUINTA': 4,
-    'SEXTA': 5,
-    'SABADO': 6
-};
-
 function normalizeTime(value){
-    if(!value) return '';
-    return String(value).slice(0,5);
-}
-
-async function loadStoreHours(){
-    try{
-        const response = await fetch(
-            SUPABASE_URL + '/rest/v1/HORARIOS?select=*',
-            {
-                headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': 'Bearer ' + SUPABASE_KEY
-                },
-                cache: 'no-store'
-            }
-        );
-
-        if(!response.ok) throw new Error('Erro ao carregar horários (' + response.status + ')');
-
-        const rows = await response.json();
-        const nextHours = {};
-
-        rows.forEach(row => {
-            const dayName = normalizeDayName(row.DIA_SEMANA ?? row.dia_semana);
-            const day = DAY_MAP[dayName];
-            if(day === undefined) return;
-
-            const abertoRaw = row.ABERTO ?? row.aberto;
-            const isOpen = abertoRaw === true || abertoRaw === 'true' || abertoRaw === 1 || abertoRaw === '1';
-            const open = normalizeTime(row.HORA_ABERTURA ?? row.hora_abertura);
-            const close = normalizeTime(row.HORA_FECHAMENTO ?? row.hora_fechamento);
-
-            nextHours[day] = {
-                enabled: isOpen,
-                open,
-                close
-            };
-        });
-
-        STORE_HOURS = nextHours;
-        storeHoursLoaded = true;
-        storeHoursError = null;
-    }catch(error){
-        console.error('KUKI: erro ao carregar horários do Supabase', error);
-        storeHoursLoaded = false;
-        storeHoursError = error;
-    }
-
-    return updateStoreStatus();
+    if(value === undefined || value === null) return "";
+    const match = String(value).match(/^(\d{1,2}):(\d{2})/);
+    if(!match) return "";
+    return String(match[1]).padStart(2,"0") + ":" + match[2];
 }
 
 function getMinutes(time){
-    const parts = String(time || '').split(':').map(Number);
-    if(parts.length < 2 || Number.isNaN(parts[0]) || Number.isNaN(parts[1])) return null;
-    return parts[0] * 60 + parts[1];
+    const normalized = normalizeTime(time);
+    if(!normalized) return 0;
+    const [hour, minute] = normalized.split(":").map(Number);
+    return hour * 60 + minute;
+}
+
+function isOpenValue(value){
+    return value === true ||
+        value === 1 ||
+        String(value || "").trim().toUpperCase() === "TRUE";
+}
+
+function getHoursRows(data){
+    if(Array.isArray(data)) return data;
+    if(data && Array.isArray(data.horarios)) return data.horarios;
+    if(data && Array.isArray(data.data)) return data.data;
+    if(data && Array.isArray(data.body)) return data.body;
+    return [];
+}
+
+function setStoreHours(data){
+    const rows = getHoursRows(data);
+    const map = {};
+
+    rows.forEach(function(row){
+        const dayName = normalizeDayName(
+            row.DIA_SEMANA ?? row.dia_semana ?? row.dia
+        );
+
+        if(!dayName) return;
+
+        map[dayName] = {
+            aberto:isOpenValue(row.ABERTO ?? row.aberto),
+            abertura:normalizeTime(row.HORA_ABERTURA ?? row.hora_abertura),
+            fechamento:normalizeTime(row.HORA_FECHAMENTO ?? row.hora_fechamento)
+        };
+    });
+
+    storeHours = map;
+    storeHoursLoaded = Object.keys(map).length > 0;
+    return storeHoursLoaded;
+}
+
+async function loadStoreHours(){
+    if(storeHoursLoading) return;
+
+    storeHoursLoading = true;
+
+    try{
+        const url = new URL(SUPABASE_URL + "/rest/v1/HORARIOS");
+        url.searchParams.set("select", "*");
+
+        const response = await fetch(url.toString(),{
+            method:"GET",
+            headers:{
+                "Accept":"application/json",
+                "apikey": SUPABASE_ANON_KEY,
+                "Authorization": "Bearer " + SUPABASE_ANON_KEY
+            }
+        });
+
+        if(!response.ok) throw new Error("HTTP " + response.status);
+
+        const data = await response.json();
+
+        if(!setStoreHours(data)){
+            throw new Error("Nenhum horário válido retornado.");
+        }
+    }catch(error){
+        console.error("Erro ao carregar horários da loja:", error);
+        storeHoursLoaded = false;
+    }finally{
+        storeHoursLoading = false;
+        updateStoreStatus();
+    }
 }
 
 function getStoreState(){
-    if(!storeHoursLoaded){
+    if(!storeHoursLoaded || !storeHours){
         return {
             open:false,
-            loading:true,
-            message: storeHoursError
-                ? '⚠️ Não foi possível consultar o funcionamento da loja. Tente novamente.'
-                : '🕐 Consultando horário de funcionamento...'
+            loading:storeHoursLoading,
+            message:storeHoursLoading
+                ? "⏳ Consultando os horários da KUKI..."
+                : "🔴 Não foi possível consultar os horários da loja no momento."
         };
     }
 
     const now = new Date();
-    const schedule = STORE_HOURS[now.getDay()];
+    const dayName = normalizeDayName(DAY_TO_NAME[now.getDay()]);
+    const schedule = storeHours[dayName];
 
-    if(!schedule || !schedule.enabled){
-        return { open:false, message:'🔴 Hoje a KUKI está fechada.' };
+    if(!schedule || !schedule.aberto){
+        return {
+            open:false,
+            message:"🔴 Hoje a KUKI está fechada. Voltamos em breve com cookies fresquinhos! 🍪🤎"
+        };
+    }
+
+    if(!schedule.abertura || !schedule.fechamento){
+        return {
+            open:false,
+            message:"🔴 Os horários de hoje ainda não estão configurados."
+        };
     }
 
     const current = now.getHours() * 60 + now.getMinutes();
-    const opening = getMinutes(schedule.open);
-    const closing = getMinutes(schedule.close);
-
-    if(opening === null || closing === null){
-        return { open:false, message:'🔴 Hoje a KUKI está fechada.' };
-    }
-
-    // Horário normal e também suporte a funcionamento atravessando meia-noite.
-    const isOpen = opening <= closing
-        ? current >= opening && current < closing
-        : current >= opening || current < closing;
+    const opening = getMinutes(schedule.abertura);
+    const closing = getMinutes(schedule.fechamento);
+    const isOpen = current >= opening && current < closing;
 
     return {
         open:isOpen,
         message:isOpen
-            ? `🟢 Estamos abertos até ${schedule.close} hs`
-            : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.open} às ${schedule.close}.`
+            ? `🟢 Estamos abertos até ${schedule.fechamento} hs`
+            : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.abertura} hs às ${schedule.fechamento} hs.`
     };
 }
 
 function updateStoreStatus(){
     const state = getStoreState();
-    const element = document.getElementById('storeStatus');
+    const element = document.getElementById("storeStatus");
+
     if(!element) return state;
+
     element.textContent = state.message;
-    element.className = 'store-status ' + (state.open ? 'open' : 'closed');
+    element.className = "store-status " + (state.open ? "open" : "closed");
+
     return state;
 }
 
@@ -925,10 +948,11 @@ const WEBHOOK_URL =
 const HISTORY_WEBHOOK_URL =
     "https://rikasolucoes.app.n8n.cloud/webhook/kuki-historico-pedidos";
 
-// Webhook para identificar cliente pelo WhatsApp e preencher os dados salvos.
-// No n8n, ele deve retornar o cliente e a última forma de pagamento.
-const CLIENT_LOOKUP_WEBHOOK_URL =
-    "https://rikasolucoes.app.n8n.cloud/webhook/kuki-buscar-cliente";
+// Consulta direta ao Supabase para localizar o cliente pelo WhatsApp.
+// Usa somente a chave pública (anon/publishable). Nunca use service_role no site.
+const SUPABASE_URL = "https://delakuvbbayovkpxemgm.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_FqBkrIbKuNSmh78DidDpow_30o7P4kP";
+const CLIENTS_TABLE = "CLIENTES";
 
 const products = [
     {
@@ -1235,25 +1259,23 @@ function getHistoryOrders(data){
 
 function renderHistory(orders){
     const container = document.getElementById("historyResult");
+
     if(!orders.length){
         container.innerHTML = '<div class="history-empty">Nenhum pedido encontrado para este WhatsApp.</div>';
         return;
     }
+
     container.innerHTML = orders.map(function(order){
-        const items = Array.isArray(order.itens) ? order.itens.map(function(item){
-            return `${item.quantidade || 1}x ${item.produto || item.nome || "Produto"}`;
-        }).join(", ") : "";
         const total = Number(order.VALOR_TOTAL ?? order.valor_total ?? order.total ?? 0);
+        const number = order.NUMERO_PEDIDO || order.numero_pedido || order.ID || order.id || "Pedido";
+        const date = order.DATA || order.data || order.created_at;
+
         return `<div class="order-history-card">
             <div class="order-history-head">
-                <div class="order-history-number">${order.NUMERO_PEDIDO || order.numero_pedido || order.ID || order.id || "Pedido"}</div>
-                <div class="order-history-status">${order.STATUS || order.status || "EM PROCESSAMENTO"}</div>
+                <div class="order-history-number">${number}</div>
             </div>
             <div class="order-history-info">
-                <div><strong>Data:</strong> ${formatHistoryDate(order.DATA || order.data)}</div>
-                ${items ? `<div><strong>Itens:</strong> ${items}</div>` : ""}
-                <div><strong>Entrega:</strong> ${order.TIPO_ENTREGA || order.tipo_entrega || "-"}</div>
-                <div><strong>Pagamento:</strong> ${order.FORMA_PAGAMENTO || order.forma_pagamento || "-"}</div>
+                <div><strong>Data:</strong> ${formatHistoryDate(date)}</div>
             </div>
             <div class="order-history-total">Total: ${money(total)}</div>
         </div>`;
@@ -1400,14 +1422,19 @@ async function lookupCustomerByPhone(){
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
 
-        const response = await fetch(CLIENT_LOOKUP_WEBHOOK_URL,{
-            method:"POST",
+        const url = new URL(SUPABASE_URL + "/rest/v1/" + CLIENTS_TABLE);
+        url.searchParams.set("select", "*");
+        url.searchParams.set("TELEFONE", "eq." + phone);
+        url.searchParams.set("limit", "1");
+
+        const response = await fetch(url.toString(),{
+            method:"GET",
             signal:controller.signal,
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({
-                telefone:phone,
-                whatsapp:phone
-            })
+            headers:{
+                "apikey": SUPABASE_ANON_KEY,
+                "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+                "Accept": "application/json"
+            }
         });
 
         clearTimeout(timeout);
@@ -1417,18 +1444,20 @@ async function lookupCustomerByPhone(){
         const data = await response.json();
         const found = fillCustomerData(data);
 
+        // Guarda o telefone consultado mesmo quando o cliente ainda não existe,
+        // evitando consultas repetidas enquanto o campo não for alterado.
+        lastCustomerLookupPhone = phone;
+
         if(found){
-            lastCustomerLookupPhone = phone;
             localStorage.setItem("kuki_whatsapp", phone);
         }
     }catch(error){
-        console.warn("Cliente não encontrado ou consulta indisponível:", error);
+        console.warn("Não foi possível consultar o cadastro agora:", error);
     }finally{
         customerLookupInProgress = false;
         phoneInput.classList.remove("customer-loading");
     }
 }
-
 function scheduleCustomerLookup(){
     clearTimeout(customerLookupTimer);
     customerLookupTimer = setTimeout(lookupCustomerByPhone, 700);
@@ -1690,12 +1719,6 @@ async function finishOrder(){
     const city = document.getElementById("city").value.trim();
     const observation = document.getElementById("observation").value.trim();
 
-    if(!name){
-        alert("Digite seu nome.");
-        document.getElementById("name").focus();
-        return;
-    }
-
     if(!phoneInput){
         alert("Digite seu WhatsApp.");
         document.getElementById("phone").focus();
@@ -1705,6 +1728,12 @@ async function finishOrder(){
     if(!isValidPhone(phoneInput)){
         alert("Digite um WhatsApp válido.");
         document.getElementById("phone").focus();
+        return;
+    }
+
+    if(!name){
+        alert("Digite seu nome.");
+        document.getElementById("name").focus();
         return;
     }
 
@@ -1844,9 +1873,10 @@ async function finishOrder(){
 
 renderProducts();
 updateCart();
+updateStoreStatus();
 loadStoreHours();
 setInterval(updateStoreStatus, 60000);
-setInterval(loadStoreHours, 300000);
+setInterval(loadStoreHours, 5 * 60 * 1000);
 </script>
 
 </body>
