@@ -954,7 +954,7 @@ const SUPABASE_URL = "https://delakuvbbayovkpxemgm.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_FqBkrIbKuNSmh78DidDpow_30o7P4kP";
 const CLIENTS_TABLE = "CLIENTES";
 
-const products = [
+let products = [
     {
         id: "1",
         name: "TRADICIONAL",
@@ -1004,6 +1004,141 @@ const products = [
         active: true
     }
 ];
+
+/* =====================================================
+   DADOS DINÂMICOS DO SUPABASE
+   - Produtos, formas de pagamento e entrega só aparecem
+     quando ATIVO = true.
+   - O catálogo local continua como fallback caso o Supabase
+     esteja indisponível, preservando o funcionamento do site.
+===================================================== */
+const PRODUCT_IMAGES = {
+    "TRADICIONAL":"images/tradicional.png",
+    "RED":"images/red.png",
+    "BLACK":"images/black.png",
+    "NUTELLA":"images/nutella.png",
+    "BUENO":"images/bueno.png",
+    "CREAM":"images/cream.png"
+};
+
+function isActiveValue(value){
+    return value === true || value === 1 ||
+        String(value ?? "").trim().toUpperCase() === "TRUE";
+}
+
+function rowValue(row, keys, fallback=""){
+    for(const key of keys){
+        if(row && row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== ""){
+            return row[key];
+        }
+    }
+    return fallback;
+}
+
+async function loadActiveTable(tableName){
+    const url = new URL(SUPABASE_URL + "/rest/v1/" + tableName);
+    url.searchParams.set("select", "*");
+    url.searchParams.set("order", "id.asc");
+
+    const response = await fetch(url.toString(), {
+        method:"GET",
+        headers:{
+            "Accept":"application/json",
+            "apikey":SUPABASE_ANON_KEY,
+            "Authorization":"Bearer " + SUPABASE_ANON_KEY
+        }
+    });
+
+    if(!response.ok) throw new Error(tableName + " HTTP " + response.status);
+    const rows = await response.json();
+    return Array.isArray(rows)
+        ? rows.filter(row => {
+            const active = row.ATIVO ?? row.ativo;
+            // Se a tabela não possuir ATIVO, não bloqueia o registro.
+            return active === undefined || active === null || isActiveValue(active);
+        })
+        : [];
+}
+
+function imageForProduct(name){
+    return PRODUCT_IMAGES[String(name || "").trim().toUpperCase()] || "images/tradicional.png";
+}
+
+async function loadProductsFromSupabase(){
+    try{
+        const rows = await loadActiveTable("PRODUTOS");
+        if(rows.length){
+            products = rows.map(row => ({
+                id:String(rowValue(row,["id","ID","CODIGO"], "")),
+                name:String(rowValue(row,["NOME","nome"], "PRODUTO")),
+                price:Number(rowValue(row,["PRECO","preco","VALOR","valor"], 0)) || 0,
+                desc:String(rowValue(row,["DESCRICAO","descricao"], "")),
+                image:imageForProduct(rowValue(row,["NOME","nome"], "")),
+                active:isActiveValue(row.ATIVO ?? row.ativo)
+            }));
+        }
+    }catch(error){
+        console.error("Erro ao carregar produtos do Supabase:", error);
+        // Regra de segurança: se não foi possível validar ATIVO no Supabase,
+        // não exibe catálogo potencialmente desatualizado.
+        products = [];
+    }
+    renderProducts();
+}
+
+function fillSelectOptions(selectId, rows, placeholder, includeValue){
+    const select = document.getElementById(selectId);
+    if(!select) return;
+
+    const current = select.value;
+    const options = rows.map(row => {
+        const name = String(rowValue(row,["NOME","nome","DESCRICAO","descricao"], "")).trim();
+        const value = includeValue
+            ? String(rowValue(row,["NOME","nome","TIPO","tipo"], name)).trim()
+            : name;
+        if(!name) return "";
+        return `<option value="${escapeOption(value)}">${escapeOption(name)}</option>`;
+    }).filter(Boolean).join("");
+
+    select.innerHTML = `<option value="">${placeholder}</option>` + options;
+    if(current && [...select.options].some(o => o.value === current)) select.value = current;
+}
+
+function escapeOption(value){
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;");
+}
+
+async function loadPaymentAndDeliveryFromSupabase(){
+    const [paymentsResult, deliveriesResult] = await Promise.allSettled([
+        loadActiveTable("FORMAS_PAGAMENTO"),
+        loadActiveTable("FORMAS_ENTREGA")
+    ]);
+
+    if(paymentsResult.status === "fulfilled"){
+        fillSelectOptions("payment", paymentsResult.value, "Selecione");
+    }else{
+        console.error("Erro ao carregar formas de pagamento:", paymentsResult.reason);
+        fillSelectOptions("payment", [], "Selecione");
+    }
+
+    if(deliveriesResult.status === "fulfilled"){
+        fillSelectOptions("delivery", deliveriesResult.value, "Selecione");
+    }else{
+        console.error("Erro ao carregar formas de entrega:", deliveriesResult.reason);
+        fillSelectOptions("delivery", [], "Selecione");
+    }
+}
+
+async function loadStoreData(){
+    await Promise.all([
+        loadProductsFromSupabase(),
+        loadPaymentAndDeliveryFromSupabase()
+    ]);
+}
 
 let cart = {};
 
@@ -1425,6 +1560,8 @@ async function lookupCustomerByPhone(){
         const url = new URL(SUPABASE_URL + "/rest/v1/" + CLIENTS_TABLE);
         url.searchParams.set("select", "*");
         url.searchParams.set("TELEFONE", "eq." + phone);
+        // Cliente inativo não deve ser reutilizado automaticamente.
+        url.searchParams.set("ATIVO", "eq.true");
         url.searchParams.set("limit", "1");
 
         const response = await fetch(url.toString(),{
@@ -1871,12 +2008,16 @@ async function finishOrder(){
     }
 }
 
+// Renderização inicial e sincronização com o Supabase.
 renderProducts();
 updateCart();
 updateStoreStatus();
+loadStoreData();
 loadStoreHours();
 setInterval(updateStoreStatus, 60000);
 setInterval(loadStoreHours, 5 * 60 * 1000);
+// Mantém catálogo e opções administrativas sincronizados com o KUKI Gerencial.
+setInterval(loadStoreData, 5 * 60 * 1000);
 </script>
 
 </body>
