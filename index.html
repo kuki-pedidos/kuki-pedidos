@@ -519,17 +519,6 @@ body{
     padding-bottom:76px;
 }
 
-.customer-lookup-status{
-    margin-top:7px;
-    min-height:16px;
-    font-size:12px;
-    font-weight:700;
-    color:var(--muted);
-}
-.customer-lookup-status.found{color:#167a3f}
-.customer-lookup-status.not-found{color:var(--muted)}
-.customer-lookup-status.error{color:var(--wine)}
-
 .history-result{
     margin-top:16px;
     display:flex;
@@ -550,36 +539,27 @@ body{
     background:#fff;
 }
 .order-history-head{
-    display:flex;
-    justify-content:space-between;
-    gap:10px;
-    align-items:flex-start;
     margin-bottom:10px;
 }
 .order-history-number{
     color:var(--wine);
     font-weight:900;
-}
-.order-history-status{
-    background:var(--cream-2);
-    color:var(--brown);
-    border-radius:999px;
-    padding:5px 9px;
-    font-size:11px;
-    font-weight:900;
+    font-size:20px;
+    letter-spacing:.4px;
 }
 .order-history-info{
     display:grid;
     gap:5px;
     color:var(--muted);
-    font-size:13px;
+    font-size:15px;
     line-height:1.45;
 }
 .order-history-total{
-    margin-top:10px;
-    padding-top:10px;
+    margin-top:12px;
+    padding-top:12px;
     border-top:1px solid var(--cream-3);
     color:var(--brown);
+    font-size:18px;
     font-weight:900;
 }
 
@@ -705,18 +685,15 @@ body{
             <div class="group">
                 <label for="phone">WhatsApp *</label>
                 <input id="phone" type="tel" placeholder="(85) 99999-9999" inputmode="tel" autocomplete="tel">
-                <div id="customerLookupStatus" class="customer-lookup-status"></div>
             </div>
 
             <div class="group">
                 <label for="name">Nome *</label>
-
-<div class="hp-field" aria-hidden="true">
-    <label for="website">Deixe este campo vazio</label>
-    <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
-</div>
-
-<input id="name" type="text" placeholder="Digite seu nome" autocomplete="name">
+                <div class="hp-field" aria-hidden="true">
+                    <label for="website">Deixe este campo vazio</label>
+                    <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+                </div>
+                <input id="name" type="text" placeholder="Digite seu nome" autocomplete="name">
             </div>
 
             <div class="group">
@@ -799,55 +776,151 @@ body{
 </div>
 
 <script>
-// HORÁRIOS DA LOJA — altere apenas este bloco quando necessário.
-// Dias: 0=domingo, 1=segunda, ... 6=sábado.
-const STORE_HOURS = {
-    0: { open: "11:30", close: "17:00" }, // Domingo
+// HORÁRIOS DA LOJA
+// A fonte oficial agora é a tabela HORARIOS do Supabase.
+// O site consulta o n8n, que lê essa tabela.
+const HORARIOS_WEBHOOK_URL =
+    "https://rikasolucoes.app.n8n.cloud/webhook/kuki-horarios";
 
-    // Segunda-feira: loja fechada
+let storeHours = null;
+let storeHoursLoaded = false;
+let storeHoursLoading = false;
 
-    2: { open: "13:30", close: "17:00" }, // Terça
-    3: { open: "08:00", close: "23:59" }, // Quarta
-    4: { open: "13:30", close: "17:00" }, // Quinta
-    5: { open: "13:30", close: "17:00" }, // Sexta
-    6: { open: "13:30", close: "17:00" }  // Sábado
+const DAY_TO_NAME = {
+    0:"DOMINGO",
+    1:"SEGUNDA",
+    2:"TERÇA",
+    3:"QUARTA",
+    4:"QUINTA",
+    5:"SEXTA",
+    6:"SÁBADO"
 };
 
+function normalizeDayName(value){
+    return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .toUpperCase();
+}
+
+function normalizeTime(value){
+    if(value === undefined || value === null) return "";
+    const match = String(value).match(/^(\d{1,2}):(\d{2})/);
+    if(!match) return "";
+    return String(match[1]).padStart(2,"0") + ":" + match[2];
+}
+
 function getMinutes(time){
-    const [hour, minute] = time.split(":").map(Number);
+    const normalized = normalizeTime(time);
+    if(!normalized) return 0;
+    const [hour, minute] = normalized.split(":").map(Number);
     return hour * 60 + minute;
 }
 
-function getStoreState(){
-    const now = new Date();
-    const day = now.getDay();
-    const schedule = STORE_HOURS[day];
+function isOpenValue(value){
+    return value === true ||
+        value === 1 ||
+        String(value || "").trim().toUpperCase() === "TRUE";
+}
 
-    // Segunda-feira
-    if(day === 1){
+function getHoursRows(data){
+    if(Array.isArray(data)) return data;
+    if(data && Array.isArray(data.horarios)) return data.horarios;
+    if(data && Array.isArray(data.data)) return data.data;
+    if(data && Array.isArray(data.body)) return data.body;
+    return [];
+}
+
+function setStoreHours(data){
+    const rows = getHoursRows(data);
+    const map = {};
+
+    rows.forEach(function(row){
+        const dayName = normalizeDayName(
+            row.DIA_SEMANA ?? row.dia_semana ?? row.dia
+        );
+
+        if(!dayName) return;
+
+        map[dayName] = {
+            aberto:isOpenValue(row.ABERTO ?? row.aberto),
+            abertura:normalizeTime(row.HORA_ABERTURA ?? row.hora_abertura),
+            fechamento:normalizeTime(row.HORA_FECHAMENTO ?? row.hora_fechamento)
+        };
+    });
+
+    storeHours = map;
+    storeHoursLoaded = Object.keys(map).length > 0;
+    return storeHoursLoaded;
+}
+
+async function loadStoreHours(){
+    if(storeHoursLoading) return;
+
+    storeHoursLoading = true;
+
+    try{
+        const response = await fetch(HORARIOS_WEBHOOK_URL,{
+            method:"GET",
+            headers:{"Accept":"application/json"}
+        });
+
+        if(!response.ok) throw new Error("HTTP " + response.status);
+
+        const data = await response.json();
+
+        if(!setStoreHours(data)){
+            throw new Error("Nenhum horário válido retornado.");
+        }
+    }catch(error){
+        console.error("Erro ao carregar horários da loja:", error);
+        storeHoursLoaded = false;
+    }finally{
+        storeHoursLoading = false;
+        updateStoreStatus();
+    }
+}
+
+function getStoreState(){
+    if(!storeHoursLoaded || !storeHours){
         return {
-            open: false,
-            message: "🔴 Forno desligado por hoje!!! Amanhã estaremos de volta com cookies fresquinhos...."
+            open:false,
+            loading:storeHoursLoading,
+            message:storeHoursLoading
+                ? "⏳ Consultando os horários da KUKI..."
+                : "🔴 Não foi possível consultar os horários da loja no momento."
         };
     }
 
-    if(!schedule){
+    const now = new Date();
+    const dayName = normalizeDayName(DAY_TO_NAME[now.getDay()]);
+    const schedule = storeHours[dayName];
+
+    if(!schedule || !schedule.aberto){
         return {
-            open: false,
-            message: "🔴 Hoje a KUKI está fechada."
+            open:false,
+            message:"🔴 Hoje a KUKI está fechada."
+        };
+    }
+
+    if(!schedule.abertura || !schedule.fechamento){
+        return {
+            open:false,
+            message:"🔴 Os horários de hoje ainda não estão configurados."
         };
     }
 
     const current = now.getHours() * 60 + now.getMinutes();
-    const opening = getMinutes(schedule.open);
-    const closing = getMinutes(schedule.close);
+    const opening = getMinutes(schedule.abertura);
+    const closing = getMinutes(schedule.fechamento);
     const isOpen = current >= opening && current < closing;
 
     return {
-        open: isOpen,
-        message: isOpen
-            ? `🟢 Estamos abertos até ${schedule.close} hs`
-            : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.open} hs às ${schedule.close} hs.`
+        open:isOpen,
+        message:isOpen
+            ? `🟢 Estamos abertos até ${schedule.fechamento} hs`
+            : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.abertura} hs às ${schedule.fechamento} hs.`
     };
 }
 
@@ -870,10 +943,11 @@ const WEBHOOK_URL =
 const HISTORY_WEBHOOK_URL =
     "https://rikasolucoes.app.n8n.cloud/webhook/kuki-historico-pedidos";
 
-// Webhook para identificar cliente pelo WhatsApp e preencher os dados salvos.
-// No n8n, ele deve retornar o cliente e a última forma de pagamento.
-const CLIENT_LOOKUP_WEBHOOK_URL =
-    "https://rikasolucoes.app.n8n.cloud/webhook/kuki-buscar-cliente";
+// Consulta direta ao Supabase para localizar o cliente pelo WhatsApp.
+// Usa somente a chave pública (anon/publishable). Nunca use service_role no site.
+const SUPABASE_URL = "https://delakuvbbayovkpxemgm.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_FqBkrIbKuNSmh78DidDpow_30o7P4kP";
+const CLIENTS_TABLE = "CLIENTES";
 
 const products = [
     {
@@ -1187,24 +1261,16 @@ function renderHistory(orders){
     }
 
     container.innerHTML = orders.map(function(order){
-        const total = Number(
-            order.VALOR_TOTAL ??
-            order.valor_total ??
-            order.total ??
-            0
-        );
-
-        const numero =
-            order.NUMERO_PEDIDO ||
-            order.numero_pedido ||
-            order.ID ||
-            order.id ||
-            "Pedido";
+        const total = Number(order.VALOR_TOTAL ?? order.valor_total ?? order.total ?? 0);
+        const number = order.NUMERO_PEDIDO || order.numero_pedido || order.ID || order.id || "Pedido";
+        const date = order.DATA || order.data || order.created_at;
 
         return `<div class="order-history-card">
-            <div class="order-history-number">${numero}</div>
+            <div class="order-history-head">
+                <div class="order-history-number">${number}</div>
+            </div>
             <div class="order-history-info">
-                <div><strong>Data:</strong> ${formatHistoryDate(order.DATA || order.data)}</div>
+                <div><strong>Data:</strong> ${formatHistoryDate(date)}</div>
             </div>
             <div class="order-history-total">Total: ${money(total)}</div>
         </div>`;
@@ -1283,26 +1349,17 @@ function firstValue(obj, keys){
     return "";
 }
 
-function setCustomerLookupStatus(message, type){
-    const element = document.getElementById("customerLookupStatus");
-    if(!element) return;
-    element.textContent = message || "";
-    element.className = "customer-lookup-status" + (type ? " " + type : "");
-}
-
 function unwrapCustomerLookup(data){
     if(Array.isArray(data)) return data[0] || null;
-    if(data && Array.isArray(data.data)) return data.data[0] || null;
-    if(data && Array.isArray(data.clientes)) return data.clientes[0] || null;
+    if(data && Array.isArray(data.data)) return data.data[0] || data;
+    if(data && Array.isArray(data.clientes)) return data.clientes[0] || data;
+    if(data && data.cliente) return data;
     return data || null;
 }
 
 function fillCustomerData(data){
     const payload = unwrapCustomerLookup(data);
-
-    if(!payload || payload.encontrado === false || payload.found === false || payload.clienteExiste === false){
-        return false;
-    }
+    if(!payload || payload.encontrado === false || payload.found === false) return false;
 
     const customer = payload.cliente && typeof payload.cliente === "object"
         ? payload.cliente
@@ -1316,9 +1373,9 @@ function fillCustomerData(data){
     const city = firstValue(customer, ["CIDADE","cidade"]);
     const observation = firstValue(customer, ["OBSERVACAO_CLIENTE","OBSERVACAO","observacao"]);
 
-    if(!name && !cep && !address && !number && !neighborhood && !city){
-        return false;
-    }
+    const payment =
+        firstValue(payload, ["ULTIMA_FORMA_PAGAMENTO","ultima_forma_pagamento","FORMA_PAGAMENTO","forma_pagamento","PAGAMENTO","pagamento"]) ||
+        firstValue(customer, ["ULTIMA_FORMA_PAGAMENTO","ultima_forma_pagamento"]);
 
     if(name) document.getElementById("name").value = name;
     if(cep) document.getElementById("cep").value = formatCep(cep);
@@ -1328,6 +1385,18 @@ function fillCustomerData(data){
     if(city) document.getElementById("city").value = city;
     if(observation) document.getElementById("observation").value = observation;
 
+    if(payment){
+        const paymentSelect = document.getElementById("payment");
+        const normalized = String(payment).trim().toUpperCase();
+        const aliases = {
+            "CARTÃO":"CARTAO",
+            "CARTAO":"CARTAO",
+            "DINHEIRO":"DINHEIRO",
+            "PIX":"PIX"
+        };
+        paymentSelect.value = aliases[normalized] || normalized;
+    }
+
     return true;
 }
 
@@ -1336,33 +1405,31 @@ async function lookupCustomerByPhone(){
     if(!phoneInput) return;
 
     const rawPhone = phoneInput.value.trim();
-    if(!rawPhone || !isValidPhone(rawPhone)){
-        setCustomerLookupStatus("", "");
-        return;
-    }
+    if(!rawPhone || !isValidPhone(rawPhone)) return;
 
     const phone = normalizePhoneForOrder(rawPhone);
     if(customerLookupInProgress || phone === lastCustomerLookupPhone) return;
 
     customerLookupInProgress = true;
     phoneInput.classList.add("customer-loading");
-    setCustomerLookupStatus("Consultando cadastro...", "");
 
     try{
         const controller = new AbortController();
-        const timeout = setTimeout(function(){ controller.abort(); }, 10000);
+        const timeout = setTimeout(() => controller.abort(), 10000);
 
-        const response = await fetch(CLIENT_LOOKUP_WEBHOOK_URL,{
-            method:"POST",
+        const url = new URL(SUPABASE_URL + "/rest/v1/" + CLIENTS_TABLE);
+        url.searchParams.set("select", "*");
+        url.searchParams.set("TELEFONE", "eq." + phone);
+        url.searchParams.set("limit", "1");
+
+        const response = await fetch(url.toString(),{
+            method:"GET",
             signal:controller.signal,
             headers:{
-                "Content-Type":"application/json",
-                "X-Requested-With":"KUKI-SITE"
-            },
-            body:JSON.stringify({
-                telefone:phone,
-                whatsapp:phone
-            })
+                "apikey": SUPABASE_ANON_KEY,
+                "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+                "Accept": "application/json"
+            }
         });
 
         clearTimeout(timeout);
@@ -1371,56 +1438,30 @@ async function lookupCustomerByPhone(){
 
         const data = await response.json();
         const found = fillCustomerData(data);
+
+        // Guarda o telefone consultado mesmo quando o cliente ainda não existe,
+        // evitando consultas repetidas enquanto o campo não for alterado.
         lastCustomerLookupPhone = phone;
 
         if(found){
             localStorage.setItem("kuki_whatsapp", phone);
-            setCustomerLookupStatus(
-                "✓ Cadastro encontrado. Seus dados foram preenchidos automaticamente.",
-                "found"
-            );
-        }else{
-            setCustomerLookupStatus(
-                "Cadastro não encontrado. Preencha seus dados para continuar.",
-                "not-found"
-            );
         }
     }catch(error){
-        console.warn("Erro ao consultar cliente:", error);
-        setCustomerLookupStatus(
-            "Não foi possível consultar o cadastro agora.",
-            "error"
-        );
+        console.warn("Não foi possível consultar o cadastro agora:", error);
     }finally{
         customerLookupInProgress = false;
         phoneInput.classList.remove("customer-loading");
     }
 }
-
 function scheduleCustomerLookup(){
     clearTimeout(customerLookupTimer);
-
-    customerLookupTimer = setTimeout(function(){
-        const phoneInput = document.getElementById("phone");
-        if(!phoneInput) return;
-
-        const digits = normalizePhone(phoneInput.value);
-
-        if(
-            digits.length === 10 ||
-            digits.length === 11 ||
-            (digits.startsWith("55") && (digits.length === 12 || digits.length === 13))
-        ){
-            lookupCustomerByPhone();
-        }
-    }, 500);
+    customerLookupTimer = setTimeout(lookupCustomerByPhone, 700);
 }
 
 const phoneInputElement = document.getElementById("phone");
 if(phoneInputElement){
     phoneInputElement.addEventListener("input", function(){
         lastCustomerLookupPhone = "";
-        setCustomerLookupStatus("", "");
         scheduleCustomerLookup();
     });
 
@@ -1673,12 +1714,6 @@ async function finishOrder(){
     const city = document.getElementById("city").value.trim();
     const observation = document.getElementById("observation").value.trim();
 
-    if(!name){
-        alert("Digite seu nome.");
-        document.getElementById("name").focus();
-        return;
-    }
-
     if(!phoneInput){
         alert("Digite seu WhatsApp.");
         document.getElementById("phone").focus();
@@ -1688,6 +1723,12 @@ async function finishOrder(){
     if(!isValidPhone(phoneInput)){
         alert("Digite um WhatsApp válido.");
         document.getElementById("phone").focus();
+        return;
+    }
+
+    if(!name){
+        alert("Digite seu nome.");
+        document.getElementById("name").focus();
         return;
     }
 
@@ -1828,7 +1869,9 @@ async function finishOrder(){
 renderProducts();
 updateCart();
 updateStoreStatus();
+loadStoreHours();
 setInterval(updateStoreStatus, 60000);
+setInterval(loadStoreHours, 5 * 60 * 1000);
 </script>
 
 </body>
