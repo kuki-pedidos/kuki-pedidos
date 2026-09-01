@@ -1061,7 +1061,7 @@ async function loadActiveTable(tableName){
 }
 
 function imageForProduct(name){
-    return PRODUCT_IMAGES[String(name || "").trim().toUpperCase()] || "images/tradicional.png";
+    return "";
 }
 
 async function loadProductsFromSupabase(){
@@ -1073,7 +1073,7 @@ async function loadProductsFromSupabase(){
                 name:String(rowValue(row,["NOME","nome"], "PRODUTO")),
                 price:Number(rowValue(row,["PRECO","preco","VALOR","valor"], 0)) || 0,
                 desc:String(rowValue(row,["DESCRICAO","descricao"], "")),
-                image:imageForProduct(rowValue(row,["NOME","nome"], "")),
+                image:String(rowValue(row,["FOTO_URL","foto_url"], "") || ""),
                 active:isActiveValue(row.ATIVO ?? row.ativo)
             }));
         }
