@@ -705,44 +705,7 @@ body{
                     <option value="CARTAO">Cartão</option>
                 </select>
             </div>
-
-            <div class="group">
-                <label for="delivery">Tipo de entrega *</label>
-                <select id="delivery">
-                    <option value="">Selecione</option>
-                    <option value="ENTREGA">Entrega</option>
-                    <option value="RETIRADA">Retirada</option>
-                </select>
-            </div>
-
-            <div class="group">
-                <label for="cep">CEP *</label>
-                <input id="cep" type="text" placeholder="00000-000" inputmode="numeric" autocomplete="postal-code" maxlength="9">
-            </div>
-
-            <div class="group">
-                <label for="address">Endereço *</label>
-                <input id="address" type="text" placeholder="Rua, avenida..." autocomplete="street-address">
-            </div>
-
-            <div class="row">
-                <div class="group">
-                    <label for="number">Número *</label>
-                    <input id="number" type="text" placeholder="Número">
-                </div>
-
-                <div class="group">
-                    <label for="neighborhood">Bairro *</label>
-                    <input id="neighborhood" type="text" placeholder="Bairro">
-                </div>
-            </div>
-
-            <div class="group">
-                <label for="city">Cidade</label>
-                <input id="city" type="text" placeholder="Digite sua cidade" autocomplete="address-level2">
-            </div>
-
-            <div class="group">
+<div class="group">
                 <label for="observation">Observação</label>
                 <textarea id="observation" rows="3" placeholder="Alguma observação?"></textarea>
             </div>
@@ -1888,29 +1851,7 @@ async function finishOrder(){
         return;
     }
 
-    if(!delivery){
-        alert("Selecione o tipo de entrega.");
-        document.getElementById("delivery").focus();
-        return;
-    }
-
-    if(!address){
-        alert("Digite o endereço.");
-        document.getElementById("address").focus();
-        return;
-    }
-
-    if(!number){
-        alert("Digite o número.");
-        document.getElementById("number").focus();
-        return;
-    }
-
-    if(!neighborhood){
-        alert("Digite o bairro.");
-        document.getElementById("neighborhood").focus();
-        return;
-    }
+    // A KUKI não realiza entregas. Endereço e dados de entrega não são obrigatórios.
 
     const order = {
         request_id: makeRequestId(),
@@ -1932,12 +1873,13 @@ async function finishOrder(){
         }),
 
         pagamento:payment,
-        entrega:delivery,
-        cep:cep,
-        endereco:address,
-        numero:number,
-        bairro:neighborhood,
-        cidade:city,
+        // Mantém compatibilidade com o n8n: todos os pedidos são para retirada.
+        entrega:"RETIRADA",
+        cep:"",
+        endereco:"",
+        numero:"",
+        bairro:"",
+        cidade:"",
         observacao:observation,
         total:calculateTotal(),
         data:new Date().toISOString()
