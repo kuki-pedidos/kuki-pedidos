@@ -27,10 +27,10 @@ body{
     font-family:Arial,Helvetica,sans-serif;
     background:var(--cream);
     color:var(--text);
+    padding-bottom:76px;
 }
 
 button,input,textarea,select{font:inherit}
-
 button{cursor:pointer}
 
 header{
@@ -439,33 +439,6 @@ header{
     transform:translateX(-50%) translateY(0);
 }
 
-@media(max-width:900px){
-    .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-
-@media(max-width:620px){
-    .header{padding:10px 14px}
-    .brand img{width:135px}
-    .cart-top,.history-top{padding:11px 12px;font-size:12px}
-    .header-actions{gap:6px}
-    .hero{padding:32px 15px 14px}
-    .products{padding:10px 15px 55px}
-    .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    .photo{height:185px}
-    .photo img{padding:2px}
-    .info{padding:11px}
-    .name{font-size:15px;margin-bottom:6px}
-    .desc{font-size:11px;min-height:48px;margin-bottom:8px}
-    .price{font-size:16px;margin-bottom:10px}
-    .actions{gap:6px;flex-direction:column}
-    .qty{justify-content:center}
-    .qty button{width:34px;height:36px}
-    .add{min-height:38px;font-size:12px}
-    .row{grid-template-columns:1fr}
-    .modal{padding:20px}
-}
-
-/* RODAPÉ FIXO */
 .site-footer{
     position:fixed;
     left:0;
@@ -506,16 +479,11 @@ header{
     font-weight:800;
     text-decoration:none;
 }
-.instagram-link:hover{
-    color:var(--wine);
-}
+.instagram-link:hover{color:var(--wine)}
 .instagram-icon{
     width:24px;
     height:24px;
     flex:0 0 24px;
-}
-body{
-    padding-bottom:76px;
 }
 
 .history-result{
@@ -537,9 +505,7 @@ body{
     padding:14px;
     background:#fff;
 }
-.order-history-head{
-    margin-bottom:10px;
-}
+.order-history-head{margin-bottom:10px}
 .order-history-number{
     color:var(--wine);
     font-weight:900;
@@ -562,33 +528,6 @@ body{
     font-weight:900;
 }
 
-@media(max-width:620px){
-    .site-footer{
-        padding:9px 12px;
-    }
-    .footer-content{
-        gap:10px;
-    }
-    .history-float{
-        padding:13px 14px;
-        font-size:12px;
-        white-space:nowrap;
-    }
-    .instagram-link{
-        font-size:12px;
-        gap:6px;
-        white-space:nowrap;
-    }
-    .instagram-icon{
-        width:21px;
-        height:21px;
-        flex-basis:21px;
-    }
-    body{
-        padding-bottom:70px;
-    }
-}
-
 .hp-field{
     position:absolute !important;
     left:-9999px !important;
@@ -597,6 +536,37 @@ body{
     overflow:hidden !important;
     opacity:0 !important;
     pointer-events:none !important;
+}
+
+@media(max-width:900px){
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:620px){
+    .header{padding:10px 14px}
+    .brand img{width:135px}
+    .cart-top{padding:11px 12px;font-size:12px}
+    .hero{padding:32px 15px 14px}
+    .products{padding:10px 15px 55px}
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .photo{height:185px}
+    .photo img{padding:2px}
+    .info{padding:11px}
+    .name{font-size:15px;margin-bottom:6px}
+    .desc{font-size:11px;min-height:48px;margin-bottom:8px}
+    .price{font-size:16px;margin-bottom:10px}
+    .actions{gap:6px;flex-direction:column}
+    .qty{justify-content:center}
+    .qty button{width:34px;height:36px}
+    .add{min-height:38px;font-size:12px}
+    .row{grid-template-columns:1fr}
+    .modal{padding:20px}
+    .site-footer{padding:9px 12px}
+    .footer-content{gap:10px}
+    .history-float{padding:13px 14px;font-size:12px;white-space:nowrap}
+    .instagram-link{font-size:12px;gap:6px;white-space:nowrap}
+    .instagram-icon{width:21px;height:21px;flex-basis:21px}
+    body{padding-bottom:70px}
 }
 </style>
 </head>
@@ -672,7 +642,7 @@ body{
 
             <div class="group">
                 <label for="phone">WhatsApp *</label>
-                <input id="phone" type="tel" placeholder="(85) 99999-9999" inputmode="tel" autocomplete="tel">
+                <input id="phone" type="tel" placeholder="(85) 99999-9999" inputmode="tel" autocomplete="tel" oninput="handlePhoneInput(this)">
             </div>
 
             <div class="group">
@@ -746,173 +716,11 @@ body{
 </div>
 
 <script>
-let storeHours = null;
-let storeHoursLoaded = false;
-let storeHoursLoading = false;
-
-const DAY_TO_NAME = {
-    0:"DOMINGO",
-    1:"SEGUNDA",
-    2:"TERÇA",
-    3:"QUARTA",
-    4:"QUINTA",
-    5:"SEXTA",
-    6:"SÁBADO"
-};
-
-function normalizeDayName(value){
-    return String(value || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .trim()
-        .toUpperCase();
-}
-
-function normalizeTime(value){
-    if(value === undefined || value === null) return "";
-    const match = String(value).match(/^(\d{1,2}):(\d{2})/);
-    if(!match) return "";
-    return String(match[1]).padStart(2,"0") + ":" + match[2];
-}
-
-function getMinutes(time){
-    const normalized = normalizeTime(time);
-    if(!normalized) return 0;
-    const [hour, minute] = normalized.split(":").map(Number);
-    return hour * 60 + minute;
-}
-
-function isOpenValue(value){
-    return value === true ||
-        value === 1 ||
-        String(value || "").trim().toUpperCase() === "TRUE";
-}
-
-function getHoursRows(data){
-    if(Array.isArray(data)) return data;
-    if(data && Array.isArray(data.horarios)) return data.horarios;
-    if(data && Array.isArray(data.data)) return data.data;
-    if(data && Array.isArray(data.body)) return data.body;
-    return [];
-}
-
-function setStoreHours(data){
-    const rows = getHoursRows(data);
-    const map = {};
-
-    rows.forEach(function(row){
-        const dayName = normalizeDayName(
-            row.DIA_SEMANA ?? row.dia_semana ?? row.dia
-        );
-
-        if(!dayName) return;
-
-        map[dayName] = {
-            aberto:isOpenValue(row.ABERTO ?? row.aberto),
-            abertura:normalizeTime(row.HORA_ABERTURA ?? row.hora_abertura),
-            fechamento:normalizeTime(row.HORA_FECHAMENTO ?? row.hora_fechamento)
-        };
-    });
-
-    storeHours = map;
-    storeHoursLoaded = Object.keys(map).length > 0;
-    return storeHoursLoaded;
-}
-
-async function loadStoreHours(){
-    if(storeHoursLoading) return;
-
-    storeHoursLoading = true;
-
-    try{
-        const url = new URL(SUPABASE_URL + "/rest/v1/HORARIOS");
-        url.searchParams.set("select", "*");
-
-        const response = await fetch(url.toString(),{
-            method:"GET",
-            headers:{
-                "Accept":"application/json",
-                "apikey": SUPABASE_ANON_KEY,
-                "Authorization": "Bearer " + SUPABASE_ANON_KEY
-            }
-        });
-
-        if(!response.ok) throw new Error("HTTP " + response.status);
-
-        const data = await response.json();
-
-        if(!setStoreHours(data)){
-            throw new Error("Nenhum horário válido retornado.");
-        }
-    }catch(error){
-        console.error("Erro ao carregar horários da loja:", error);
-        storeHoursLoaded = false;
-    }finally{
-        storeHoursLoading = false;
-        updateStoreStatus();
-    }
-}
-
-function getStoreState(){
-    if(!storeHoursLoaded || !storeHours){
-        return {
-            open:true, // Permite o fluxo caso ocorra erro na busca do banco
-            loading:storeHoursLoading,
-            message:storeHoursLoading
-                ? "⏳ Consultando os horários da KUKI..."
-                : "🟢 Faça seu pedido normalmente."
-        };
-    }
-
-    const now = new Date();
-    const dayName = normalizeDayName(DAY_TO_NAME[now.getDay()]);
-    const schedule = storeHours[dayName];
-
-    if(!schedule || !schedule.aberto){
-        return {
-            open:false,
-            message:"🔴 Hoje a KUKI está fechada. Voltamos em breve com cookies fresquinhos! 🍪🤎"
-        };
-    }
-
-    if(!schedule.abertura || !schedule.fechamento){
-        return {
-            open:false,
-            message:"🔴 Os horários de hoje ainda não estão configurados."
-        };
-    }
-
-    const current = now.getHours() * 60 + now.getMinutes();
-    const opening = getMinutes(schedule.abertura);
-    const closing = getMinutes(schedule.fechamento);
-    const isOpen = current >= opening && current < closing;
-
-    return {
-        open:isOpen,
-        message:isOpen
-            ? `🟢 Estamos abertos até ${schedule.fechamento} hs`
-            : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.abertura} hs às ${schedule.fechamento} hs.`
-    };
-}
-
-function updateStoreStatus(){
-    const state = getStoreState();
-    const element = document.getElementById("storeStatus");
-
-    if(!element) return state;
-
-    element.textContent = state.message;
-    element.className = "store-status " + (state.open ? "open" : "closed");
-
-    return state;
-}
-
 const WEBHOOK_URL = "https://n8n.rikasolucoes.com.br/webhook/kuki-pedido-site";
 const HISTORY_WEBHOOK_URL = "https://n8n.rikasolucoes.com.br/webhook/kuki-historico-pedidos";
 
 const SUPABASE_URL = "https://delakuvbbayovkpxemgm.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_FqBkrIbKuNSmh78DidDpow_30o7P4kP";
-const CLIENTS_TABLE = "CLIENTES";
 
 let products = [
     { id: "1", name: "TRADICIONAL", price: 10.90, desc: "Chocolate ao leite e gotas de chocolate", image: "images/tradicional.png", active: true },
@@ -923,10 +731,145 @@ let products = [
     { id: "6", name: "CREAM", price: 15.90, desc: "Cookie com recheio cremoso e sabor irresistível", image: "images/cream.png", active: true }
 ];
 
-function isActiveValue(value){
-    return value === true || value === 1 || String(value ?? "").trim().toUpperCase() === "TRUE";
+let cart = {};
+let storeHours = null;
+let storeHoursLoaded = false;
+let storeHoursLoading = false;
+
+// --- BUSCA AUTOMÁTICA DE CLIENTE PELO WHATSAPP ---
+let phoneSearchTimeout = null;
+
+function handlePhoneInput(input) {
+    clearTimeout(phoneSearchTimeout);
+    const digits = normalizePhone(input.value);
+
+    // Se já tiver DDD + Número (10 ou 11 dígitos)
+    if (digits.length >= 10 && digits.length <= 11) {
+        phoneSearchTimeout = setTimeout(() => {
+            fetchClientByPhone(digits);
+        }, 500);
+    }
 }
 
+async function fetchClientByPhone(phoneDigits) {
+    try {
+        const phoneFormatted = normalizePhoneForOrder(phoneDigits);
+        const url = new URL(SUPABASE_URL + "/rest/v1/CLIENTES");
+        url.searchParams.set("select", "NOME,nome");
+        url.searchParams.set("or", `WHATSAPP.eq.${phoneFormatted},TELEFONE.eq.${phoneFormatted},whatsapp.eq.${phoneFormatted}`);
+
+        const response = await fetch(url.toString(), {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "apikey": SUPABASE_ANON_KEY,
+                "Authorization": "Bearer " + SUPABASE_ANON_KEY
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (Array.isArray(data) && data.length > 0) {
+                const clientName = data[0].NOME || data[0].nome;
+                if (clientName) {
+                    const nameField = document.getElementById("name");
+                    if (nameField && !nameField.value.trim()) {
+                        nameField.value = clientName;
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.error("Erro ao buscar cadastro de cliente:", e);
+    }
+}
+
+// --- CONTROLE DE HORÁRIOS ---
+const DAY_TO_NAME = { 0:"DOMINGO", 1:"SEGUNDA", 2:"TERÇA", 3:"QUARTA", 4:"QUINTA", 5:"SEXTA", 6:"SÁBADO" };
+
+function normalizeDayName(value){
+    return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
+}
+
+function normalizeTime(value){
+    if(!value) return "";
+    const match = String(value).match(/^(\d{1,2}):(\d{2})/);
+    return match ? String(match[1]).padStart(2,"0") + ":" + match[2] : "";
+}
+
+function getMinutes(time){
+    const normalized = normalizeTime(time);
+    if(!normalized) return 0;
+    const [hour, minute] = normalized.split(":").map(Number);
+    return hour * 60 + minute;
+}
+
+async function loadStoreHours(){
+    if(storeHoursLoading) return;
+    storeHoursLoading = true;
+    try{
+        const url = new URL(SUPABASE_URL + "/rest/v1/HORARIOS");
+        url.searchParams.set("select", "*");
+        const response = await fetch(url.toString(),{
+            method:"GET",
+            headers:{ "Accept":"application/json", "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY }
+        });
+        if(response.ok){
+            const rows = await response.json();
+            const map = {};
+            (Array.isArray(rows) ? rows : []).forEach(row => {
+                const dayName = normalizeDayName(row.DIA_SEMANA ?? row.dia_semana ?? row.dia);
+                if(dayName){
+                    map[dayName] = {
+                        aberto: row.ABERTO ?? row.aberto,
+                        abertura: normalizeTime(row.HORA_ABERTURA ?? row.hora_abertura),
+                        fechamento: normalizeTime(row.HORA_FECHAMENTO ?? row.hora_fechamento)
+                    };
+                }
+            });
+            storeHours = map;
+            storeHoursLoaded = true;
+        }
+    }catch(e){
+        console.error("Erro ao carregar horários:", e);
+    }finally{
+        storeHoursLoading = false;
+        updateStoreStatus();
+    }
+}
+
+function updateStoreStatus(){
+    const element = document.getElementById("storeStatus");
+    if(!element) return;
+
+    if(!storeHoursLoaded || !storeHours){
+        element.textContent = "🟢 Faça seu pedido normalmente.";
+        element.className = "store-status open";
+        return;
+    }
+
+    const now = new Date();
+    const dayName = normalizeDayName(DAY_TO_NAME[now.getDay()]);
+    const schedule = storeHours[dayName];
+
+    if(!schedule || !schedule.aberto){
+        element.textContent = "🔴 Hoje a KUKI está fechada. Voltamos em breve com cookies fresquinhos! 🍪🤎";
+        element.className = "store-status closed";
+        return;
+    }
+
+    const current = now.getHours() * 60 + now.getMinutes();
+    const opening = getMinutes(schedule.abertura);
+    const closing = getMinutes(schedule.fechamento);
+    const isOpen = current >= opening && current < closing;
+
+    element.textContent = isOpen 
+        ? `🟢 Estamos abertos até ${schedule.fechamento} hs` 
+        : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.abertura} hs às ${schedule.fechamento} hs.`;
+    element.className = "store-status " + (isOpen ? "open" : "closed");
+}
+
+// --- DADOS DO SUPABASE ---
 function rowValue(row, keys, fallback=""){
     for(const key of keys){
         if(row && row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== ""){
@@ -943,21 +886,15 @@ async function loadActiveTable(tableName){
 
     const response = await fetch(url.toString(), {
         method:"GET",
-        headers:{
-            "Accept":"application/json",
-            "apikey":SUPABASE_ANON_KEY,
-            "Authorization":"Bearer " + SUPABASE_ANON_KEY
-        }
+        headers:{ "Accept":"application/json", "apikey":SUPABASE_ANON_KEY, "Authorization":"Bearer " + SUPABASE_ANON_KEY }
     });
 
-    if(!response.ok) throw new Error(tableName + " HTTP " + response.status);
+    if(!response.ok) return [];
     const rows = await response.json();
-    return Array.isArray(rows)
-        ? rows.filter(row => {
-            const active = row.ATIVO ?? row.ativo;
-            return active === undefined || active === null || isActiveValue(active);
-        })
-        : [];
+    return Array.isArray(rows) ? rows.filter(row => {
+        const active = row.ATIVO ?? row.ativo;
+        return active === undefined || active === null || active === true || String(active).toUpperCase() === "TRUE";
+    }) : [];
 }
 
 async function loadProductsFromSupabase(){
@@ -965,16 +902,16 @@ async function loadProductsFromSupabase(){
         const rows = await loadActiveTable("PRODUTOS");
         if(rows.length){
             products = rows.map(row => ({
-                id:String(rowValue(row,["id","ID","CODIGO"], "")),
-                name:String(rowValue(row,["NOME","nome"], "PRODUTO")),
-                price:Number(rowValue(row,["PRECO","preco","VALOR","valor"], 0)) || 0,
-                desc:String(rowValue(row,["DESCRICAO","descricao"], "")),
-                image:String(rowValue(row,["FOTO_URL","foto_url"], "") || ""),
-                active:isActiveValue(row.ATIVO ?? row.ativo)
+                id: String(rowValue(row,["id","ID","CODIGO"], "")),
+                name: String(rowValue(row,["NOME","nome"], "PRODUTO")),
+                price: Number(rowValue(row,["PRECO","preco","VALOR","valor"], 0)) || 0,
+                desc: String(rowValue(row,["DESCRICAO","descricao"], "")),
+                image: String(rowValue(row,["FOTO_URL","foto_url"], "") || ""),
+                active: true
             }));
         }
-    }catch(error){
-        console.error("Erro ao carregar produtos do Supabase:", error);
+    }catch(e){
+        console.error("Erro ao carregar produtos:", e);
     }
     renderProducts();
 }
@@ -982,104 +919,63 @@ async function loadProductsFromSupabase(){
 function fillSelectOptions(selectId, rows, placeholder){
     const select = document.getElementById(selectId);
     if(!select) return;
-
     const current = select.value;
     const options = rows.map(row => {
         const name = String(rowValue(row,["NOME","nome","DESCRICAO","descricao"], "")).trim();
-        const value = name;
-        if(!name) return "";
-        return `<option value="${escapeOption(value)}">${escapeOption(name)}</option>`;
+        return name ? `<option value="${name}">${name}</option>` : "";
     }).filter(Boolean).join("");
 
     select.innerHTML = `<option value="">${placeholder}</option>` + options;
-    if(current && [...select.options].some(o => o.value === current)) select.value = current;
-}
-
-function escapeOption(value){
-    return String(value)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;");
+    if(current) select.value = current;
 }
 
 async function loadPaymentAndDeliveryFromSupabase(){
-    const [paymentsResult, deliveriesResult] = await Promise.allSettled([
+    const [payments, deliveries] = await Promise.allSettled([
         loadActiveTable("FORMAS_PAGAMENTO"),
         loadActiveTable("FORMAS_ENTREGA")
     ]);
-
-    if(paymentsResult.status === "fulfilled" && paymentsResult.value.length > 0){
-        fillSelectOptions("payment", paymentsResult.value, "Selecione");
-    }
-
-    if(deliveriesResult.status === "fulfilled" && deliveriesResult.value.length > 0){
-        fillSelectOptions("delivery", deliveriesResult.value, "Selecione");
-    }
+    if(payments.status === "fulfilled" && payments.value.length > 0) fillSelectOptions("payment", payments.value, "Selecione");
+    if(deliveries.status === "fulfilled" && deliveries.value.length > 0) fillSelectOptions("delivery", deliveries.value, "Selecione");
 }
 
-async function loadStoreData(){
-    await Promise.all([
-        loadProductsFromSupabase(),
-        loadPaymentAndDeliveryFromSupabase()
-    ]);
-}
-
-let cart = {};
-
-function money(value) {
-    return value.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL"
-    });
+// --- CARRINHO E INTERFACE ---
+function money(val) {
+    return val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 function renderProducts() {
-    const activeProducts = products.filter(item => item.active);
-
-    document.getElementById("products").innerHTML =
-        activeProducts.map(product => `
-            <div class="card">
-                <div class="photo">
-                    <img src="${product.image}" alt="${product.name}" loading="lazy">
-                </div>
-                <div class="info">
-                    <div class="name">${product.name}</div>
-                    <div class="desc">${product.desc}</div>
-                    <div class="price">${money(product.price)}</div>
-                    <div class="actions">
-                        <div class="qty">
-                            <button type="button" onclick="changeQty('${product.id}',-1)">−</button>
-                            <span id="q${product.id}">0</span>
-                            <button type="button" onclick="changeQty('${product.id}',1)">+</button>
-                        </div>
-                        <button type="button" class="add" onclick="add('${product.id}')">ADICIONAR</button>
+    document.getElementById("products").innerHTML = products.filter(p => p.active).map(product => `
+        <div class="card">
+            <div class="photo"><img src="${product.image}" alt="${product.name}" loading="lazy"></div>
+            <div class="info">
+                <div class="name">${product.name}</div>
+                <div class="desc">${product.desc}</div>
+                <div class="price">${money(product.price)}</div>
+                <div class="actions">
+                    <div class="qty">
+                        <button type="button" onclick="changeQty('${product.id}',-1)">−</button>
+                        <span id="q${product.id}">0</span>
+                        <button type="button" onclick="changeQty('${product.id}',1)">+</button>
                     </div>
+                    <button type="button" class="add" onclick="add('${product.id}')">ADICIONAR</button>
                 </div>
             </div>
-        `).join("");
+        </div>
+    `).join("");
 }
 
 function changeQty(id, amount) {
-    const element = document.getElementById("q" + id);
-    let value = parseInt(element.textContent,10) || 0;
-    value += amount;
-    if(value < 0) value = 0;
-    element.textContent = value;
+    const el = document.getElementById("q" + id);
+    let val = (parseInt(el.textContent,10) || 0) + amount;
+    el.textContent = val < 0 ? 0 : val;
 }
 
 function add(id) {
     const quantity = parseInt(document.getElementById("q" + id).textContent, 10) || 0;
-    if(quantity <= 0){
-        alert("Escolha pelo menos 1 unidade.");
-        return;
-    }
+    if(quantity <= 0){ alert("Escolha pelo menos 1 unidade."); return; }
     const product = products.find(item => item.id === id);
-    if(!product){
-        alert("Produto não encontrado.");
-        return;
-    }
-    cart[id] = { ...product, quantity: quantity };
+    if(!product) return;
+    cart[id] = { ...product, quantity };
     updateCart();
     showAddedFeedback(product.name, quantity);
 }
@@ -1097,11 +993,11 @@ function removeItem(id){
 }
 
 function calculateTotal(){
-    return Object.values(cart).reduce((total,item) => total + item.price * item.quantity, 0);
+    return Object.values(cart).reduce((tot, item) => tot + item.price * item.quantity, 0);
 }
 
 function calculateCount(){
-    return Object.values(cart).reduce((total,item) => total + item.quantity, 0);
+    return Object.values(cart).reduce((tot, item) => tot + item.quantity, 0);
 }
 
 function updateCart(){
@@ -1113,12 +1009,11 @@ function updateCart(){
     }else{
         container.innerHTML = ids.map(id => {
             const item = cart[id];
-            const subtotal = item.price * item.quantity;
             return `
                 <div class="item">
                     <div>
                         <div class="itemname">${item.name}</div>
-                        <div class="itemprice">${item.quantity} x ${money(item.price)} = ${money(subtotal)}</div>
+                        <div class="itemprice">${item.quantity} x ${money(item.price)} = ${money(item.price * item.quantity)}</div>
                     </div>
                     <div class="controls">
                         <button type="button" onclick="changeCart('${id}',-1)">−</button>
@@ -1133,57 +1028,41 @@ function updateCart(){
 
     document.getElementById("total").textContent = money(calculateTotal());
     document.getElementById("topCount").textContent = calculateCount();
-
-    products.forEach(product => {
-        const quantityElement = document.getElementById("q" + product.id);
-        if(quantityElement){
-            quantityElement.textContent = cart[product.id] ? cart[product.id].quantity : 0;
-        }
-    });
 }
 
 function openCart(){
     document.getElementById("overlay").classList.add("active");
+    const savedPhone = localStorage.getItem("kuki_whatsapp") || "";
+    if(savedPhone && !document.getElementById("phone").value) {
+        document.getElementById("phone").value = savedPhone;
+        fetchClientByPhone(savedPhone);
+    }
     updateCart();
 }
 
-function closeCart(){
-    document.getElementById("overlay").classList.remove("active");
-}
-
-function outside(event){
-    if(event.target.id === "overlay") closeCart();
-}
+function closeCart(){ document.getElementById("overlay").classList.remove("active"); }
+function outside(e){ if(e.target.id === "overlay") closeCart(); }
 
 function openPaymentModal(data){
     const container = document.getElementById("paymentModalContent");
     const title = document.getElementById("paymentModalTitle");
 
-    if(data && (data.type === 'pix' || data.qr_code || data.pix_copia_e_cola)){
+    if(data && (data.qr_code || data.pix_copia_e_cola)){
         const pixCode = data.qr_code || data.pix_copia_e_cola;
         title.textContent = "Pagamento via PIX";
         container.innerHTML = `
-            <p style="margin-bottom:12px; color:var(--muted); font-size:15px; line-height:1.4;">
-                Seu pedido foi registrado! Copie a chave Pix abaixo e pague no aplicativo do seu banco:
-            </p>
-            <textarea id="pixCodeInput" readonly style="width:100%; height:90px; padding:10px; border:1px solid var(--border); border-radius:10px; font-size:12px; font-family:monospace; resize:none; background:#f9e5d1; color:var(--text);">${pixCode}</textarea>
-            <button type="button" class="finish" onclick="copyPixCode()" style="margin-top:14px; background:#167a3f;">
-                COPIAR CHAVE PIX 📋
-            </button>
+            <p style="margin-bottom:12px; color:var(--muted); font-size:15px;">Copie a chave Pix abaixo e pague no app do seu banco:</p>
+            <textarea id="pixCodeInput" readonly style="width:100%; height:90px; padding:10px; border:1px solid var(--border); border-radius:10px; font-size:12px; font-family:monospace; background:#f9e5d1; color:var(--text);">${pixCode}</textarea>
+            <button type="button" class="finish" onclick="copyPixCode()" style="margin-top:14px; background:#167a3f;">COPIAR CHAVE PIX 📋</button>
         `;
     } else if(data && (data.checkout_url || data.init_point)){
         const checkoutUrl = data.checkout_url || data.init_point;
         title.textContent = "Pagamento";
         container.innerHTML = `
-            <p style="margin-bottom:18px; color:var(--muted); font-size:15px; line-height:1.4;">
-                Seu pedido foi registrado com sucesso! 🍪<br>Clique no botão abaixo para concluir o pagamento no Mercado Pago:
-            </p>
-            <a href="${checkoutUrl}" target="_blank" class="finish" style="display:inline-block; text-decoration:none; text-align:center; background:#009ee3;">
-                PAGAR COM MERCADO PAGO 💳
-            </a>
+            <p style="margin-bottom:18px; color:var(--muted); font-size:15px;">Clique abaixo para concluir o pagamento no Mercado Pago:</p>
+            <a href="${checkoutUrl}" target="_blank" class="finish" style="display:inline-block; text-decoration:none; background:#009ee3;">PAGAR COM MERCADO PAGO 💳</a>
         `;
     }
-
     document.getElementById("paymentOverlay").classList.add("active");
 }
 
@@ -1191,108 +1070,28 @@ function copyPixCode(){
     const copyText = document.getElementById("pixCodeInput");
     if(copyText){
         copyText.select();
-        copyText.setSelectionRange(0, 99999);
-        navigator.clipboard.writeText(copyText.value).then(() => {
-            alert("Chave Pix copiada para a área de transferência!");
-        }).catch(() => {
-            alert("Copie a chave manualmente da caixa de texto.");
-        });
+        navigator.clipboard.writeText(copyText.value).then(() => alert("Chave Pix copiada!"));
     }
 }
 
-function closePayment(){
-    document.getElementById("paymentOverlay").classList.remove("active");
-}
-
-function outsidePayment(event){
-    if(event.target.id === "paymentOverlay") closePayment();
-}
-
-function normalizePhone(phone){
-    return String(phone || "").replace(/\D/g,"");
-}
-
-function normalizePhoneForOrder(phone){
-    const digits = normalizePhone(phone);
-    if(digits.startsWith("55") && (digits.length === 12 || digits.length === 13)){
-        return digits.substring(2);
-    }
-    return digits;
-}
-
-function isValidPhone(phone){
-    const digits = normalizePhone(phone);
-    return digits.length >= 8 && digits.length <= 13;
-}
+function closePayment(){ document.getElementById("paymentOverlay").classList.remove("active"); }
+function outsidePayment(e){ if(e.target.id === "paymentOverlay") closePayment(); }
 
 function openHistory(){
     document.getElementById("historyOverlay").classList.add("active");
-    document.getElementById("historyResult").innerHTML = "";
     const savedPhone = localStorage.getItem("kuki_whatsapp") || "";
     if(savedPhone) document.getElementById("historyPhone").value = savedPhone;
 }
-
-function closeHistory(){
-    document.getElementById("historyOverlay").classList.remove("active");
-}
-
-function outsideHistory(event){
-    if(event.target.id === "historyOverlay") closeHistory();
-}
-
-function formatHistoryDate(value){
-    if(!value) return "Data não informada";
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString("pt-BR");
-}
-
-function getHistoryOrders(data){
-    if(Array.isArray(data)) return data;
-    if(Array.isArray(data && data.pedidos)) return data.pedidos;
-    if(Array.isArray(data && data.data)) return data.data;
-    if(Array.isArray(data && data.body)) return data.body;
-    return [];
-}
-
-function renderHistory(orders){
-    const container = document.getElementById("historyResult");
-
-    if(!orders.length){
-        container.innerHTML = '<div class="history-empty">Nenhum pedido encontrado para este WhatsApp.</div>';
-        return;
-    }
-
-    container.innerHTML = orders.map(order => {
-        const total = Number(order.VALOR_TOTAL ?? order.valor_total ?? order.total ?? 0);
-        const number = order.NUMERO_PEDIDO || order.numero_pedido || order.ID || order.id || "Pedido";
-        const date = order.DATA || order.data || order.created_at;
-
-        return `<div class="order-history-card">
-            <div class="order-history-head">
-                <div class="order-history-number">${number}</div>
-            </div>
-            <div class="order-history-info">
-                <div><strong>Data:</strong> ${formatHistoryDate(date)}</div>
-            </div>
-            <div class="order-history-total">Total: ${money(total)}</div>
-        </div>`;
-    }).join("");
-}
+function closeHistory(){ document.getElementById("historyOverlay").classList.remove("active"); }
+function outsideHistory(e){ if(e.target.id === "historyOverlay") closeHistory(); }
 
 async function loadHistory(){
     const input = document.getElementById("historyPhone");
     const result = document.getElementById("historyResult");
-    const button = document.getElementById("searchHistory");
-    const phoneInput = input.value.trim();
-    if(!phoneInput || !isValidPhone(phoneInput)){
-        alert("Digite um WhatsApp válido.");
-        input.focus();
-        return;
-    }
-    const phone = normalizePhoneForOrder(phoneInput);
-    localStorage.setItem("kuki_whatsapp", phone);
-    button.disabled = true;
-    button.textContent = "CONSULTANDO...";
+    const phone = normalizePhoneForOrder(input.value);
+
+    if(!isValidPhone(input.value)){ alert("Digite um WhatsApp válido."); return; }
+
     result.innerHTML = '<div class="history-loading">Buscando seus pedidos...</div>';
     try{
         const response = await fetch(HISTORY_WEBHOOK_URL,{
@@ -1300,90 +1099,52 @@ async function loadHistory(){
             headers:{"Content-Type":"application/json"},
             body:JSON.stringify({telefone:phone, whatsapp:phone})
         });
-        if(!response.ok) throw new Error("HTTP " + response.status);
         const data = await response.json();
-        renderHistory(getHistoryOrders(data));
-    }catch(error){
-        console.error("Erro ao consultar histórico:", error);
-        result.innerHTML = '<div class="history-empty">Não foi possível consultar os pedidos agora. Tente novamente.</div>';
-    }finally{
-        button.disabled = false;
-        button.textContent = "CONSULTAR PEDIDOS";
+        const orders = Array.isArray(data) ? data : (data.pedidos || data.data || []);
+        
+        if(!orders.length){
+            result.innerHTML = '<div class="history-empty">Nenhum pedido encontrado.</div>';
+            return;
+        }
+
+        result.innerHTML = orders.map(o => `
+            <div class="order-history-card">
+                <div class="order-history-number">${o.NUMERO_PEDIDO || o.id || "Pedido"}</div>
+                <div class="order-history-info">Data: ${new Date(o.DATA || o.created_at).toLocaleString("pt-BR")}</div>
+                <div class="order-history-total">Total: ${money(Number(o.VALOR_TOTAL || o.total || 0))}</div>
+            </div>
+        `).join("");
+    }catch(e){
+        result.innerHTML = '<div class="history-empty">Erro ao consultar. Tente novamente.</div>';
     }
 }
 
-function showAddedFeedback(productName, quantity){
-    const cartButton = document.querySelector(".cart-top");
+function showAddedFeedback(name, quantity){
     const toast = document.getElementById("cartToast");
-
-    if(cartButton){
-        cartButton.classList.remove("cart-added-shake");
-        void cartButton.offsetWidth;
-        cartButton.classList.add("cart-added-shake");
-    }
-
     if(toast){
-        const unitText = quantity === 1 ? "unidade" : "unidades";
-        toast.textContent = `🍪 ${quantity} ${unitText} de ${productName} adicionado${quantity === 1 ? "" : "s"} ao carrinho!`;
-        toast.classList.remove("show");
-        void toast.offsetWidth;
+        toast.textContent = `🍪 ${quantity}x ${name} adicionado ao carrinho!`;
         toast.classList.add("show");
-
         clearTimeout(window.cartToastTimer);
         window.cartToastTimer = setTimeout(() => toast.classList.remove("show"), 2400);
     }
 }
 
-const SECURITY = {
-    ORDER_COOLDOWN_MS: 3000,
-    MAX_NAME_LENGTH: 80,
-    MAX_TEXT_LENGTH: 300
-};
+function normalizePhone(phone){ return String(phone || "").replace(/\D/g,""); }
 
-let lastOrderAttemptAt = 0;
-
-function sanitizeText(value, maxLength){
-    return String(value ?? "")
-        .replace(/[\u0000-\u001F\u007F]/g, " ")
-        .replace(/[<>]/g, "")
-        .replace(/\s+/g, " ")
-        .trim()
-        .slice(0, maxLength);
+function normalizePhoneForOrder(phone){
+    const digits = normalizePhone(phone);
+    return (digits.startsWith("55") && (digits.length === 12 || digits.length === 13)) ? digits.substring(2) : digits;
 }
 
-function isBotSubmission(){
-    const hp = document.getElementById("website");
-    return !!(hp && hp.value.trim());
+function isValidPhone(phone){
+    const digits = normalizePhone(phone);
+    return digits.length >= 8 && digits.length <= 13;
 }
 
-function makeRequestId(){
-    if(window.crypto && crypto.randomUUID){
-        return crypto.randomUUID();
-    }
-    return "kuki-" + Date.now() + "-" + Math.random().toString(36).slice(2);
-}
-
-function cleanCheckoutFields(){
-    const name = document.getElementById("name");
-    if(name) name.value = sanitizeText(name.value, SECURITY.MAX_NAME_LENGTH);
-
-    const observation = document.getElementById("observation");
-    if(observation) observation.value = sanitizeText(observation.value, SECURITY.MAX_TEXT_LENGTH);
-}
-
+// --- FINALIZAR PEDIDO (ENVIO PARA O N8N) ---
 async function finishOrder(){
-    cleanCheckoutFields();
-
-    if(isBotSubmission()){
-        console.warn("Envio bloqueado pelo guard rail anti-bot.");
-        return;
-    }
-
-    const now = Date.now();
-    if(now - lastOrderAttemptAt < SECURITY.ORDER_COOLDOWN_MS){
-        alert("Aguarde alguns segundos antes de enviar novamente.");
-        return;
-    }
+    const hp = document.getElementById("website");
+    if(hp && hp.value.trim()) return; // Anti-bot
 
     if(Object.keys(cart).length === 0){
         alert("Adicione pelo menos um produto ao pedido.");
@@ -1396,13 +1157,7 @@ async function finishOrder(){
     const delivery = document.getElementById("delivery").value.trim();
     const observation = document.getElementById("observation").value.trim();
 
-    if(!phoneInput){
-        alert("Digite seu WhatsApp.");
-        document.getElementById("phone").focus();
-        return;
-    }
-
-    if(!isValidPhone(phoneInput)){
+    if(!phoneInput || !isValidPhone(phoneInput)){
         alert("Digite um WhatsApp válido com DDD.");
         document.getElementById("phone").focus();
         return;
@@ -1414,72 +1169,44 @@ async function finishOrder(){
         return;
     }
 
-    if(!payment){
-        alert("Selecione a forma de pagamento.");
-        document.getElementById("payment").focus();
-        return;
-    }
-
-    if(!delivery){
-        alert("Selecione o tipo de entrega.");
-        document.getElementById("delivery").focus();
-        return;
-    }
+    if(!payment){ alert("Selecione a forma de pagamento."); return; }
+    if(!delivery){ alert("Selecione o tipo de entrega."); return; }
 
     const phone = normalizePhoneForOrder(phoneInput);
 
-    const order = {
-        request_id: makeRequestId(),
+    const orderPayload = {
+        request_id: "kuki-" + Date.now(),
         origem: "SITE_KUKI",
-
-        cliente:{
-            nome:name,
-            whatsapp:phone
-        },
-
-        itens:Object.values(cart).map(item => ({
-            produto_id:item.id,
-            produto:item.name,
-            quantidade:item.quantity,
-            preco_unitario:item.price,
-            valor_item:item.price * item.quantity
+        cliente: { nome: name, whatsapp: phone },
+        itens: Object.values(cart).map(item => ({
+            produto_id: item.id,
+            produto: item.name,
+            quantidade: item.quantity,
+            preco_unitario: item.price,
+            valor_item: item.price * item.quantity
         })),
-
-        pagamento:payment,
-        entrega:delivery,
-        observacao:observation,
-        total:calculateTotal(),
-        data:new Date().toISOString()
+        pagamento: payment,
+        entrega: delivery,
+        observacao: observation,
+        total: calculateTotal(),
+        data: new Date().toISOString()
     };
 
     const button = document.getElementById("finish");
-
-    lastOrderAttemptAt = Date.now();
     button.disabled = true;
     button.textContent = "ENVIANDO PEDIDO...";
 
-    try{
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+        const response = await fetch(WEBHOOK_URL, {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(orderPayload)
+        });
 
-        const response = await fetch(
-            WEBHOOK_URL,
-            {
-                method:"POST",
-                signal:controller.signal,
-                headers:{
-                    "Content-Type":"application/json",
-                    "X-Requested-With":"KUKI-SITE"
-                },
-                body:JSON.stringify(order)
-            }
-        );
-
-        clearTimeout(timeout);
-
-        if(!response.ok){
-            throw new Error("HTTP " + response.status);
-        }
+        if (!response.ok) throw new Error("HTTP " + response.status);
 
         const responseData = await response.json();
         localStorage.setItem("kuki_whatsapp", phone);
@@ -1488,10 +1215,6 @@ async function finishOrder(){
         updateCart();
         closeCart();
 
-        document.getElementById("name").value = "";
-        document.getElementById("phone").value = "";
-        document.getElementById("payment").value = "";
-        document.getElementById("delivery").value = "";
         document.getElementById("observation").value = "";
 
         if (responseData && (responseData.qr_code || responseData.pix_copia_e_cola || responseData.checkout_url || responseData.init_point)) {
@@ -1500,10 +1223,10 @@ async function finishOrder(){
             alert("Pedido enviado com sucesso! 🍪\n\nObrigado, " + name + "!");
         }
 
-    }catch(error){
-        console.error("Erro ao enviar pedido:", error);
-        alert("Não foi possível enviar o pedido.\n\nVerifique sua conexão e tente novamente.");
-    }finally{
+    } catch (error) {
+        console.error("Erro no envio:", error);
+        alert("Não foi possível enviar o pedido. Verifique sua conexão e tente novamente.");
+    } finally {
         button.disabled = false;
         button.textContent = "FINALIZAR PEDIDO";
     }
@@ -1513,11 +1236,9 @@ async function finishOrder(){
 renderProducts();
 updateCart();
 updateStoreStatus();
-loadStoreData();
+loadProductsFromSupabase();
+loadPaymentAndDeliveryFromSupabase();
 loadStoreHours();
-setInterval(updateStoreStatus, 60000);
-setInterval(loadStoreHours, 5 * 60 * 1000);
-setInterval(loadStoreData, 5 * 60 * 1000);
 </script>
 
 </body>
