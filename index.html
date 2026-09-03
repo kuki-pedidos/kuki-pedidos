@@ -27,10 +27,10 @@ body{
     font-family:Arial,Helvetica,sans-serif;
     background:var(--cream);
     color:var(--text);
-    padding-bottom:76px;
 }
 
 button,input,textarea,select{font:inherit}
+
 button{cursor:pointer}
 
 header{
@@ -404,6 +404,7 @@ header{
 .finish:hover{background:var(--wine-dark)}
 .finish:disabled{opacity:.6;cursor:wait}
 
+/* Feedback visual ao adicionar produto */
 @keyframes shake{
     0%,100%{transform:translateX(0)}
     20%{transform:translateX(-8px)}
@@ -439,6 +440,33 @@ header{
     transform:translateX(-50%) translateY(0);
 }
 
+@media(max-width:900px){
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:620px){
+    .header{padding:10px 14px}
+    .brand img{width:135px}
+    .cart-top,.history-top{padding:11px 12px;font-size:12px}
+    .header-actions{gap:6px}
+    .hero{padding:32px 15px 14px}
+    .products{padding:10px 15px 55px}
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .photo{height:185px}
+    .photo img{padding:2px}
+    .info{padding:11px}
+    .name{font-size:15px;margin-bottom:6px}
+    .desc{font-size:11px;min-height:48px;margin-bottom:8px}
+    .price{font-size:16px;margin-bottom:10px}
+    .actions{gap:6px;flex-direction:column}
+    .qty{justify-content:center}
+    .qty button{width:34px;height:36px}
+    .add{min-height:38px;font-size:12px}
+    .row{grid-template-columns:1fr}
+    .modal{padding:20px}
+}
+
+/* RODAPÉ FIXO */
 .site-footer{
     position:fixed;
     left:0;
@@ -479,11 +507,16 @@ header{
     font-weight:800;
     text-decoration:none;
 }
-.instagram-link:hover{color:var(--wine)}
+.instagram-link:hover{
+    color:var(--wine);
+}
 .instagram-icon{
     width:24px;
     height:24px;
     flex:0 0 24px;
+}
+body{
+    padding-bottom:76px;
 }
 
 .history-result{
@@ -505,7 +538,9 @@ header{
     padding:14px;
     background:#fff;
 }
-.order-history-head{margin-bottom:10px}
+.order-history-head{
+    margin-bottom:10px;
+}
 .order-history-number{
     color:var(--wine);
     font-weight:900;
@@ -528,6 +563,34 @@ header{
     font-weight:900;
 }
 
+@media(max-width:620px){
+    .site-footer{
+        padding:9px 12px;
+    }
+    .footer-content{
+        gap:10px;
+    }
+    .history-float{
+        padding:13px 14px;
+        font-size:12px;
+        white-space:nowrap;
+    }
+    .instagram-link{
+        font-size:12px;
+        gap:6px;
+        white-space:nowrap;
+    }
+    .instagram-icon{
+        width:21px;
+        height:21px;
+        flex-basis:21px;
+    }
+    body{
+        padding-bottom:70px;
+    }
+}
+
+/* GUARD RAILS DE SEGURANÇA */
 .hp-field{
     position:absolute !important;
     left:-9999px !important;
@@ -537,37 +600,13 @@ header{
     opacity:0 !important;
     pointer-events:none !important;
 }
-
-@media(max-width:900px){
-    .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.security-note{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:8px;
+    line-height:1.35;
 }
 
-@media(max-width:620px){
-    .header{padding:10px 14px}
-    .brand img{width:135px}
-    .cart-top{padding:11px 12px;font-size:12px}
-    .hero{padding:32px 15px 14px}
-    .products{padding:10px 15px 55px}
-    .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    .photo{height:185px}
-    .photo img{padding:2px}
-    .info{padding:11px}
-    .name{font-size:15px;margin-bottom:6px}
-    .desc{font-size:11px;min-height:48px;margin-bottom:8px}
-    .price{font-size:16px;margin-bottom:10px}
-    .actions{gap:6px;flex-direction:column}
-    .qty{justify-content:center}
-    .qty button{width:34px;height:36px}
-    .add{min-height:38px;font-size:12px}
-    .row{grid-template-columns:1fr}
-    .modal{padding:20px}
-    .site-footer{padding:9px 12px}
-    .footer-content{gap:10px}
-    .history-float{padding:13px 14px;font-size:12px;white-space:nowrap}
-    .instagram-link{font-size:12px;gap:6px;white-space:nowrap}
-    .instagram-icon{width:21px;height:21px;flex-basis:21px}
-    body{padding-bottom:70px}
-}
 </style>
 </head>
 
@@ -600,6 +639,7 @@ header{
     <div class="grid" id="products"></div>
 </main>
 
+<!-- RODAPÉ FIXO -->
 <footer class="site-footer">
     <div class="footer-content">
         <a class="instagram-link"
@@ -642,7 +682,7 @@ header{
 
             <div class="group">
                 <label for="phone">WhatsApp *</label>
-                <input id="phone" type="tel" placeholder="(85) 99999-9999" inputmode="tel" autocomplete="tel" oninput="handlePhoneInput(this)">
+                <input id="phone" type="tel" placeholder="(85) 99999-9999" inputmode="tel" autocomplete="tel">
             </div>
 
             <div class="group">
@@ -656,12 +696,30 @@ header{
 
             <div class="group">
                 <label for="payment">Forma de pagamento *</label>
-                <select id="payment">
+                <select id="payment" onchange="togglePaymentOptions()">
                     <option value="">Selecione</option>
                     <option value="PIX">PIX</option>
                     <option value="DINHEIRO">Dinheiro</option>
                     <option value="CARTAO">Cartão</option>
                 </select>
+            </div>
+
+            <!-- OPÇÕES DE CARTÃO -->
+            <div id="cardOptionsGroup" class="group" style="display: none;">
+                <label for="cardType">Tipo de Cartão *</label>
+                <select id="cardType">
+                    <option value="CREDITO">Cartão de Crédito</option>
+                    <option value="DEBITO">Cartão de Débito</option>
+                </select>
+            </div>
+
+            <!-- OPÇÃO PIX COPIA E COLA -->
+            <div id="pixGroup" class="group" style="display: none;">
+                <label for="pixCopy">Chave PIX Copia e Cola</label>
+                <div style="display: flex; gap: 8px;">
+                    <input id="pixCopy" type="text" value="00020126580014BR.GOV.BCB.PIX0136123e4567-e89b-12d3-a456-426614174000520400005303986540510.005802BR5913KUKI COOKIES6009FORTALEZA62070503***6304E2CA" readonly style="font-size: 12px; background: var(--cream-2);">
+                    <button type="button" onclick="copyPix()" style="padding: 0 15px; border-radius: 10px; border: 1px solid var(--border); background: var(--wine); color: #fff; font-weight: 800; white-space: nowrap;">Copiar</button>
+                </div>
             </div>
 
             <div class="group">
@@ -685,16 +743,25 @@ header{
     </div>
 </div>
 
+<!-- MODAL DE PAGAMENTO MERCADO PAGO -->
 <div id="paymentOverlay" class="overlay" onclick="outsidePayment(event)">
     <div class="modal" style="text-align:center;">
         <div class="modalhead">
-            <h2 id="paymentModalTitle">Pagamento</h2>
+            <h2>Pagamento</h2>
             <button class="close" type="button" onclick="closePayment()">×</button>
         </div>
-        <div id="paymentModalContent" style="padding: 10px 0;"></div>
+        <div id="paymentModalContent" style="padding: 10px 0;">
+            <p style="margin-bottom:18px; color:var(--muted); font-size:15px; line-height:1.4;">
+                Seu pedido foi registrado com sucesso! 🍪<br>Clique no botão abaixo para concluir o pagamento no Mercado Pago:
+            </p>
+            <a id="mpPayButton" href="#" target="_blank" class="finish" style="display:inline-block; text-decoration:none; text-align:center; background:#009ee3;">
+                PAGAR COM MERCADO PAGO 💳
+            </a>
+        </div>
     </div>
 </div>
 
+<!-- HISTÓRICO DE PEDIDOS -->
 <div id="historyOverlay" class="overlay" onclick="outsideHistory(event)">
     <div class="modal">
         <div class="modalhead">
@@ -716,85 +783,54 @@ header{
 </div>
 
 <script>
-const WEBHOOK_URL = "https://n8n.rikasolucoes.com.br/webhook/kuki-pedido-site";
-const HISTORY_WEBHOOK_URL = "https://n8n.rikasolucoes.com.br/webhook/kuki-historico-pedidos";
+// EXIBIR / OCULTAR OPÇÕES DE PAGAMENTO DINAMICAMENTE
+function togglePaymentOptions() {
+    const payment = document.getElementById("payment").value;
+    const pixGroup = document.getElementById("pixGroup");
+    const cardGroup = document.getElementById("cardOptionsGroup");
 
-const SUPABASE_URL = "https://delakuvbbayovkpxemgm.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_FqBkrIbKuNSmh78DidDpow_30o7P4kP";
+    if (pixGroup) pixGroup.style.display = (payment === "PIX") ? "block" : "none";
+    if (cardGroup) cardGroup.style.display = (payment === "CARTAO") ? "block" : "none";
+}
 
-let products = [
-    { id: "1", name: "TRADICIONAL", price: 10.90, desc: "Chocolate ao leite e gotas de chocolate", image: "images/tradicional.png", active: true },
-    { id: "2", name: "RED", price: 13.90, desc: "Massa vermelha com muito chocolate branco", image: "images/red.png", active: true },
-    { id: "3", name: "BLACK", price: 13.90, desc: "Massa 100% cacau com chocolate branco e chocolate ao leite", image: "images/black.png", active: true },
-    { id: "4", name: "NUTELLA", price: 15.90, desc: "Massa tradicional com muito recheio de Nutella", image: "images/nutella.png", active: true },
-    { id: "5", name: "BUENO", price: 17.90, desc: "Cookie com recheio cremoso e o delicioso sabor bueno", image: "images/bueno.png", active: true },
-    { id: "6", name: "CREAM", price: 15.90, desc: "Cookie com recheio cremoso e sabor irresistível", image: "images/cream.png", active: true }
-];
+function copyPix() {
+    const pixInput = document.getElementById("pixCopy");
+    if (pixInput) {
+        pixInput.select();
+        pixInput.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(pixInput.value);
+        alert("Chave PIX Copia e Cola copiada para a área de transferência!");
+    }
+}
 
-let cart = {};
+// HORÁRIOS DA LOJA
 let storeHours = null;
 let storeHoursLoaded = false;
 let storeHoursLoading = false;
 
-// --- BUSCA AUTOMÁTICA DE CLIENTE PELO WHATSAPP ---
-let phoneSearchTimeout = null;
-
-function handlePhoneInput(input) {
-    clearTimeout(phoneSearchTimeout);
-    const digits = normalizePhone(input.value);
-
-    // Se já tiver DDD + Número (10 ou 11 dígitos)
-    if (digits.length >= 10 && digits.length <= 11) {
-        phoneSearchTimeout = setTimeout(() => {
-            fetchClientByPhone(digits);
-        }, 500);
-    }
-}
-
-async function fetchClientByPhone(phoneDigits) {
-    try {
-        const phoneFormatted = normalizePhoneForOrder(phoneDigits);
-        const url = new URL(SUPABASE_URL + "/rest/v1/CLIENTES");
-        url.searchParams.set("select", "NOME,nome");
-        url.searchParams.set("or", `WHATSAPP.eq.${phoneFormatted},TELEFONE.eq.${phoneFormatted},whatsapp.eq.${phoneFormatted}`);
-
-        const response = await fetch(url.toString(), {
-            method: "GET",
-            headers: {
-                "Accept": "application/json",
-                "apikey": SUPABASE_ANON_KEY,
-                "Authorization": "Bearer " + SUPABASE_ANON_KEY
-            }
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            if (Array.isArray(data) && data.length > 0) {
-                const clientName = data[0].NOME || data[0].nome;
-                if (clientName) {
-                    const nameField = document.getElementById("name");
-                    if (nameField && !nameField.value.trim()) {
-                        nameField.value = clientName;
-                    }
-                }
-            }
-        }
-    } catch (e) {
-        console.error("Erro ao buscar cadastro de cliente:", e);
-    }
-}
-
-// --- CONTROLE DE HORÁRIOS ---
-const DAY_TO_NAME = { 0:"DOMINGO", 1:"SEGUNDA", 2:"TERÇA", 3:"QUARTA", 4:"QUINTA", 5:"SEXTA", 6:"SÁBADO" };
+const DAY_TO_NAME = {
+    0:"DOMINGO",
+    1:"SEGUNDA",
+    2:"TERÇA",
+    3:"QUARTA",
+    4:"QUINTA",
+    5:"SEXTA",
+    6:"SÁBADO"
+};
 
 function normalizeDayName(value){
-    return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
+    return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .toUpperCase();
 }
 
 function normalizeTime(value){
-    if(!value) return "";
+    if(value === undefined || value === null) return "";
     const match = String(value).match(/^(\d{1,2}):(\d{2})/);
-    return match ? String(match[1]).padStart(2,"0") + ":" + match[2] : "";
+    if(!match) return "";
+    return String(match[1]).padStart(2,"0") + ":" + match[2];
 }
 
 function getMinutes(time){
@@ -804,48 +840,86 @@ function getMinutes(time){
     return hour * 60 + minute;
 }
 
+function isOpenValue(value){
+    return value === true ||
+        value === 1 ||
+        String(value || "").trim().toUpperCase() === "TRUE";
+}
+
+function getHoursRows(data){
+    if(Array.isArray(data)) return data;
+    if(data && Array.isArray(data.horarios)) return data.horarios;
+    if(data && Array.isArray(data.data)) return data.data;
+    if(data && Array.isArray(data.body)) return data.body;
+    return [];
+}
+
+function setStoreHours(data){
+    const rows = getHoursRows(data);
+    const map = {};
+
+    rows.forEach(function(row){
+        const dayName = normalizeDayName(
+            row.DIA_SEMANA ?? row.dia_semana ?? row.dia
+        );
+
+        if(!dayName) return;
+
+        map[dayName] = {
+            aberto:isOpenValue(row.ABERTO ?? row.aberto),
+            abertura:normalizeTime(row.HORA_ABERTURA ?? row.hora_abertura),
+            fechamento:normalizeTime(row.HORA_FECHAMENTO ?? row.hora_fechamento)
+        };
+    });
+
+    storeHours = map;
+    storeHoursLoaded = Object.keys(map).length > 0;
+    return storeHoursLoaded;
+}
+
 async function loadStoreHours(){
     if(storeHoursLoading) return;
+
     storeHoursLoading = true;
+
     try{
         const url = new URL(SUPABASE_URL + "/rest/v1/HORARIOS");
         url.searchParams.set("select", "*");
+
         const response = await fetch(url.toString(),{
             method:"GET",
-            headers:{ "Accept":"application/json", "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY }
+            headers:{
+                "Accept":"application/json",
+                "apikey": SUPABASE_ANON_KEY,
+                "Authorization": "Bearer " + SUPABASE_ANON_KEY
+            }
         });
-        if(response.ok){
-            const rows = await response.json();
-            const map = {};
-            (Array.isArray(rows) ? rows : []).forEach(row => {
-                const dayName = normalizeDayName(row.DIA_SEMANA ?? row.dia_semana ?? row.dia);
-                if(dayName){
-                    map[dayName] = {
-                        aberto: row.ABERTO ?? row.aberto,
-                        abertura: normalizeTime(row.HORA_ABERTURA ?? row.hora_abertura),
-                        fechamento: normalizeTime(row.HORA_FECHAMENTO ?? row.hora_fechamento)
-                    };
-                }
-            });
-            storeHours = map;
-            storeHoursLoaded = true;
+
+        if(!response.ok) throw new Error("HTTP " + response.status);
+
+        const data = await response.json();
+
+        if(!setStoreHours(data)){
+            throw new Error("Nenhum horário válido retornado.");
         }
-    }catch(e){
-        console.error("Erro ao carregar horários:", e);
+    }catch(error){
+        console.error("Erro ao carregar horários da loja:", error);
+        storeHoursLoaded = false;
     }finally{
         storeHoursLoading = false;
         updateStoreStatus();
     }
 }
 
-function updateStoreStatus(){
-    const element = document.getElementById("storeStatus");
-    if(!element) return;
-
+function getStoreState(){
     if(!storeHoursLoaded || !storeHours){
-        element.textContent = "🟢 Faça seu pedido normalmente.";
-        element.className = "store-status open";
-        return;
+        return {
+            open:false,
+            loading:storeHoursLoading,
+            message:storeHoursLoading
+                ? "⏳ Consultando os horários da KUKI..."
+                : "🔴 Não foi possível consultar os horários da loja no momento."
+        };
     }
 
     const now = new Date();
@@ -853,9 +927,17 @@ function updateStoreStatus(){
     const schedule = storeHours[dayName];
 
     if(!schedule || !schedule.aberto){
-        element.textContent = "🔴 Hoje a KUKI está fechada. Voltamos em breve com cookies fresquinhos! 🍪🤎";
-        element.className = "store-status closed";
-        return;
+        return {
+            open:false,
+            message:"🔴 Hoje a KUKI está fechada. Voltamos em breve com cookies fresquinhos! 🍪🤎"
+        };
+    }
+
+    if(!schedule.abertura || !schedule.fechamento){
+        return {
+            open:false,
+            message:"🔴 Os horários de hoje ainda não estão configurados."
+        };
     }
 
     const current = now.getHours() * 60 + now.getMinutes();
@@ -863,13 +945,92 @@ function updateStoreStatus(){
     const closing = getMinutes(schedule.fechamento);
     const isOpen = current >= opening && current < closing;
 
-    element.textContent = isOpen 
-        ? `🟢 Estamos abertos até ${schedule.fechamento} hs` 
-        : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.abertura} hs às ${schedule.fechamento} hs.`;
-    element.className = "store-status " + (isOpen ? "open" : "closed");
+    return {
+        open:isOpen,
+        message:isOpen
+            ? `🟢 Estamos abertos até ${schedule.fechamento} hs`
+            : `🔴 Estamos fechados no momento. Funcionamos hoje das ${schedule.abertura} hs às ${schedule.fechamento} hs.`
+    };
 }
 
-// --- DADOS DO SUPABASE ---
+function updateStoreStatus(){
+    const state = getStoreState();
+    const element = document.getElementById("storeStatus");
+
+    if(!element) return state;
+
+    element.textContent = state.message;
+    element.className = "store-status " + (state.open ? "open" : "closed");
+
+    return state;
+}
+
+const WEBHOOK_URL =
+    "https://n8n.rikasolucoes.com.br/webhook/kuki-pedido-site";
+
+const HISTORY_WEBHOOK_URL =
+    "https://n8n.rikasolucoes.com.br/webhook/kuki-historico-pedidos";
+
+const SUPABASE_URL = "https://delakuvbbayovkpxemgm.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_FqBkrIbKuNSmh78DidDpow_30o7P4kP";
+const CLIENTS_TABLE = "CLIENTES";
+
+let products = [
+    {
+        id: "1",
+        name: "TRADICIONAL",
+        price: 10.90,
+        desc: "Chocolate ao leite e gotas de chocolate",
+        image: "images/tradicional.png",
+        active: true
+    },
+    {
+        id: "2",
+        name: "RED",
+        price: 13.90,
+        desc: "Massa vermelha com muito chocolate branco",
+        image: "images/red.png",
+        active: true
+    },
+    {
+        id: "3",
+        name: "BLACK",
+        price: 13.90,
+        desc: "Massa 100% cacau com chocolate branco e chocolate ao leite",
+        image: "images/black.png",
+        active: true
+    },
+    {
+        id: "4",
+        name: "NUTELLA",
+        price: 15.90,
+        desc: "Massa tradicional com muito recheio de Nutella",
+        image: "images/nutella.png",
+        active: true
+    },
+    {
+        id: "5",
+        name: "BUENO",
+        price: 17.90,
+        desc: "Cookie com recheio cremoso e o delicioso sabor bueno",
+        image: "images/bueno.png",
+        active: true
+    },
+    {
+        id: "6",
+        name: "CREAM",
+        price: 15.90,
+        desc: "Cookie com recheio cremoso e sabor irresistível",
+        image: "images/cream.png",
+        active: true
+    }
+];
+
+function isActiveValue(value){
+    return value === true || value === 1 ||
+        String(value ?? "").trim().toUpperCase() === "TRUE";
+}
+
 function rowValue(row, keys, fallback=""){
     for(const key of keys){
         if(row && row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== ""){
@@ -886,15 +1047,21 @@ async function loadActiveTable(tableName){
 
     const response = await fetch(url.toString(), {
         method:"GET",
-        headers:{ "Accept":"application/json", "apikey":SUPABASE_ANON_KEY, "Authorization":"Bearer " + SUPABASE_ANON_KEY }
+        headers:{
+            "Accept":"application/json",
+            "apikey":SUPABASE_ANON_KEY,
+            "Authorization":"Bearer " + SUPABASE_ANON_KEY
+        }
     });
 
-    if(!response.ok) return [];
+    if(!response.ok) throw new Error(tableName + " HTTP " + response.status);
     const rows = await response.json();
-    return Array.isArray(rows) ? rows.filter(row => {
-        const active = row.ATIVO ?? row.ativo;
-        return active === undefined || active === null || active === true || String(active).toUpperCase() === "TRUE";
-    }) : [];
+    return Array.isArray(rows)
+        ? rows.filter(row => {
+            const active = row.ATIVO ?? row.ativo;
+            return active === undefined || active === null || isActiveValue(active);
+        })
+        : [];
 }
 
 async function loadProductsFromSupabase(){
@@ -902,88 +1069,177 @@ async function loadProductsFromSupabase(){
         const rows = await loadActiveTable("PRODUTOS");
         if(rows.length){
             products = rows.map(row => ({
-                id: String(rowValue(row,["id","ID","CODIGO"], "")),
-                name: String(rowValue(row,["NOME","nome"], "PRODUTO")),
-                price: Number(rowValue(row,["PRECO","preco","VALOR","valor"], 0)) || 0,
-                desc: String(rowValue(row,["DESCRICAO","descricao"], "")),
-                image: String(rowValue(row,["FOTO_URL","foto_url"], "") || ""),
-                active: true
+                id:String(rowValue(row,["id","ID","CODIGO"], "")),
+                name:String(rowValue(row,["NOME","nome"], "PRODUTO")),
+                price:Number(rowValue(row,["PRECO","preco","VALOR","valor"], 0)) || 0,
+                desc:String(rowValue(row,["DESCRICAO","descricao"], "")),
+                image:String(rowValue(row,["FOTO_URL","foto_url"], "") || ""),
+                active:isActiveValue(row.ATIVO ?? row.ativo)
             }));
         }
-    }catch(e){
-        console.error("Erro ao carregar produtos:", e);
+    }catch(error){
+        console.error("Erro ao carregar produtos do Supabase:", error);
+        products = [];
     }
     renderProducts();
 }
 
-function fillSelectOptions(selectId, rows, placeholder){
+function fillSelectOptions(selectId, rows, placeholder, includeValue){
     const select = document.getElementById(selectId);
     if(!select) return;
+
     const current = select.value;
     const options = rows.map(row => {
         const name = String(rowValue(row,["NOME","nome","DESCRICAO","descricao"], "")).trim();
-        return name ? `<option value="${name}">${name}</option>` : "";
+        const value = includeValue
+            ? String(rowValue(row,["NOME","nome","TIPO","tipo"], name)).trim()
+            : name;
+        if(!name) return "";
+        return `<option value="${escapeOption(value)}">${escapeOption(name)}</option>`;
     }).filter(Boolean).join("");
 
     select.innerHTML = `<option value="">${placeholder}</option>` + options;
-    if(current) select.value = current;
+    if(current && [...select.options].some(o => o.value === current)) select.value = current;
+}
+
+function escapeOption(value){
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;");
 }
 
 async function loadPaymentAndDeliveryFromSupabase(){
-    const [payments, deliveries] = await Promise.allSettled([
+    const [paymentsResult, deliveriesResult] = await Promise.allSettled([
         loadActiveTable("FORMAS_PAGAMENTO"),
         loadActiveTable("FORMAS_ENTREGA")
     ]);
-    if(payments.status === "fulfilled" && payments.value.length > 0) fillSelectOptions("payment", payments.value, "Selecione");
-    if(deliveries.status === "fulfilled" && deliveries.value.length > 0) fillSelectOptions("delivery", deliveries.value, "Selecione");
+
+    if(paymentsResult.status === "fulfilled"){
+        fillSelectOptions("payment", paymentsResult.value, "Selecione");
+    }else{
+        console.error("Erro ao carregar formas de pagamento:", paymentsResult.reason);
+        fillSelectOptions("payment", [], "Selecione");
+    }
+
+    if(deliveriesResult.status === "fulfilled"){
+        fillSelectOptions("delivery", deliveriesResult.value, "Selecione");
+    }else{
+        console.error("Erro ao carregar formas de entrega:", deliveriesResult.reason);
+        fillSelectOptions("delivery", [], "Selecione");
+    }
 }
 
-// --- CARRINHO E INTERFACE ---
-function money(val) {
-    return val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+async function loadStoreData(){
+    await Promise.all([
+        loadProductsFromSupabase(),
+        loadPaymentAndDeliveryFromSupabase()
+    ]);
+}
+
+let cart = {};
+
+function money(value) {
+    return value.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    });
 }
 
 function renderProducts() {
-    document.getElementById("products").innerHTML = products.filter(p => p.active).map(product => `
-        <div class="card">
-            <div class="photo"><img src="${product.image}" alt="${product.name}" loading="lazy"></div>
-            <div class="info">
-                <div class="name">${product.name}</div>
-                <div class="desc">${product.desc}</div>
-                <div class="price">${money(product.price)}</div>
-                <div class="actions">
-                    <div class="qty">
-                        <button type="button" onclick="changeQty('${product.id}',-1)">−</button>
-                        <span id="q${product.id}">0</span>
-                        <button type="button" onclick="changeQty('${product.id}',1)">+</button>
+    const activeProducts =
+        products.filter(function(item) {
+            return item.active;
+        });
+
+    document.getElementById("products").innerHTML =
+        activeProducts.map(function(product) {
+            return `
+                <div class="card">
+                    <div class="photo">
+                        <img
+                            src="${product.image}"
+                            alt="${product.name}"
+                            loading="lazy">
                     </div>
-                    <button type="button" class="add" onclick="add('${product.id}')">ADICIONAR</button>
+
+                    <div class="info">
+                        <div class="name">${product.name}</div>
+                        <div class="desc">${product.desc}</div>
+                        <div class="price">${money(product.price)}</div>
+
+                        <div class="actions">
+                            <div class="qty">
+                                <button type="button" onclick="changeQty('${product.id}',-1)">−</button>
+                                <span id="q${product.id}">0</span>
+                                <button type="button" onclick="changeQty('${product.id}',1)">+</button>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="add"
+                                onclick="add('${product.id}')">
+                                ADICIONAR
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    `).join("");
+            `;
+        }).join("");
 }
 
 function changeQty(id, amount) {
-    const el = document.getElementById("q" + id);
-    let val = (parseInt(el.textContent,10) || 0) + amount;
-    el.textContent = val < 0 ? 0 : val;
+    const element = document.getElementById("q" + id);
+    let value = parseInt(element.textContent,10) || 0;
+
+    value += amount;
+
+    if(value < 0) value = 0;
+
+    element.textContent = value;
 }
 
 function add(id) {
-    const quantity = parseInt(document.getElementById("q" + id).textContent, 10) || 0;
-    if(quantity <= 0){ alert("Escolha pelo menos 1 unidade."); return; }
-    const product = products.find(item => item.id === id);
-    if(!product) return;
-    cart[id] = { ...product, quantity };
+    const quantity =
+        parseInt(
+            document.getElementById("q" + id).textContent,
+            10
+        ) || 0;
+
+    if(quantity <= 0){
+        alert("Escolha pelo menos 1 unidade.");
+        return;
+    }
+
+    const product =
+        products.find(function(item){
+            return item.id === id;
+        });
+
+    if(!product){
+        alert("Produto não encontrado.");
+        return;
+    }
+
+    cart[id] = {
+        ...product,
+        quantity: quantity
+    };
+
     updateCart();
     showAddedFeedback(product.name, quantity);
 }
 
 function changeCart(id, amount) {
     if(!cart[id]) return;
+
     cart[id].quantity += amount;
-    if(cart[id].quantity <= 0) delete cart[id];
+
+    if(cart[id].quantity <= 0){
+        delete cart[id];
+    }
+
     updateCart();
 }
 
@@ -993,11 +1249,21 @@ function removeItem(id){
 }
 
 function calculateTotal(){
-    return Object.values(cart).reduce((tot, item) => tot + item.price * item.quantity, 0);
+    return Object.values(cart).reduce(
+        function(total,item){
+            return total + item.price * item.quantity;
+        },
+        0
+    );
 }
 
 function calculateCount(){
-    return Object.values(cart).reduce((tot, item) => tot + item.quantity, 0);
+    return Object.values(cart).reduce(
+        function(total,item){
+            return total + item.quantity;
+        },
+        0
+    );
 }
 
 function updateCart(){
@@ -1005,93 +1271,179 @@ function updateCart(){
     const ids = Object.keys(cart);
 
     if(ids.length === 0){
-        container.innerHTML = '<div class="empty">Seu pedido está vazio.</div>';
+        container.innerHTML =
+            '<div class="empty">Seu pedido está vazio.</div>';
     }else{
-        container.innerHTML = ids.map(id => {
-            const item = cart[id];
-            return `
-                <div class="item">
-                    <div>
-                        <div class="itemname">${item.name}</div>
-                        <div class="itemprice">${item.quantity} x ${money(item.price)} = ${money(item.price * item.quantity)}</div>
+        container.innerHTML =
+            ids.map(function(id){
+                const item = cart[id];
+                const subtotal = item.price * item.quantity;
+
+                return `
+                    <div class="item">
+                        <div>
+                            <div class="itemname">${item.name}</div>
+                            <div class="itemprice">
+                                ${item.quantity} x ${money(item.price)}
+                                = ${money(subtotal)}
+                            </div>
+                        </div>
+
+                        <div class="controls">
+                            <button type="button" onclick="changeCart('${id}',-1)">−</button>
+                            <strong>${item.quantity}</strong>
+                            <button type="button" onclick="changeCart('${id}',1)">+</button>
+                            <button type="button" class="remove" onclick="removeItem('${id}')">🗑</button>
+                        </div>
                     </div>
-                    <div class="controls">
-                        <button type="button" onclick="changeCart('${id}',-1)">−</button>
-                        <strong>${item.quantity}</strong>
-                        <button type="button" onclick="changeCart('${id}',1)">+</button>
-                        <button type="button" class="remove" onclick="removeItem('${id}')">🗑</button>
-                    </div>
-                </div>
-            `;
-        }).join("");
+                `;
+            }).join("");
     }
 
     document.getElementById("total").textContent = money(calculateTotal());
     document.getElementById("topCount").textContent = calculateCount();
+
+    products.forEach(function(product){
+        const quantityElement = document.getElementById("q" + product.id);
+        if(quantityElement){
+            quantityElement.textContent =
+                cart[product.id] ? cart[product.id].quantity : 0;
+        }
+    });
 }
 
 function openCart(){
     document.getElementById("overlay").classList.add("active");
-    const savedPhone = localStorage.getItem("kuki_whatsapp") || "";
-    if(savedPhone && !document.getElementById("phone").value) {
-        document.getElementById("phone").value = savedPhone;
-        fetchClientByPhone(savedPhone);
-    }
     updateCart();
 }
 
-function closeCart(){ document.getElementById("overlay").classList.remove("active"); }
-function outside(e){ if(e.target.id === "overlay") closeCart(); }
+function closeCart(){
+    document.getElementById("overlay").classList.remove("active");
+}
 
-function openPaymentModal(data){
-    const container = document.getElementById("paymentModalContent");
-    const title = document.getElementById("paymentModalTitle");
+function outside(event){
+    if(event.target.id === "overlay"){
+        closeCart();
+    }
+}
 
-    if(data && (data.qr_code || data.pix_copia_e_cola)){
-        const pixCode = data.qr_code || data.pix_copia_e_cola;
-        title.textContent = "Pagamento via PIX";
-        container.innerHTML = `
-            <p style="margin-bottom:12px; color:var(--muted); font-size:15px;">Copie a chave Pix abaixo e pague no app do seu banco:</p>
-            <textarea id="pixCodeInput" readonly style="width:100%; height:90px; padding:10px; border:1px solid var(--border); border-radius:10px; font-size:12px; font-family:monospace; background:#f9e5d1; color:var(--text);">${pixCode}</textarea>
-            <button type="button" class="finish" onclick="copyPixCode()" style="margin-top:14px; background:#167a3f;">COPIAR CHAVE PIX 📋</button>
-        `;
-    } else if(data && (data.checkout_url || data.init_point)){
-        const checkoutUrl = data.checkout_url || data.init_point;
-        title.textContent = "Pagamento";
-        container.innerHTML = `
-            <p style="margin-bottom:18px; color:var(--muted); font-size:15px;">Clique abaixo para concluir o pagamento no Mercado Pago:</p>
-            <a href="${checkoutUrl}" target="_blank" class="finish" style="display:inline-block; text-decoration:none; background:#009ee3;">PAGAR COM MERCADO PAGO 💳</a>
-        `;
+/* FUNÇÕES DA MODAL DE PAGAMENTO */
+function openPayment(checkoutUrl){
+    const mpBtn = document.getElementById("mpPayButton");
+    if(mpBtn){
+        mpBtn.href = checkoutUrl;
     }
     document.getElementById("paymentOverlay").classList.add("active");
 }
 
-function copyPixCode(){
-    const copyText = document.getElementById("pixCodeInput");
-    if(copyText){
-        copyText.select();
-        navigator.clipboard.writeText(copyText.value).then(() => alert("Chave Pix copiada!"));
+function closePayment(){
+    document.getElementById("paymentOverlay").classList.remove("active");
+}
+
+function outsidePayment(event){
+    if(event.target.id === "paymentOverlay"){
+        closePayment();
     }
 }
 
-function closePayment(){ document.getElementById("paymentOverlay").classList.remove("active"); }
-function outsidePayment(e){ if(e.target.id === "paymentOverlay") closePayment(); }
+function normalizePhone(phone){
+    return String(phone || "").replace(/\D/g,"");
+}
+
+function normalizePhoneForOrder(phone){
+    const digits = normalizePhone(phone);
+
+    if(
+        digits.startsWith("55") &&
+        (digits.length === 12 || digits.length === 13)
+    ){
+        return digits.substring(2);
+    }
+
+    return digits;
+}
+
+function isValidPhone(phone){
+    const digits = normalizePhone(phone);
+
+    return (
+        digits.length === 10 ||
+        digits.length === 11 ||
+        (
+            digits.startsWith("55") &&
+            (digits.length === 12 || digits.length === 13)
+        )
+    );
+}
 
 function openHistory(){
     document.getElementById("historyOverlay").classList.add("active");
+    document.getElementById("historyResult").innerHTML = "";
     const savedPhone = localStorage.getItem("kuki_whatsapp") || "";
     if(savedPhone) document.getElementById("historyPhone").value = savedPhone;
 }
-function closeHistory(){ document.getElementById("historyOverlay").classList.remove("active"); }
-function outsideHistory(e){ if(e.target.id === "historyOverlay") closeHistory(); }
+
+function closeHistory(){
+    document.getElementById("historyOverlay").classList.remove("active");
+}
+
+function outsideHistory(event){
+    if(event.target.id === "historyOverlay") closeHistory();
+}
+
+function formatHistoryDate(value){
+    if(!value) return "Data não informada";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString("pt-BR");
+}
+
+function getHistoryOrders(data){
+    if(Array.isArray(data)) return data;
+    if(Array.isArray(data && data.pedidos)) return data.pedidos;
+    if(Array.isArray(data && data.data)) return data.data;
+    if(Array.isArray(data && data.body)) return data.body;
+    return [];
+}
+
+function renderHistory(orders){
+    const container = document.getElementById("historyResult");
+
+    if(!orders.length){
+        container.innerHTML = '<div class="history-empty">Nenhum pedido encontrado para este WhatsApp.</div>';
+        return;
+    }
+
+    container.innerHTML = orders.map(function(order){
+        const total = Number(order.VALOR_TOTAL ?? order.valor_total ?? order.total ?? 0);
+        const number = order.NUMERO_PEDIDO || order.numero_pedido || order.ID || order.id || "Pedido";
+        const date = order.DATA || order.data || order.created_at;
+
+        return `<div class="order-history-card">
+            <div class="order-history-head">
+                <div class="order-history-number">${number}</div>
+            </div>
+            <div class="order-history-info">
+                <div><strong>Data:</strong> ${formatHistoryDate(date)}</div>
+            </div>
+            <div class="order-history-total">Total: ${money(total)}</div>
+        </div>`;
+    }).join("");
+}
 
 async function loadHistory(){
     const input = document.getElementById("historyPhone");
     const result = document.getElementById("historyResult");
-    const phone = normalizePhoneForOrder(input.value);
-
-    if(!isValidPhone(input.value)){ alert("Digite um WhatsApp válido."); return; }
-
+    const button = document.getElementById("searchHistory");
+    const phoneInput = input.value.trim();
+    if(!phoneInput || !isValidPhone(phoneInput)){
+        alert("Digite um WhatsApp válido.");
+        input.focus();
+        return;
+    }
+    const phone = normalizePhoneForOrder(phoneInput);
+    localStorage.setItem("kuki_whatsapp", phone);
+    button.disabled = true;
+    button.textContent = "CONSULTANDO...";
     result.innerHTML = '<div class="history-loading">Buscando seus pedidos...</div>';
     try{
         const response = await fetch(HISTORY_WEBHOOK_URL,{
@@ -1099,52 +1451,288 @@ async function loadHistory(){
             headers:{"Content-Type":"application/json"},
             body:JSON.stringify({telefone:phone, whatsapp:phone})
         });
+        if(!response.ok) throw new Error("HTTP " + response.status);
         const data = await response.json();
-        const orders = Array.isArray(data) ? data : (data.pedidos || data.data || []);
-        
-        if(!orders.length){
-            result.innerHTML = '<div class="history-empty">Nenhum pedido encontrado.</div>';
-            return;
+        renderHistory(getHistoryOrders(data));
+    }catch(error){
+        console.error("Erro ao consultar histórico:", error);
+        result.innerHTML = '<div class="history-empty">Não foi possível consultar os pedidos agora. Tente novamente.</div>';
+    }finally{
+        button.disabled = false;
+        button.textContent = "CONSULTAR PEDIDOS";
+    }
+}
+
+function showAddedFeedback(productName, quantity){
+    const cartButton = document.querySelector(".cart-top");
+    const toast = document.getElementById("cartToast");
+
+    if(cartButton){
+        cartButton.classList.remove("cart-added-shake");
+        void cartButton.offsetWidth;
+        cartButton.classList.add("cart-added-shake");
+    }
+
+    if(toast){
+        const unitText = quantity === 1 ? "unidade" : "unidades";
+        toast.textContent = `🍪 ${quantity} ${unitText} de ${productName} adicionado${quantity === 1 ? "" : "s"} ao carrinho!`;
+        toast.classList.remove("show");
+        void toast.offsetWidth;
+        toast.classList.add("show");
+
+        clearTimeout(window.cartToastTimer);
+        window.cartToastTimer = setTimeout(function(){
+            toast.classList.remove("show");
+        }, 2400);
+    }
+}
+
+let customerLookupTimer = null;
+let lastCustomerLookupPhone = "";
+let customerLookupInProgress = false;
+
+function firstValue(obj, keys){
+    if(!obj || typeof obj !== "object") return "";
+    for(const key of keys){
+        if(obj[key] !== undefined && obj[key] !== null && String(obj[key]).trim() !== ""){
+            return obj[key];
+        }
+    }
+    return "";
+}
+
+function unwrapCustomerLookup(data){
+    if(Array.isArray(data)) return data[0] || null;
+    if(data && Array.isArray(data.data)) return data.data[0] || data;
+    if(data && Array.isArray(data.clientes)) return data.clientes[0] || data;
+    if(data && data.cliente) return data;
+    return data || null;
+}
+
+function fillCustomerData(data){
+    const payload = unwrapCustomerLookup(data);
+    if(!payload || payload.encontrado === false || payload.found === false) return false;
+
+    const customer = payload.cliente && typeof payload.cliente === "object"
+        ? payload.cliente
+        : payload;
+
+    const name = firstValue(customer, ["NOME","nome"]);
+    const observation = firstValue(customer, ["OBSERVACAO_CLIENTE","OBSERVACAO","observacao"]);
+
+    const payment =
+        firstValue(payload, ["ULTIMA_FORMA_PAGAMENTO","ultima_forma_pagamento","FORMA_PAGAMENTO","forma_pagamento","PAGAMENTO","pagamento"]) ||
+        firstValue(customer, ["ULTIMA_FORMA_PAGAMENTO","ultima_forma_pagamento"]);
+
+    if(name) document.getElementById("name").value = name;
+    if(observation) document.getElementById("observation").value = observation;
+
+    if(payment){
+        const paymentSelect = document.getElementById("payment");
+        const normalized = String(payment).trim().toUpperCase();
+        const aliases = {
+            "CARTÃO":"CARTAO",
+            "CARTAO":"CARTAO",
+            "DINHEIRO":"DINHEIRO",
+            "PIX":"PIX"
+        };
+        paymentSelect.value = aliases[normalized] || normalized;
+        togglePaymentOptions();
+    }
+
+    return true;
+}
+
+async function lookupCustomerByPhone(){
+    const phoneInput = document.getElementById("phone");
+    if(!phoneInput) return;
+
+    const rawPhone = phoneInput.value.trim();
+    if(!rawPhone || !isValidPhone(rawPhone)) return;
+
+    const phone = normalizePhoneForOrder(rawPhone);
+    if(customerLookupInProgress || phone === lastCustomerLookupPhone) return;
+
+    customerLookupInProgress = true;
+    phoneInput.classList.add("customer-loading");
+
+    try{
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+
+        const url = new URL(SUPABASE_URL + "/rest/v1/" + CLIENTS_TABLE);
+        url.searchParams.set("select", "*");
+        url.searchParams.set("TELEFONE", "eq." + phone);
+        url.searchParams.set("ATIVO", "eq.true");
+        url.searchParams.set("limit", "1");
+
+        const response = await fetch(url.toString(),{
+            method:"GET",
+            signal:controller.signal,
+            headers:{
+                "apikey": SUPABASE_ANON_KEY,
+                "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+                "Accept": "application/json"
+            }
+        });
+
+        clearTimeout(timeout);
+
+        if(!response.ok) throw new Error("HTTP " + response.status);
+
+        const data = await response.json();
+        const found = fillCustomerData(data);
+
+        lastCustomerLookupPhone = phone;
+
+        if(found){
+            localStorage.setItem("kuki_whatsapp", phone);
+        }
+    }catch(error){
+        console.warn("Não foi possível consultar o cadastro agora:", error);
+    }finally{
+        customerLookupInProgress = false;
+        phoneInput.classList.remove("customer-loading");
+    }
+}
+function scheduleCustomerLookup(){
+    clearTimeout(customerLookupTimer);
+    customerLookupTimer = setTimeout(lookupCustomerByPhone, 700);
+}
+
+const phoneInputElement = document.getElementById("phone");
+if(phoneInputElement){
+    phoneInputElement.addEventListener("input", function(){
+        lastCustomerLookupPhone = "";
+        scheduleCustomerLookup();
+    });
+
+    phoneInputElement.addEventListener("blur", lookupCustomerByPhone);
+}
+
+const SECURITY = {
+    ORDER_COOLDOWN_MS: 8000,
+    MAX_NAME_LENGTH: 80,
+    MAX_TEXT_LENGTH: 300,
+    MAX_CART_QUANTITY_PER_ITEM: 30,
+    MAX_CART_ITEMS: 20,
+    MAX_ORDER_TOTAL: 5000
+};
+
+let lastOrderAttemptAt = 0;
+
+function sanitizeText(value, maxLength){
+    return String(value ?? "")
+        .replace(/[\u0000-\u001F\u007F]/g, " ")
+        .replace(/[<>]/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, maxLength);
+}
+
+function safeNumber(value, fallback = 0){
+    const n = Number(value);
+    return Number.isFinite(n) ? n : fallback;
+}
+
+function isSafeOrder(){
+    const items = Object.values(cart || {});
+
+    if(items.length === 0 || items.length > SECURITY.MAX_CART_ITEMS){
+        return {ok:false, message:"Quantidade de itens inválida."};
+    }
+
+    for(const item of items){
+        const quantity = safeNumber(item.quantity);
+        const price = safeNumber(item.price);
+
+        if(!Number.isInteger(quantity) || quantity < 1 ||
+           quantity > SECURITY.MAX_CART_QUANTITY_PER_ITEM){
+            return {ok:false, message:"Quantidade inválida no carrinho."};
         }
 
-        result.innerHTML = orders.map(o => `
-            <div class="order-history-card">
-                <div class="order-history-number">${o.NUMERO_PEDIDO || o.id || "Pedido"}</div>
-                <div class="order-history-info">Data: ${new Date(o.DATA || o.created_at).toLocaleString("pt-BR")}</div>
-                <div class="order-history-total">Total: ${money(Number(o.VALOR_TOTAL || o.total || 0))}</div>
-            </div>
-        `).join("");
-    }catch(e){
-        result.innerHTML = '<div class="history-empty">Erro ao consultar. Tente novamente.</div>';
+        if(price < 0 || price > SECURITY.MAX_ORDER_TOTAL){
+            return {ok:false, message:"Preço inválido no pedido."};
+        }
     }
-}
 
-function showAddedFeedback(name, quantity){
-    const toast = document.getElementById("cartToast");
-    if(toast){
-        toast.textContent = `🍪 ${quantity}x ${name} adicionado ao carrinho!`;
-        toast.classList.add("show");
-        clearTimeout(window.cartToastTimer);
-        window.cartToastTimer = setTimeout(() => toast.classList.remove("show"), 2400);
+    const total = safeNumber(calculateTotal());
+    if(total <= 0 || total > SECURITY.MAX_ORDER_TOTAL){
+        return {ok:false, message:"Valor total inválido."};
     }
+
+    return {ok:true};
 }
 
-function normalizePhone(phone){ return String(phone || "").replace(/\D/g,""); }
-
-function normalizePhoneForOrder(phone){
-    const digits = normalizePhone(phone);
-    return (digits.startsWith("55") && (digits.length === 12 || digits.length === 13)) ? digits.substring(2) : digits;
-}
-
-function isValidPhone(phone){
-    const digits = normalizePhone(phone);
-    return digits.length >= 8 && digits.length <= 13;
-}
-
-// --- FINALIZAR PEDIDO (ENVIO PARA O N8N) ---
-async function finishOrder(){
+function isBotSubmission(){
     const hp = document.getElementById("website");
-    if(hp && hp.value.trim()) return; // Anti-bot
+    return !!(hp && hp.value.trim());
+}
+
+function makeRequestId(){
+    if(window.crypto && crypto.randomUUID){
+        return crypto.randomUUID();
+    }
+    return "kuki-" + Date.now() + "-" + Math.random().toString(36).slice(2);
+}
+
+function cleanCheckoutFields(){
+    const fields = {
+        name: ["name", SECURITY.MAX_NAME_LENGTH],
+        observation: ["observation", SECURITY.MAX_TEXT_LENGTH]
+    };
+
+    const name = document.getElementById(fields.name[0]);
+    if(name) name.value = sanitizeText(name.value, fields.name[1]);
+
+    const observation = document.getElementById(fields.observation[0]);
+    if(observation) observation.value = sanitizeText(observation.value, fields.observation[1]);
+}
+
+function addInputGuardRails(){
+    const maxMap = {
+        name: SECURITY.MAX_NAME_LENGTH,
+        observation: SECURITY.MAX_TEXT_LENGTH
+    };
+
+    Object.entries(maxMap).forEach(([id, max]) => {
+        const el = document.getElementById(id);
+        if(el){
+            el.setAttribute("maxlength", String(max));
+        }
+    });
+
+    const phone = document.getElementById("phone");
+    if(phone) phone.setAttribute("inputmode", "tel");
+}
+
+addInputGuardRails();
+
+async function finishOrder(){
+    cleanCheckoutFields();
+
+    if(isBotSubmission()){
+        console.warn("Envio bloqueado pelo guard rail anti-bot.");
+        return;
+    }
+
+    const now = Date.now();
+    if(now - lastOrderAttemptAt < SECURITY.ORDER_COOLDOWN_MS){
+        alert("Aguarde alguns segundos antes de enviar novamente.");
+        return;
+    }
+
+    const orderSafety = isSafeOrder();
+    if(!orderSafety.ok){
+        alert(orderSafety.message);
+        return;
+    }
+
+    const storeState = getStoreState();
+    if(!storeState.open){
+        alert("A KUKI está fechada no momento. Não é possível finalizar pedidos agora.");
+        return;
+    }
 
     if(Object.keys(cart).length === 0){
         alert("Adicione pelo menos um produto ao pedido.");
@@ -1153,12 +1741,23 @@ async function finishOrder(){
 
     const name = document.getElementById("name").value.trim();
     const phoneInput = document.getElementById("phone").value.trim();
-    const payment = document.getElementById("payment").value.trim();
+    let payment = document.getElementById("payment").value.trim();
     const delivery = document.getElementById("delivery").value.trim();
     const observation = document.getElementById("observation").value.trim();
 
-    if(!phoneInput || !isValidPhone(phoneInput)){
-        alert("Digite um WhatsApp válido com DDD.");
+    if(payment === "CARTAO"){
+        const cardType = document.getElementById("cardType").value;
+        payment = `CARTAO (${cardType})`;
+    }
+
+    if(!phoneInput){
+        alert("Digite seu WhatsApp.");
+        document.getElementById("phone").focus();
+        return;
+    }
+
+    if(!isValidPhone(phoneInput)){
+        alert("Digite um WhatsApp válido.");
         document.getElementById("phone").focus();
         return;
     }
@@ -1169,76 +1768,120 @@ async function finishOrder(){
         return;
     }
 
-    if(!payment){ alert("Selecione a forma de pagamento."); return; }
-    if(!delivery){ alert("Selecione o tipo de entrega."); return; }
-
     const phone = normalizePhoneForOrder(phoneInput);
 
-    const orderPayload = {
-        request_id: "kuki-" + Date.now(),
+    if(!payment){
+        alert("Selecione a forma de pagamento.");
+        document.getElementById("payment").focus();
+        return;
+    }
+
+    if(!delivery){
+        alert("Selecione o tipo de entrega.");
+        document.getElementById("delivery").focus();
+        return;
+    }
+
+    const order = {
+        request_id: makeRequestId(),
         origem: "SITE_KUKI",
-        cliente: { nome: name, whatsapp: phone },
-        itens: Object.values(cart).map(item => ({
-            produto_id: item.id,
-            produto: item.name,
-            quantidade: item.quantity,
-            preco_unitario: item.price,
-            valor_item: item.price * item.quantity
-        })),
-        pagamento: payment,
-        entrega: delivery,
-        observacao: observation,
-        total: calculateTotal(),
-        data: new Date().toISOString()
+
+        cliente:{
+            nome:name,
+            whatsapp:phone
+        },
+
+        itens:Object.values(cart).map(function(item){
+            return {
+                produto_id:item.id,
+                produto:item.name,
+                quantidade:item.quantity,
+                preco_unitario:item.price,
+                valor_item:item.price * item.quantity
+            };
+        }),
+
+        pagamento:payment,
+        entrega:delivery,
+        observacao:observation,
+        total:calculateTotal(),
+        data:new Date().toISOString()
     };
 
     const button = document.getElementById("finish");
+
+    lastOrderAttemptAt = Date.now();
     button.disabled = true;
     button.textContent = "ENVIANDO PEDIDO...";
 
-    try {
-        const response = await fetch(WEBHOOK_URL, {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(orderPayload)
-        });
+    try{
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
 
-        if (!response.ok) throw new Error("HTTP " + response.status);
+        const response = await fetch(
+            WEBHOOK_URL,
+            {
+                method:"POST",
+                signal:controller.signal,
+                headers:{
+                    "Content-Type":"application/json",
+                    "X-Requested-With":"KUKI-SITE"
+                },
+                body:JSON.stringify(order)
+            }
+        );
+
+        clearTimeout(timeout);
+
+        if(!response.ok){
+            throw new Error("HTTP " + response.status);
+        }
 
         const responseData = await response.json();
         localStorage.setItem("kuki_whatsapp", phone);
 
+        // Limpa o carrinho e fecha a modal principal
         cart = {};
         updateCart();
         closeCart();
 
+        document.getElementById("name").value = "";
+        document.getElementById("phone").value = "";
+        document.getElementById("payment").value = "";
+        document.getElementById("delivery").value = "";
         document.getElementById("observation").value = "";
+        togglePaymentOptions();
 
-        if (responseData && (responseData.qr_code || responseData.pix_copia_e_cola || responseData.checkout_url || responseData.init_point)) {
-            openPaymentModal(responseData);
+        // Se o n8n devolver a URL de checkout do Mercado Pago, abre a popup
+        if (responseData && (responseData.checkout_url || responseData.init_point)) {
+            const payUrl = responseData.checkout_url || responseData.init_point;
+            openPayment(payUrl);
         } else {
             alert("Pedido enviado com sucesso! 🍪\n\nObrigado, " + name + "!");
         }
 
-    } catch (error) {
-        console.error("Erro no envio:", error);
-        alert("Não foi possível enviar o pedido. Verifique sua conexão e tente novamente.");
-    } finally {
+    }catch(error){
+        console.error("Erro ao enviar pedido:",error);
+
+        alert(
+            "Não foi possível enviar o pedido.\n\n" +
+            "Verifique sua conexão e tente novamente."
+        );
+    }finally{
         button.disabled = false;
         button.textContent = "FINALIZAR PEDIDO";
     }
 }
 
-// Inicialização
+// Renderização inicial e sincronização com o Supabase.
 renderProducts();
 updateCart();
 updateStoreStatus();
-loadProductsFromSupabase();
-loadPaymentAndDeliveryFromSupabase();
+loadStoreData();
 loadStoreHours();
+setInterval(updateStoreStatus, 60000);
+setInterval(loadStoreHours, 5 * 60 * 1000);
+setInterval(loadStoreData, 5 * 60 * 1000);
 </script>
 
 </body>
