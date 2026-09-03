@@ -993,6 +993,19 @@ function updateStoreStatus(){
 const WEBHOOK_URL =
     "https://n8n.rikasolucoes.com.br/webhook/kuki-pedido-site";
 
+// Fluxo dedicado do Mercado Pago no n8n — é ele que efetivamente
+// gera o código PIX e o link de pagamento. O webhook geral acima
+// (kuki-pedido-site) não faz essa integração, então PIX e LINK DE
+// PAGAMENTO precisam ser enviados para este endpoint.
+const MP_WEBHOOK_URL =
+    "https://n8n.rikasolucoes.com.br/webhook/kuki/pedidomp";
+
+// Quais formas de pagamento exigem o fluxo do Mercado Pago.
+function paymentNeedsMercadoPago(paymentValue){
+    const normalized = String(paymentValue || "").toUpperCase();
+    return normalized.includes("PIX") || normalized.includes("LINK");
+}
+
 const HISTORY_WEBHOOK_URL =
     "https://n8n.rikasolucoes.com.br/webhook/kuki-historico-pedidos";
 
@@ -1892,13 +1905,22 @@ async function finishOrder(){
     button.disabled = true;
     button.textContent = "ENVIANDO PEDIDO...";
 
+    const useMercadoPago = paymentNeedsMercadoPago(payment);
+    const targetWebhook = useMercadoPago ? MP_WEBHOOK_URL : WEBHOOK_URL;
+
+    console.log(
+        "Enviando pedido para:", targetWebhook,
+        "| forma de pagamento:", payment,
+        "| usa Mercado Pago:", useMercadoPago
+    );
+
     try{
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 15000);
 
         // Envios como application/json garantem o parse estruturado no n8n
         const response = await fetch(
-            WEBHOOK_URL,
+            targetWebhook,
             {
                 method:"POST",
                 signal:controller.signal,
@@ -1937,9 +1959,14 @@ async function finishOrder(){
         document.getElementById("delivery").value = "";
         document.getElementById("observation").value = "";
 
-        // Processa o retorno do PIX ou Link de Pagamento do n8n
-        const pixCode = responseData.pix_copia_cola || responseData.pix_code || responseData.pix;
-        const paymentUrl = responseData.payment_url || responseData.pix_url || responseData.link_pagamento;
+        // Processa o retorno do PIX ou Link de Pagamento do n8n.
+        // Alguns nodes "Respond to Webhook" do n8n devolvem os dados
+        // dentro de uma lista (ex: [{ pix_copia_cola: "..." }]) em vez
+        // de um objeto direto — este trecho cobre os dois formatos.
+        const paymentData = Array.isArray(responseData) ? (responseData[0] || {}) : responseData;
+
+        const pixCode = paymentData.pix_copia_cola || paymentData.pix_code || paymentData.pix;
+        const paymentUrl = paymentData.payment_url || paymentData.pix_url || paymentData.link_pagamento;
 
         showPaymentResult(pixCode, paymentUrl, name);
 
