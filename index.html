@@ -667,14 +667,12 @@ header{box-shadow:0 2px 12px rgba(80,35,20,.04)}
 .finish{min-height:52px;border-radius:13px;box-shadow:0 7px 16px rgba(179,11,46,.2)}
 .finish:hover{transform:translateY(-1px);box-shadow:0 10px 20px rgba(179,11,46,.25)}
 
-.mobile-cart-cta{display:none}
-
 @media(max-width:620px){
     .hero{padding:28px 15px 16px}
     .hero h1{font-size:32px}
     .hero p{font-size:14px}
     .product-search{height:45px;margin-top:17px;border-radius:12px}
-    .products{padding-bottom:145px}
+    .products{padding-bottom:80px}
     .grid{gap:12px}
     .card{border-radius:15px}
     .photo{height:155px}
@@ -683,16 +681,6 @@ header{box-shadow:0 2px 12px rgba(80,35,20,.04)}
     .desc{text-align:left;min-height:44px;line-height:1.35}
     .price{font-size:17px}
     .add{min-height:40px}
-    .mobile-cart-cta{
-        position:fixed;left:12px;right:12px;bottom:78px;z-index:1490;
-        min-height:54px;padding:0 16px;border:0;border-radius:15px;
-        display:flex;align-items:center;justify-content:space-between;
-        background:var(--wine);color:#fff;box-shadow:0 12px 26px rgba(179,11,46,.3);
-        font-size:14px;font-weight:800;
-    }
-    .mobile-cart-cta:active{transform:scale(.99)}
-    .mobile-cart-copy{display:flex;align-items:center;gap:7px}
-    .mobile-cart-cta > span:last-child{font-size:13px;opacity:.96}
     .modal{max-height:92dvh;padding:19px 16px;border-radius:20px 20px 0 0}
     .overlay{align-items:flex-end;padding:0}
     .modalhead{position:sticky;top:-19px;z-index:2;background:var(--white);padding-top:19px}
@@ -760,11 +748,6 @@ header{box-shadow:0 2px 12px rgba(80,35,20,.04)}
         </button>
     </div>
 </footer>
-
-<button class="mobile-cart-cta" id="mobileCartCta" type="button" onclick="openCart()" aria-label="Abrir meu pedido">
-    <span class="mobile-cart-copy">🛒 <strong><span id="mobileCartCount">0</span> item(s)</strong></span>
-    <span id="mobileCartTotal">Ver pedido</span>
-</button>
 
 <div id="overlay" class="overlay" onclick="outside(event)">
     <div class="modal">
@@ -1390,9 +1373,6 @@ function updateCart(){
     const count = calculateCount();
     document.getElementById("total").textContent = money(total);
     document.getElementById("topCount").textContent = count;
-    document.getElementById("mobileCartCount").textContent = count;
-    document.getElementById("mobileCartTotal").textContent = count ? money(total) : "Ver pedido";
-
     updateProductQuantities();
 }
 
