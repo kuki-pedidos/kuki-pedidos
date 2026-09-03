@@ -590,7 +590,6 @@ body{
     }
 }
 
-
 /* GUARD RAILS DE SEGURANÇA */
 .hp-field{
     position:absolute !important;
@@ -639,7 +638,6 @@ body{
 <main class="products">
     <div class="grid" id="products"></div>
 </main>
-
 
 <!-- RODAPÉ FIXO -->
 <footer class="site-footer">
@@ -723,6 +721,24 @@ body{
             <button id="finish" class="finish" type="button" onclick="finishOrder()">
                 FINALIZAR PEDIDO
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE PAGAMENTO MERCADO PAGO -->
+<div id="paymentOverlay" class="overlay" onclick="outsidePayment(event)">
+    <div class="modal" style="text-align:center;">
+        <div class="modalhead">
+            <h2>Pagamento</h2>
+            <button class="close" type="button" onclick="closePayment()">×</button>
+        </div>
+        <div id="paymentModalContent" style="padding: 10px 0;">
+            <p style="margin-bottom:18px; color:var(--muted); font-size:15px; line-height:1.4;">
+                Seu pedido foi registrado com sucesso! 🍪<br>Clique no botão abaixo para concluir o pagamento no Mercado Pago:
+            </p>
+            <a id="mpPayButton" href="#" target="_blank" class="finish" style="display:inline-block; text-decoration:none; text-align:center; background:#009ee3;">
+                PAGAR COM MERCADO PAGO 💳
+            </a>
         </div>
     </div>
 </div>
@@ -1273,6 +1289,25 @@ function outside(event){
     }
 }
 
+/* FUNÇÕES DA MODAL DE PAGAMENTO */
+function openPayment(checkoutUrl){
+    const mpBtn = document.getElementById("mpPayButton");
+    if(mpBtn){
+        mpBtn.href = checkoutUrl;
+    }
+    document.getElementById("paymentOverlay").classList.add("active");
+}
+
+function closePayment(){
+    document.getElementById("paymentOverlay").classList.remove("active");
+}
+
+function outsidePayment(event){
+    if(event.target.id === "paymentOverlay"){
+        closePayment();
+    }
+}
+
 function normalizePhone(phone){
     return String(phone || "").replace(/\D/g,"");
 }
@@ -1758,15 +1793,11 @@ async function finishOrder(){
             throw new Error("HTTP " + response.status);
         }
 
+        const responseData = await response.json();
         localStorage.setItem("kuki_whatsapp", phone);
 
-        alert(
-            "Pedido enviado com sucesso! 🍪\n\n" +
-            "Obrigado, " + name + "!"
-        );
-
+        // Limpa o carrinho e fecha a modal principal
         cart = {};
-
         updateCart();
         closeCart();
 
@@ -1775,6 +1806,14 @@ async function finishOrder(){
         document.getElementById("payment").value = "";
         document.getElementById("delivery").value = "";
         document.getElementById("observation").value = "";
+
+        // Se o n8n devolver a URL de checkout do Mercado Pago, abre a popup
+        if (responseData && (responseData.checkout_url || responseData.init_point)) {
+            const payUrl = responseData.checkout_url || responseData.init_point;
+            openPayment(payUrl);
+        } else {
+            alert("Pedido enviado com sucesso! 🍪\n\nObrigado, " + name + "!");
+        }
 
     }catch(error){
         console.error("Erro ao enviar pedido:",error);
