@@ -404,6 +404,7 @@ header{
 .finish:hover{background:var(--wine-dark)}
 .finish:disabled{opacity:.6;cursor:wait}
 
+/* Feedback visual ao adicionar produto */
 @keyframes shake{
     0%,100%{transform:translateX(0)}
     20%{transform:translateX(-8px)}
@@ -465,6 +466,7 @@ header{
     .modal{padding:20px}
 }
 
+/* RODAPÉ FIXO */
 .site-footer{
     position:fixed;
     left:0;
@@ -588,6 +590,7 @@ body{
     }
 }
 
+/* GUARD RAILS DE SEGURANÇA */
 .hp-field{
     position:absolute !important;
     left:-9999px !important;
@@ -636,6 +639,7 @@ body{
     <div class="grid" id="products"></div>
 </main>
 
+<!-- RODAPÉ FIXO -->
 <footer class="site-footer">
     <div class="footer-content">
         <a class="instagram-link"
@@ -721,23 +725,20 @@ body{
     </div>
 </div>
 
+<!-- MODAL DE PAGAMENTO DINÂMICA (PIX / MERCADO PAGO) -->
 <div id="paymentOverlay" class="overlay" onclick="outsidePayment(event)">
     <div class="modal" style="text-align:center;">
         <div class="modalhead">
-            <h2>Pagamento</h2>
+            <h2 id="paymentModalTitle">Pagamento</h2>
             <button class="close" type="button" onclick="closePayment()">×</button>
         </div>
         <div id="paymentModalContent" style="padding: 10px 0;">
-            <p style="margin-bottom:18px; color:var(--muted); font-size:15px; line-height:1.4;">
-                Seu pedido foi registrado com sucesso! 🍪<br>Clique no botão abaixo para concluir o pagamento no Mercado Pago:
-            </p>
-            <a id="mpPayButton" href="#" target="_blank" class="finish" style="display:inline-block; text-decoration:none; text-align:center; background:#009ee3;">
-                PAGAR COM MERCADO PAGO 💳
-            </a>
+            <!-- Conteúdo injetado via JS -->
         </div>
     </div>
 </div>
 
+<!-- HISTÓRICO DE PEDIDOS -->
 <div id="historyOverlay" class="overlay" onclick="outsideHistory(event)">
     <div class="modal">
         <div class="modalhead">
@@ -759,17 +760,7 @@ body{
 </div>
 
 <script>
-// URL DO WEBHOOK ATUALIZADA CONFORME N8N
-const WEBHOOK_URL =
-    "https://n8n.rikasolucoes.com.br/webhook/kuki/pedidomp";
-
-const HISTORY_WEBHOOK_URL =
-    "https://n8n.rikasolucoes.com.br/webhook/kuki-historico-pedidos";
-
-const SUPABASE_URL = "https://delakuvbbayovkpxemgm.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_FqBkrIbKuNSmh78DidDpow_30o7P4kP";
-const CLIENTS_TABLE = "CLIENTES";
-
+// HORÁRIOS DA LOJA
 let storeHours = null;
 let storeHoursLoaded = false;
 let storeHoursLoading = false;
@@ -930,6 +921,16 @@ function updateStoreStatus(){
 
     return state;
 }
+
+const WEBHOOK_URL =
+    "https://n8n.rikasolucoes.com.br/webhook/kuki-pedido-site";
+
+const HISTORY_WEBHOOK_URL =
+    "https://n8n.rikasolucoes.com.br/webhook/kuki-historico-pedidos";
+
+const SUPABASE_URL = "https://delakuvbbayovkpxemgm.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_FqBkrIbKuNSmh78DidDpow_30o7P4kP";
+const CLIENTS_TABLE = "CLIENTES";
 
 let products = [
     {
@@ -1283,12 +1284,53 @@ function outside(event){
     }
 }
 
-function openPayment(checkoutUrl){
-    const mpBtn = document.getElementById("mpPayButton");
-    if(mpBtn){
-        mpBtn.href = checkoutUrl;
+/* FUNÇÕES DA MODAL DE PAGAMENTO DINÂMICA */
+function openPaymentModal(data){
+    const container = document.getElementById("paymentModalContent");
+    const title = document.getElementById("paymentModalTitle");
+
+    // LÓGICA 1: PAGAMENTO VIA PIX (EXIBE A CHAVE COPIA E COLA)
+    if(data && (data.type === 'pix' || data.qr_code || data.pix_copia_e_cola)){
+        const pixCode = data.qr_code || data.pix_copia_e_cola;
+        title.textContent = "Pagamento via PIX";
+        container.innerHTML = `
+            <p style="margin-bottom:12px; color:var(--muted); font-size:15px; line-height:1.4;">
+                Seu pedido foi registrado! Copie a chave Pix abaixo e pague no aplicativo do seu banco:
+            </p>
+            <textarea id="pixCodeInput" readonly style="width:100%; height:90px; padding:10px; border:1px solid var(--border); border-radius:10px; font-size:12px; font-family:monospace; resize:none; background:#f9e5d1; color:var(--text);">${pixCode}</textarea>
+            <button type="button" class="finish" onclick="copyPixCode()" style="margin-top:14px; background:#167a3f;">
+                COPIAR CHAVE PIX 📋
+            </button>
+        `;
+    } 
+    // LÓGICA 2: CHECKOUT MERCADO PAGO (BOTÃO AZUL DE REDIRECIONAMENTO)
+    else if(data && (data.checkout_url || data.init_point)){
+        const checkoutUrl = data.checkout_url || data.init_point;
+        title.textContent = "Pagamento";
+        container.innerHTML = `
+            <p style="margin-bottom:18px; color:var(--muted); font-size:15px; line-height:1.4;">
+                Seu pedido foi registrado com sucesso! 🍪<br>Clique no botão abaixo para concluir o pagamento no Mercado Pago:
+            </p>
+            <a href="${checkoutUrl}" target="_blank" class="finish" style="display:inline-block; text-decoration:none; text-align:center; background:#009ee3;">
+                PAGAR COM MERCADO PAGO 💳
+            </a>
+        `;
     }
+
     document.getElementById("paymentOverlay").classList.add("active");
+}
+
+function copyPixCode(){
+    const copyText = document.getElementById("pixCodeInput");
+    if(copyText){
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value).then(() => {
+            alert("Chave Pix copiada para a área de transferência!");
+        }).catch(() => {
+            alert("Copie a chave manualmente da caixa de texto.");
+        });
+    }
 }
 
 function closePayment(){
@@ -1549,6 +1591,7 @@ async function lookupCustomerByPhone(){
         phoneInput.classList.remove("customer-loading");
     }
 }
+
 function scheduleCustomerLookup(){
     clearTimeout(customerLookupTimer);
     customerLookupTimer = setTimeout(lookupCustomerByPhone, 700);
@@ -1789,6 +1832,7 @@ async function finishOrder(){
         const responseData = await response.json();
         localStorage.setItem("kuki_whatsapp", phone);
 
+        // Limpa o carrinho e fecha a modal principal
         cart = {};
         updateCart();
         closeCart();
@@ -1799,10 +1843,9 @@ async function finishOrder(){
         document.getElementById("delivery").value = "";
         document.getElementById("observation").value = "";
 
-        // Se o n8n devolver a URL de checkout do Mercado Pago, abre a modal
-        if (responseData && (responseData.checkout_url || responseData.init_point)) {
-            const payUrl = responseData.checkout_url || responseData.init_point;
-            openPayment(payUrl);
+        // Se o n8n devolver Pix ou Checkout Mercado Pago, abre a modal dinamica
+        if (responseData && (responseData.qr_code || responseData.pix_copia_e_cola || responseData.checkout_url || responseData.init_point)) {
+            openPaymentModal(responseData);
         } else {
             alert("Pedido enviado com sucesso! 🍪\n\nObrigado, " + name + "!");
         }
@@ -1820,6 +1863,7 @@ async function finishOrder(){
     }
 }
 
+// Renderização inicial e sincronização com o Supabase.
 renderProducts();
 updateCart();
 updateStoreStatus();
