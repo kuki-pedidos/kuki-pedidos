@@ -404,6 +404,70 @@ header{
 .finish:hover{background:var(--wine-dark)}
 .finish:disabled{opacity:.6;cursor:wait}
 
+/* Modal de pagamento (PIX / Link de pagamento) */
+.payment-box{
+    background:var(--cream-2);
+    border:1px dashed var(--wine);
+    border-radius:14px;
+    padding:16px;
+    margin-top:6px;
+    margin-bottom:16px;
+    text-align:center;
+}
+
+.payment-box .pix-label{
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:8px;
+    font-weight:800;
+}
+
+.payment-code{
+    display:block;
+    width:100%;
+    word-break:break-all;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px;
+    font-size:13px;
+    color:var(--text);
+    margin-bottom:12px;
+    text-align:left;
+}
+
+.payment-btn{
+    display:block;
+    width:100%;
+    border:0;
+    border-radius:12px;
+    padding:15px;
+    background:var(--wine);
+    color:#fff;
+    font-size:15px;
+    font-weight:900;
+    text-align:center;
+    text-decoration:none;
+    margin-bottom:10px;
+}
+
+.payment-btn:hover{background:var(--wine-dark)}
+
+.payment-btn.secondary{
+    background:#fff;
+    color:var(--wine);
+    border:1px solid var(--wine);
+}
+
+.copy-feedback{
+    font-size:12px;
+    color:#167a3f;
+    font-weight:800;
+    margin-top:-4px;
+    margin-bottom:10px;
+    min-height:16px;
+}
+
 /* Feedback visual ao adicionar produto */
 @keyframes shake{
     0%,100%{transform:translateX(0)}
@@ -722,6 +786,23 @@ body{
                 FINALIZAR PEDIDO
             </button>
         </div>
+    </div>
+</div>
+
+<!-- PAGAMENTO (PIX / LINK DE PAGAMENTO) -->
+<div id="paymentOverlay" class="overlay" onclick="outsidePayment(event)">
+    <div class="modal">
+
+        <div class="modalhead">
+            <h2>Pedido confirmado! 🍪</h2>
+            <button class="close" type="button" onclick="closePaymentModal()">×</button>
+        </div>
+
+        <div id="paymentBody"></div>
+
+        <button class="payment-btn secondary" type="button" onclick="closePaymentModal()">
+            Fechar
+        </button>
     </div>
 </div>
 
@@ -1271,6 +1352,83 @@ function outside(event){
     }
 }
 
+let lastPixCode = "";
+
+// Mostra o resultado do pagamento (PIX ou link) numa tela própria,
+// em vez de depender de alert()/prompt()/clipboard, que são
+// pouco confiáveis em navegadores mobile (inclusive in-app, como
+// os abertos de dentro do WhatsApp/Instagram).
+function showPaymentResult(pixCode, paymentUrl, customerName){
+    lastPixCode = pixCode || "";
+    const body = document.getElementById("paymentBody");
+    let html = `<p style="margin-bottom:14px;color:var(--muted)">Obrigado, ${customerName ? escapeOption(customerName) : "cliente"}! Seu pedido foi recebido.</p>`;
+
+    if(paymentUrl){
+        html += `
+            <div class="payment-box">
+                <div class="pix-label">Finalize o pagamento pelo link abaixo:</div>
+                <a class="payment-btn" href="${paymentUrl}" target="_blank" rel="noopener">Ir para o pagamento</a>
+            </div>
+        `;
+    }
+
+    if(pixCode){
+        html += `
+            <div class="payment-box">
+                <div class="pix-label">Código PIX Copia e Cola:</div>
+                <span class="payment-code" id="pixCodeText">${escapeOption(pixCode)}</span>
+                <button class="payment-btn" type="button" onclick="copyPixCode()">Copiar código PIX</button>
+                <div class="copy-feedback" id="copyFeedback"></div>
+            </div>
+        `;
+    }
+
+    if(!paymentUrl && !pixCode){
+        html += `<p style="color:var(--muted)">Em instantes entraremos em contato pelo WhatsApp com os detalhes do pagamento.</p>`;
+    }
+
+    body.innerHTML = html;
+    document.getElementById("paymentOverlay").classList.add("active");
+}
+
+async function copyPixCode(){
+    const feedback = document.getElementById("copyFeedback");
+    try{
+        if(navigator.clipboard && navigator.clipboard.writeText){
+            await navigator.clipboard.writeText(lastPixCode);
+            if(feedback) feedback.textContent = "Código copiado!";
+            return;
+        }
+        throw new Error("Clipboard API indisponível");
+    }catch(error){
+        // Fallback para navegadores/webviews mobile que bloqueiam a Clipboard API
+        try{
+            const temp = document.createElement("textarea");
+            temp.value = lastPixCode;
+            temp.style.position = "fixed";
+            temp.style.opacity = "0";
+            document.body.appendChild(temp);
+            temp.focus();
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+            if(feedback) feedback.textContent = "Código copiado!";
+        }catch(fallbackError){
+            if(feedback) feedback.textContent = "Não foi possível copiar automaticamente. Toque no código acima e copie manualmente.";
+        }
+    }
+}
+
+function closePaymentModal(){
+    document.getElementById("paymentOverlay").classList.remove("active");
+}
+
+function outsidePayment(event){
+    if(event.target.id === "paymentOverlay"){
+        closePaymentModal();
+    }
+}
+
 function normalizePhone(phone){
     return String(phone || "").replace(/\D/g,"");
 }
@@ -1760,28 +1918,16 @@ async function finishOrder(){
         const responseData = await response.json();
         localStorage.setItem("kuki_whatsapp", phone);
 
-        // Processa o retorno do PIX ou Link de Pagamento do n8n
-        const pixCode = responseData.pix_copia_cola || responseData.pix_code || responseData.pix;
-        const paymentUrl = responseData.payment_url || responseData.pix_url || responseData.link_pagamento;
+        // Log de depuração: abra o console do navegador (ou o modo de
+        // depuração remota no celular) para ver exatamente o que o n8n
+        // devolveu em cada forma de pagamento.
+        console.log("Resposta do n8n:", responseData);
 
-        if(paymentUrl){
-            window.location.href = paymentUrl;
-        } else if(pixCode){
-            if(navigator.clipboard && navigator.clipboard.writeText){
-                await navigator.clipboard.writeText(pixCode);
-                alert("Pedido realizado com sucesso! 🍪\n\nO código PIX 'Copia e Cola' foi copiado para a sua área de transferência.");
-            } else {
-                prompt("Pedido realizado com sucesso! 🍪\nCopie o código PIX abaixo:", pixCode);
-            }
-        } else {
-            alert(
-                "Pedido enviado com sucesso! 🍪\n\n" +
-                "Obrigado, " + name + "!"
-            );
-        }
-
+        // O pedido já foi enviado com sucesso a partir daqui — o que
+        // acontece abaixo é só a EXIBIÇÃO do PIX/link, então isso fica
+        // fora do try/catch de rede para não gerar um alerta de "erro
+        // de conexão" falso caso algo falhe só na exibição.
         cart = {};
-
         updateCart();
         closeCart();
 
@@ -1790,6 +1936,12 @@ async function finishOrder(){
         document.getElementById("payment").value = "";
         document.getElementById("delivery").value = "";
         document.getElementById("observation").value = "";
+
+        // Processa o retorno do PIX ou Link de Pagamento do n8n
+        const pixCode = responseData.pix_copia_cola || responseData.pix_code || responseData.pix;
+        const paymentUrl = responseData.payment_url || responseData.pix_url || responseData.link_pagamento;
+
+        showPaymentResult(pixCode, paymentUrl, name);
 
     }catch(error){
         console.error("Erro ao enviar pedido:",error);
