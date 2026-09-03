@@ -404,7 +404,6 @@ header{
 .finish:hover{background:var(--wine-dark)}
 .finish:disabled{opacity:.6;cursor:wait}
 
-/* Feedback visual ao adicionar produto */
 @keyframes shake{
     0%,100%{transform:translateX(0)}
     20%{transform:translateX(-8px)}
@@ -466,7 +465,6 @@ header{
     .modal{padding:20px}
 }
 
-/* RODAPÉ FIXO */
 .site-footer{
     position:fixed;
     left:0;
@@ -590,7 +588,6 @@ body{
     }
 }
 
-/* GUARD RAILS DE SEGURANÇA */
 .hp-field{
     position:absolute !important;
     left:-9999px !important;
@@ -639,7 +636,6 @@ body{
     <div class="grid" id="products"></div>
 </main>
 
-<!-- RODAPÉ FIXO -->
 <footer class="site-footer">
     <div class="footer-content">
         <a class="instagram-link"
@@ -725,7 +721,6 @@ body{
     </div>
 </div>
 
-<!-- MODAL DE PAGAMENTO MERCADO PAGO -->
 <div id="paymentOverlay" class="overlay" onclick="outsidePayment(event)">
     <div class="modal" style="text-align:center;">
         <div class="modalhead">
@@ -743,7 +738,6 @@ body{
     </div>
 </div>
 
-<!-- HISTÓRICO DE PEDIDOS -->
 <div id="historyOverlay" class="overlay" onclick="outsideHistory(event)">
     <div class="modal">
         <div class="modalhead">
@@ -765,7 +759,17 @@ body{
 </div>
 
 <script>
-// HORÁRIOS DA LOJA
+// URL DO WEBHOOK ATUALIZADA CONFORME N8N
+const WEBHOOK_URL =
+    "https://n8n.rikasolucoes.com.br/webhook/kuki/pedidomp";
+
+const HISTORY_WEBHOOK_URL =
+    "https://n8n.rikasolucoes.com.br/webhook/kuki-historico-pedidos";
+
+const SUPABASE_URL = "https://delakuvbbayovkpxemgm.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_FqBkrIbKuNSmh78DidDpow_30o7P4kP";
+const CLIENTS_TABLE = "CLIENTES";
+
 let storeHours = null;
 let storeHoursLoaded = false;
 let storeHoursLoading = false;
@@ -926,16 +930,6 @@ function updateStoreStatus(){
 
     return state;
 }
-
-const WEBHOOK_URL =
-    "https://n8n.rikasolucoes.com.br/webhook/kuki-pedido-site";
-
-const HISTORY_WEBHOOK_URL =
-    "https://n8n.rikasolucoes.com.br/webhook/kuki-historico-pedidos";
-
-const SUPABASE_URL = "https://delakuvbbayovkpxemgm.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_FqBkrIbKuNSmh78DidDpow_30o7P4kP";
-const CLIENTS_TABLE = "CLIENTES";
 
 let products = [
     {
@@ -1289,7 +1283,6 @@ function outside(event){
     }
 }
 
-/* FUNÇÕES DA MODAL DE PAGAMENTO */
 function openPayment(checkoutUrl){
     const mpBtn = document.getElementById("mpPayButton");
     if(mpBtn){
@@ -1796,7 +1789,6 @@ async function finishOrder(){
         const responseData = await response.json();
         localStorage.setItem("kuki_whatsapp", phone);
 
-        // Limpa o carrinho e fecha a modal principal
         cart = {};
         updateCart();
         closeCart();
@@ -1807,7 +1799,7 @@ async function finishOrder(){
         document.getElementById("delivery").value = "";
         document.getElementById("observation").value = "";
 
-        // Se o n8n devolver a URL de checkout do Mercado Pago, abre a popup
+        // Se o n8n devolver a URL de checkout do Mercado Pago, abre a modal
         if (responseData && (responseData.checkout_url || responseData.init_point)) {
             const payUrl = responseData.checkout_url || responseData.init_point;
             openPayment(payUrl);
@@ -1828,7 +1820,6 @@ async function finishOrder(){
     }
 }
 
-// Renderização inicial e sincronização com o Supabase.
 renderProducts();
 updateCart();
 updateStoreStatus();
