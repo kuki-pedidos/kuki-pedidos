@@ -606,7 +606,6 @@ body{
     margin-top:8px;
     line-height:1.35;
 }
-
 </style>
 </head>
 
@@ -696,30 +695,12 @@ body{
 
             <div class="group">
                 <label for="payment">Forma de pagamento *</label>
-                <select id="payment" onchange="togglePaymentOptions()">
+                <select id="payment">
                     <option value="">Selecione</option>
                     <option value="PIX">PIX</option>
                     <option value="DINHEIRO">Dinheiro</option>
                     <option value="CARTAO">Cartão</option>
                 </select>
-            </div>
-
-            <!-- OPÇÕES DE CARTÃO -->
-            <div id="cardOptionsGroup" class="group" style="display: none;">
-                <label for="cardType">Tipo de Cartão *</label>
-                <select id="cardType">
-                    <option value="CREDITO">Cartão de Crédito</option>
-                    <option value="DEBITO">Cartão de Débito</option>
-                </select>
-            </div>
-
-            <!-- OPÇÃO PIX COPIA E COLA -->
-            <div id="pixGroup" class="group" style="display: none;">
-                <label for="pixCopy">Chave PIX Copia e Cola</label>
-                <div style="display: flex; gap: 8px;">
-                    <input id="pixCopy" type="text" value="00020126580014BR.GOV.BCB.PIX0136123e4567-e89b-12d3-a456-426614174000520400005303986540510.005802BR5913KUKI COOKIES6009FORTALEZA62070503***6304E2CA" readonly style="font-size: 12px; background: var(--cream-2);">
-                    <button type="button" onclick="copyPix()" style="padding: 0 15px; border-radius: 10px; border: 1px solid var(--border); background: var(--wine); color: #fff; font-weight: 800; white-space: nowrap;">Copiar</button>
-                </div>
             </div>
 
             <div class="group">
@@ -739,24 +720,6 @@ body{
             <button id="finish" class="finish" type="button" onclick="finishOrder()">
                 FINALIZAR PEDIDO
             </button>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL DE PAGAMENTO MERCADO PAGO -->
-<div id="paymentOverlay" class="overlay" onclick="outsidePayment(event)">
-    <div class="modal" style="text-align:center;">
-        <div class="modalhead">
-            <h2>Pagamento</h2>
-            <button class="close" type="button" onclick="closePayment()">×</button>
-        </div>
-        <div id="paymentModalContent" style="padding: 10px 0;">
-            <p style="margin-bottom:18px; color:var(--muted); font-size:15px; line-height:1.4;">
-                Seu pedido foi registrado com sucesso! 🍪<br>Clique no botão abaixo para concluir o pagamento no Mercado Pago:
-            </p>
-            <a id="mpPayButton" href="#" target="_blank" class="finish" style="display:inline-block; text-decoration:none; text-align:center; background:#009ee3;">
-                PAGAR COM MERCADO PAGO 💳
-            </a>
         </div>
     </div>
 </div>
@@ -783,26 +746,6 @@ body{
 </div>
 
 <script>
-// EXIBIR / OCULTAR OPÇÕES DE PAGAMENTO DINAMICAMENTE
-function togglePaymentOptions() {
-    const payment = document.getElementById("payment").value;
-    const pixGroup = document.getElementById("pixGroup");
-    const cardGroup = document.getElementById("cardOptionsGroup");
-
-    if (pixGroup) pixGroup.style.display = (payment === "PIX") ? "block" : "none";
-    if (cardGroup) cardGroup.style.display = (payment === "CARTAO") ? "block" : "none";
-}
-
-function copyPix() {
-    const pixInput = document.getElementById("pixCopy");
-    if (pixInput) {
-        pixInput.select();
-        pixInput.setSelectionRange(0, 99999);
-        navigator.clipboard.writeText(pixInput.value);
-        alert("Chave PIX Copia e Cola copiada para a área de transferência!");
-    }
-}
-
 // HORÁRIOS DA LOJA
 let storeHours = null;
 let storeHoursLoaded = false;
@@ -1327,25 +1270,6 @@ function outside(event){
     }
 }
 
-/* FUNÇÕES DA MODAL DE PAGAMENTO */
-function openPayment(checkoutUrl){
-    const mpBtn = document.getElementById("mpPayButton");
-    if(mpBtn){
-        mpBtn.href = checkoutUrl;
-    }
-    document.getElementById("paymentOverlay").classList.add("active");
-}
-
-function closePayment(){
-    document.getElementById("paymentOverlay").classList.remove("active");
-}
-
-function outsidePayment(event){
-    if(event.target.id === "paymentOverlay"){
-        closePayment();
-    }
-}
-
 function normalizePhone(phone){
     return String(phone || "").replace(/\D/g,"");
 }
@@ -1537,7 +1461,6 @@ function fillCustomerData(data){
             "PIX":"PIX"
         };
         paymentSelect.value = aliases[normalized] || normalized;
-        togglePaymentOptions();
     }
 
     return true;
@@ -1741,14 +1664,9 @@ async function finishOrder(){
 
     const name = document.getElementById("name").value.trim();
     const phoneInput = document.getElementById("phone").value.trim();
-    let payment = document.getElementById("payment").value.trim();
+    const payment = document.getElementById("payment").value.trim();
     const delivery = document.getElementById("delivery").value.trim();
     const observation = document.getElementById("observation").value.trim();
-
-    if(payment === "CARTAO"){
-        const cardType = document.getElementById("cardType").value;
-        payment = `CARTAO (${cardType})`;
-    }
 
     if(!phoneInput){
         alert("Digite seu WhatsApp.");
@@ -1824,8 +1742,7 @@ async function finishOrder(){
                 method:"POST",
                 signal:controller.signal,
                 headers:{
-                    "Content-Type":"application/json",
-                    "X-Requested-With":"KUKI-SITE"
+                    "Content-Type":"text/plain;charset=utf-8"
                 },
                 body:JSON.stringify(order)
             }
@@ -1834,14 +1751,26 @@ async function finishOrder(){
         clearTimeout(timeout);
 
         if(!response.ok){
-            throw new Error("HTTP " + response.status);
+            throw new Error("HTTP status " + response.status);
         }
 
-        const responseData = await response.json();
+        let responseData = {};
+        const responseText = await response.text();
+        try {
+            responseData = JSON.parse(responseText);
+        } catch (e) {
+            console.log("Resposta do n8n não é um JSON válido, mas o envio foi recebido.");
+        }
+
         localStorage.setItem("kuki_whatsapp", phone);
 
-        // Limpa o carrinho e fecha a modal principal
+        alert(
+            "Pedido enviado com sucesso! 🍪\n\n" +
+            "Obrigado, " + name + "!"
+        );
+
         cart = {};
+
         updateCart();
         closeCart();
 
@@ -1850,15 +1779,6 @@ async function finishOrder(){
         document.getElementById("payment").value = "";
         document.getElementById("delivery").value = "";
         document.getElementById("observation").value = "";
-        togglePaymentOptions();
-
-        // Se o n8n devolver a URL de checkout do Mercado Pago, abre a popup
-        if (responseData && (responseData.checkout_url || responseData.init_point)) {
-            const payUrl = responseData.checkout_url || responseData.init_point;
-            openPayment(payUrl);
-        } else {
-            alert("Pedido enviado com sucesso! 🍪\n\nObrigado, " + name + "!");
-        }
 
     }catch(error){
         console.error("Erro ao enviar pedido:",error);
