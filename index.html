@@ -1371,7 +1371,7 @@ let lastPixCode = "";
 // em vez de depender de alert()/prompt()/clipboard, que são
 // pouco confiáveis em navegadores mobile (inclusive in-app, como
 // os abertos de dentro do WhatsApp/Instagram).
-function showPaymentResult(pixCode, paymentUrl, customerName){
+function showPaymentResult(pixCode, paymentUrl, customerName, pixQrImage){
     lastPixCode = pixCode || "";
     const body = document.getElementById("paymentBody");
     let html = `<p style="margin-bottom:14px;color:var(--muted)">Obrigado, ${customerName ? escapeOption(customerName) : "cliente"}! Seu pedido foi recebido.</p>`;
@@ -1389,6 +1389,7 @@ function showPaymentResult(pixCode, paymentUrl, customerName){
         html += `
             <div class="payment-box">
                 <div class="pix-label">Código PIX Copia e Cola:</div>
+                ${pixQrImage ? `<img src="${pixQrImage}" alt="QR Code PIX" style="max-width:220px;width:100%;margin:0 auto 12px;display:block;border-radius:10px;border:1px solid var(--border)">` : ""}
                 <span class="payment-code" id="pixCodeText">${escapeOption(pixCode)}</span>
                 <button class="payment-btn" type="button" onclick="copyPixCode()">Copiar código PIX</button>
                 <div class="copy-feedback" id="copyFeedback"></div>
@@ -1961,14 +1962,38 @@ async function finishOrder(){
 
         // Processa o retorno do PIX ou Link de Pagamento do n8n.
         // Alguns nodes "Respond to Webhook" do n8n devolvem os dados
-        // dentro de uma lista (ex: [{ pix_copia_cola: "..." }]) em vez
-        // de um objeto direto — este trecho cobre os dois formatos.
+        // dentro de uma lista (ex: [{ ... }]) em vez de um objeto
+        // direto — este trecho cobre os dois formatos.
         const paymentData = Array.isArray(responseData) ? (responseData[0] || {}) : responseData;
 
-        const pixCode = paymentData.pix_copia_cola || paymentData.pix_code || paymentData.pix;
-        const paymentUrl = paymentData.payment_url || paymentData.pix_url || paymentData.link_pagamento;
+        // "init_point" (ou "sandbox_init_point" em ambiente de teste)
+        // é o campo padrão da API do Mercado Pago para o link de
+        // checkout (Preference).
+        const paymentUrl =
+            paymentData.init_point ||
+            paymentData.sandbox_init_point ||
+            paymentData.payment_url ||
+            paymentData.pix_url ||
+            paymentData.link_pagamento;
 
-        showPaymentResult(pixCode, paymentUrl, name);
+        // No pagamento via PIX, a API do Mercado Pago normalmente
+        // devolve o código "copia e cola" dentro de
+        // point_of_interaction.transaction_data.qr_code, e a imagem
+        // do QR Code (em base64) em .qr_code_base64.
+        const transactionData =
+            (paymentData.point_of_interaction && paymentData.point_of_interaction.transaction_data) || {};
+
+        const pixCode =
+            paymentData.pix_copia_cola ||
+            paymentData.pix_code ||
+            paymentData.pix ||
+            transactionData.qr_code;
+
+        const pixQrImage = transactionData.qr_code_base64
+            ? ("data:image/png;base64," + transactionData.qr_code_base64)
+            : null;
+
+        showPaymentResult(pixCode, paymentUrl, name, pixQrImage);
 
     }catch(error){
         console.error("Erro ao enviar pedido:",error);
