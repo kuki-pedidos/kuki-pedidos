@@ -590,6 +590,7 @@ body{
     }
 }
 
+
 /* GUARD RAILS DE SEGURANÇA */
 .hp-field{
     position:absolute !important;
@@ -606,6 +607,7 @@ body{
     margin-top:8px;
     line-height:1.35;
 }
+
 </style>
 </head>
 
@@ -637,6 +639,7 @@ body{
 <main class="products">
     <div class="grid" id="products"></div>
 </main>
+
 
 <!-- RODAPÉ FIXO -->
 <footer class="site-footer">
@@ -1736,6 +1739,7 @@ async function finishOrder(){
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 15000);
 
+        // Ajuste no cabeçalho para evitar o bloqueio de CORS do navegador
         const response = await fetch(
             WEBHOOK_URL,
             {
@@ -1759,7 +1763,7 @@ async function finishOrder(){
         try {
             responseData = JSON.parse(responseText);
         } catch (e) {
-            console.log("Resposta do n8n não é um JSON válido, mas o envio foi recebido.");
+            console.log("Resposta do n8n não é um JSON válido, mas o envio foi recebido com sucesso.");
         }
 
         localStorage.setItem("kuki_whatsapp", phone);
@@ -1781,7 +1785,7 @@ async function finishOrder(){
         document.getElementById("observation").value = "";
 
     }catch(error){
-        console.error("Erro ao enviar pedido:",error);
+        console.error("Erro ao enviar pedido:", error);
 
         alert(
             "Não foi possível enviar o pedido.\n\n" +
