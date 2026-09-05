@@ -127,6 +127,8 @@ header{
     overflow:hidden;
     box-shadow:var(--shadow);
     transition:transform .2s ease,box-shadow .2s ease;
+    display:flex;
+    align-items:stretch;
 }
 
 .card:hover{
@@ -135,13 +137,14 @@ header{
 }
 
 .photo{
-    height:290px;
+    width:120px;
+    flex:0 0 120px;
     background:var(--cream-2);
     display:flex;
     align-items:center;
     justify-content:center;
     overflow:hidden;
-    border-bottom:1px solid var(--border);
+    border-right:1px solid var(--border);
 }
 
 .photo img{
@@ -152,31 +155,30 @@ header{
     display:block;
 }
 
-.info{padding:20px}
+.info{padding:14px 18px;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
 
 .name{
     color:var(--wine);
     font-weight:900;
-    font-size:23px;
+    font-size:19px;
     letter-spacing:.4px;
-    margin-bottom:8px;
-    text-align:center;
+    margin-bottom:4px;
+    text-align:left;
 }
 
 .desc{
     color:var(--muted);
-    min-height:44px;
-    font-size:14px;
-    line-height:1.45;
-    margin-bottom:14px;
-    text-align:center;
+    font-size:13px;
+    line-height:1.4;
+    margin-bottom:8px;
+    text-align:left;
 }
 
 .price{
     color:var(--brown);
-    font-size:24px;
+    font-size:20px;
     font-weight:900;
-    margin-bottom:16px;
+    margin-bottom:10px;
 }
 
 .actions{
@@ -515,14 +517,14 @@ header{
     .header-actions{gap:6px}
     .hero{padding:32px 15px 14px}
     .products{padding:10px 15px 55px}
-    .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    .photo{height:185px}
+    .grid{grid-template-columns:1fr;gap:10px}
+    .photo{width:88px;flex:0 0 88px}
     .photo img{padding:2px}
-    .info{padding:11px}
-    .name{font-size:15px;margin-bottom:6px}
-    .desc{font-size:11px;min-height:48px;margin-bottom:8px}
-    .price{font-size:16px;margin-bottom:10px}
-    .actions{gap:6px;flex-direction:column}
+    .info{padding:10px 12px}
+    .name{font-size:15px;margin-bottom:4px}
+    .desc{font-size:11px;margin-bottom:6px}
+    .price{font-size:16px;margin-bottom:8px}
+    .actions{gap:6px;flex-wrap:wrap}
     .qty{justify-content:center}
     .qty button{width:34px;height:36px}
     .add{min-height:38px;font-size:12px}
@@ -1656,20 +1658,22 @@ async function lookupCustomerByPhone(){
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
 
-        const url = new URL(SUPABASE_URL + "/rest/v1/" + CLIENTS_TABLE);
-        url.searchParams.set("select", "*");
-        url.searchParams.set("TELEFONE", "eq." + phone);
-        url.searchParams.set("ATIVO", "eq.true");
-        url.searchParams.set("limit", "1");
+        // Busca por telefone via função segura (RPC) em vez de ler a tabela
+        // CLIENTES direto — a tabela não é mais legível publicamente, então
+        // essa função retorna só nome/observação do cliente (sem endereço,
+        // telefone de outras pessoas etc).
+        const url = new URL(SUPABASE_URL + "/rest/v1/rpc/buscar_cliente_por_telefone");
 
         const response = await fetch(url.toString(),{
-            method:"GET",
+            method:"POST",
             signal:controller.signal,
             headers:{
                 "apikey": SUPABASE_ANON_KEY,
                 "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-                "Accept": "application/json"
-            }
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ p_telefone: phone })
         });
 
         clearTimeout(timeout);
