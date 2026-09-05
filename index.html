@@ -329,6 +329,58 @@ header{
     color:#a33;
 }
 
+.coupon-group{
+    margin-top:16px;
+    padding-top:16px;
+    border-top:1px dashed var(--border);
+}
+
+.coupon-row{
+    display:flex;
+    gap:8px;
+}
+
+.coupon-row input{
+    flex:1;
+    padding:12px 13px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:#fff;
+    color:var(--text);
+    text-transform:uppercase;
+}
+
+.coupon-apply{
+    border:1px solid var(--wine);
+    background:#fff;
+    color:var(--wine);
+    border-radius:10px;
+    padding:0 16px;
+    font-weight:900;
+    font-size:13px;
+    white-space:nowrap;
+}
+
+.coupon-feedback{
+    margin-top:8px;
+    font-size:12px;
+    font-weight:800;
+}
+
+.coupon-feedback.success{color:#167a3f}
+.coupon-feedback.error{color:#b30b2e}
+
+.coupon-line{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+    color:var(--muted);
+    font-size:14px;
+    font-weight:700;
+}
+
+.coupon-line.discount{color:#167a3f}
+
 .total{
     display:flex;
     justify-content:space-between;
@@ -736,6 +788,24 @@ body{
         </div>
 
         <div id="items" class="items"></div>
+
+        <div class="group coupon-group">
+            <label for="coupon">Cupom de desconto</label>
+            <div class="coupon-row">
+                <input id="coupon" type="text" placeholder="Digite o código" autocomplete="off">
+                <button type="button" class="coupon-apply" onclick="applyCoupon()">Aplicar</button>
+            </div>
+            <div id="couponFeedback" class="coupon-feedback" hidden></div>
+        </div>
+
+        <div id="subtotalLine" class="coupon-line" hidden>
+            <span>Subtotal</span>
+            <span id="subtotalValue">R$ 0,00</span>
+        </div>
+        <div id="discountLine" class="coupon-line discount" hidden>
+            <span>Desconto</span>
+            <span id="discountValue">- R$ 0,00</span>
+        </div>
 
         <div class="total">
             <span>Total</span>
@@ -1179,6 +1249,7 @@ async function loadStoreData(){
 }
 
 let cart = {};
+let appliedCoupon = null;
 
 function money(value) {
     return value.toLocaleString("pt-BR", {
@@ -1306,6 +1377,89 @@ function calculateCount(){
     );
 }
 
+function computeDiscount(subtotal, coupon){
+    if(!coupon) return 0;
+    let discount = 0;
+    if(coupon.tipo_desconto === "PERCENTUAL"){
+        discount = subtotal * (coupon.valor_desconto / 100);
+    }else{
+        discount = coupon.valor_desconto;
+    }
+    if(discount > subtotal) discount = subtotal;
+    if(discount < 0) discount = 0;
+    return discount;
+}
+
+function clearCoupon(){
+    appliedCoupon = null;
+    const couponInput = document.getElementById("coupon");
+    if(couponInput) couponInput.value = "";
+    const feedback = document.getElementById("couponFeedback");
+    if(feedback){
+        feedback.hidden = true;
+        feedback.textContent = "";
+        feedback.className = "coupon-feedback";
+    }
+}
+
+async function applyCoupon(){
+    const input = document.getElementById("coupon");
+    const feedback = document.getElementById("couponFeedback");
+    const code = (input.value || "").trim();
+
+    if(!code){
+        feedback.hidden = false;
+        feedback.className = "coupon-feedback error";
+        feedback.textContent = "Digite um código de cupom.";
+        return;
+    }
+
+    feedback.hidden = false;
+    feedback.className = "coupon-feedback";
+    feedback.textContent = "Verificando cupom...";
+
+    try{
+        const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/rpc/validar_cupom`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "apikey": SUPABASE_ANON_KEY,
+                    "Authorization": "Bearer " + SUPABASE_ANON_KEY
+                },
+                body: JSON.stringify({ p_codigo: code })
+            }
+        );
+
+        const data = await response.json();
+        const result = Array.isArray(data) ? data[0] : data;
+
+        if(!result || !result.valido){
+            appliedCoupon = null;
+            feedback.className = "coupon-feedback error";
+            feedback.textContent = (result && result.mensagem) || "Cupom inválido.";
+            updateCart();
+            return;
+        }
+
+        appliedCoupon = {
+            codigo: code,
+            tipo_desconto: result.tipo_desconto,
+            valor_desconto: Number(result.valor_desconto)
+        };
+
+        feedback.className = "coupon-feedback success";
+        feedback.textContent = "Cupom aplicado com sucesso!";
+        updateCart();
+    }catch(error){
+        appliedCoupon = null;
+        feedback.className = "coupon-feedback error";
+        feedback.textContent = "Não foi possível verificar o cupom. Tente novamente.";
+        updateCart();
+    }
+}
+
 function updateCart(){
     const container = document.getElementById("items");
     const ids = Object.keys(cart);
@@ -1340,7 +1494,24 @@ function updateCart(){
             }).join("");
     }
 
-    document.getElementById("total").textContent = money(calculateTotal());
+    const subtotal = calculateTotal();
+    const discount = computeDiscount(subtotal, appliedCoupon);
+    const finalTotal = subtotal - discount;
+
+    const subtotalLine = document.getElementById("subtotalLine");
+    const discountLine = document.getElementById("discountLine");
+
+    if(appliedCoupon && discount > 0){
+        subtotalLine.hidden = false;
+        discountLine.hidden = false;
+        document.getElementById("subtotalValue").textContent = money(subtotal);
+        document.getElementById("discountValue").textContent = "- " + money(discount);
+    }else{
+        subtotalLine.hidden = true;
+        discountLine.hidden = true;
+    }
+
+    document.getElementById("total").textContent = money(finalTotal);
     document.getElementById("topCount").textContent = calculateCount();
 
     products.forEach(function(product){
@@ -1878,6 +2049,56 @@ async function finishOrder(){
         return;
     }
 
+    const subtotalBeforeDiscount = calculateTotal();
+    let discountApplied = 0;
+    let couponCodeUsed = "";
+
+    if(appliedCoupon){
+        const button = document.getElementById("finish");
+        button.disabled = true;
+        button.textContent = "VALIDANDO CUPOM...";
+
+        try{
+            const redeemResponse = await fetch(
+                `${SUPABASE_URL}/rest/v1/rpc/resgatar_cupom`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "apikey": SUPABASE_ANON_KEY,
+                        "Authorization": "Bearer " + SUPABASE_ANON_KEY
+                    },
+                    body: JSON.stringify({ p_codigo: appliedCoupon.codigo })
+                }
+            );
+
+            const redeemData = await redeemResponse.json();
+            const redeemResult = Array.isArray(redeemData) ? redeemData[0] : redeemData;
+
+            if(!redeemResult || !redeemResult.sucesso){
+                alert((redeemResult && redeemResult.mensagem) || "Não foi possível aplicar o cupom. Tente novamente.");
+                clearCoupon();
+                updateCart();
+                button.disabled = false;
+                button.textContent = "FINALIZAR PEDIDO";
+                return;
+            }
+
+            discountApplied = computeDiscount(subtotalBeforeDiscount, {
+                tipo_desconto: redeemResult.tipo_desconto,
+                valor_desconto: Number(redeemResult.valor_desconto)
+            });
+            couponCodeUsed = appliedCoupon.codigo;
+        }catch(error){
+            alert("Não foi possível validar o cupom. Verifique sua conexão e tente novamente.");
+            button.disabled = false;
+            button.textContent = "FINALIZAR PEDIDO";
+            return;
+        }
+    }
+
+    const finalTotal = subtotalBeforeDiscount - discountApplied;
+
     const order = {
         request_id: makeRequestId(),
         origem: "SITE_KUKI",
@@ -1900,7 +2121,10 @@ async function finishOrder(){
         pagamento:payment,
         entrega:delivery,
         observacao:observation,
-        total:calculateTotal(),
+        total:finalTotal,
+        desconto:discountApplied,
+        valor_total_sem_desconto:subtotalBeforeDiscount,
+        cupom_codigo:couponCodeUsed,
         data:new Date().toISOString()
     };
 
@@ -1963,6 +2187,7 @@ async function finishOrder(){
         document.getElementById("payment").value = "";
         document.getElementById("delivery").value = "";
         document.getElementById("observation").value = "";
+        clearCoupon();
 
         // Processa o retorno do PIX ou Link de Pagamento do n8n.
         // Alguns nodes "Respond to Webhook" do n8n devolvem os dados
