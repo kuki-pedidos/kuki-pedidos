@@ -1656,20 +1656,18 @@ async function lookupCustomerByPhone(){
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
 
-        const url = new URL(SUPABASE_URL + "/rest/v1/" + CLIENTS_TABLE);
-        url.searchParams.set("select", "*");
-        url.searchParams.set("TELEFONE", "eq." + phone);
-        url.searchParams.set("ATIVO", "eq.true");
-        url.searchParams.set("limit", "1");
+       const url = new URL(SUPABASE_URL + "/rest/v1/rpc/buscar_cliente_por_telefone");
 
         const response = await fetch(url.toString(),{
-            method:"GET",
+            method:"POST",
             signal:controller.signal,
             headers:{
                 "apikey": SUPABASE_ANON_KEY,
                 "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-                "Accept": "application/json"
-            }
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ p_telefone: phone })
         });
 
         clearTimeout(timeout);
