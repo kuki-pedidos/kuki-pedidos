@@ -1656,7 +1656,11 @@ async function lookupCustomerByPhone(){
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
 
-       const url = new URL(SUPABASE_URL + "/rest/v1/rpc/buscar_cliente_por_telefone");
+        // Busca por telefone via função segura (RPC) em vez de ler a tabela
+        // CLIENTES direto — a tabela não é mais legível publicamente, então
+        // essa função retorna só nome/observação do cliente (sem endereço,
+        // telefone de outras pessoas etc).
+        const url = new URL(SUPABASE_URL + "/rest/v1/rpc/buscar_cliente_por_telefone");
 
         const response = await fetch(url.toString(),{
             method:"POST",
