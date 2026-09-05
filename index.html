@@ -778,8 +778,8 @@ body{
             </div>
 
             <div class="group">
-                <label for="observation">Observação</label>
-                <textarea id="observation" rows="3" placeholder="Alguma observação?"></textarea>
+                <label for="observation">Observação/Troco</label>
+                <textarea id="observation" rows="3" placeholder="Alguma observação? Ex: troco para R$ 50"></textarea>
             </div>
 
             <button id="finish" class="finish" type="button" onclick="finishOrder()">
@@ -1656,22 +1656,20 @@ async function lookupCustomerByPhone(){
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
 
-        // Busca por telefone via função segura (RPC) em vez de ler a tabela
-        // CLIENTES direto — a tabela não é mais legível publicamente, então
-        // essa função retorna só nome/observação do cliente (sem endereço,
-        // telefone de outras pessoas etc).
-        const url = new URL(SUPABASE_URL + "/rest/v1/rpc/buscar_cliente_por_telefone");
+        const url = new URL(SUPABASE_URL + "/rest/v1/" + CLIENTS_TABLE);
+        url.searchParams.set("select", "*");
+        url.searchParams.set("TELEFONE", "eq." + phone);
+        url.searchParams.set("ATIVO", "eq.true");
+        url.searchParams.set("limit", "1");
 
         const response = await fetch(url.toString(),{
-            method:"POST",
+            method:"GET",
             signal:controller.signal,
             headers:{
                 "apikey": SUPABASE_ANON_KEY,
                 "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ p_telefone: phone })
+                "Accept": "application/json"
+            }
         });
 
         clearTimeout(timeout);
